@@ -204,6 +204,12 @@
           <input class="form-input" id="o-name" placeholder="יוסי ישראלי" />
         </div>
         <div class="form-row">
+          <label class="form-label">טלפון ליצירת קשר *</label>
+          <input class="form-input" id="o-phone" placeholder="050-0000000" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
           <label class="form-label">סוג פרי *</label>
           <select class="form-select" id="o-fruit">
             <option>תפוח 🍎</option><option>תפוז 🍊</option><option selected>לימון 🍋</option>
@@ -336,6 +342,7 @@
         </div>
         <div class="tree-meta">📍 ${tree.address}</div>
         <div class="tree-meta">👤 ${tree.owner_name}</div>
+        ${tree.owner_phone ? `<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ${tree.owner_phone}</div>` : ""}
         ${tree.description ? `<div class="tree-desc">${tree.description}</div>` : ""}
         <div class="tree-footer">
           <div style="display:flex;gap:8px;align-items:center">
@@ -363,6 +370,10 @@
             <button onclick="toggleAvailable('${tree.id}', ${tree.available})"
               style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:'Heebo',sans-serif;font-weight:700">
               ${tree.available ? "✅ זמין" : "❌ לא זמין"}
+            </button>
+            <button onclick="deleteTree('${tree.id}')"
+              style="background:rgba(220,50,50,0.25);color:white;border:1px solid rgba(255,150,150,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:'Heebo',sans-serif;font-weight:700">
+              🗑️ הסר
             </button>
           </div>
         </div>
@@ -424,14 +435,16 @@
 
   async function addTree() {
     const name = document.getElementById("o-name").value.trim();
+    const phone = document.getElementById("o-phone").value.trim();
     const fruit = document.getElementById("o-fruit").value.replace(/ .+/, "");
     const address = document.getElementById("o-address").value.trim();
     const quantity = document.getElementById("o-quantity").value.trim();
     const description = document.getElementById("o-desc").value.trim();
-    if (!name || !address) { showToast("נא למלא שם וכתובת", true); return; }
+    if (!name || !address || !phone) { showToast("נא למלא שם, טלפון וכתובת", true); return; }
     try {
-      await sbFetch("trees", { method: "POST", body: JSON.stringify({ owner_name: name, fruit, address, quantity, description }) });
+      await sbFetch("trees", { method: "POST", body: JSON.stringify({ owner_name: name, owner_phone: phone, fruit, address, quantity, description }) });
       document.getElementById("o-name").value = "";
+      document.getElementById("o-phone").value = "";
       document.getElementById("o-address").value = "";
       document.getElementById("o-quantity").value = "";
       document.getElementById("o-desc").value = "";
@@ -445,6 +458,16 @@
       await sbFetch(`trees?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ available: !current }) });
       await loadTrees();
     } catch(e) { showToast("שגיאה בעדכון", true); }
+  }
+
+  async function deleteTree(id) {
+    if (!confirm("האם למחוק את העץ הזה? כל הבקשות שלו יימחקו גם כן.")) return;
+    try {
+      await sbFetch(`requests?tree_id=eq.${id}`, { method: "DELETE", prefer: "return=minimal" });
+      await sbFetch(`trees?id=eq.${id}`, { method: "DELETE", prefer: "return=minimal" });
+      await loadTrees();
+      showToast("✅ העץ הוסר בהצלחה");
+    } catch(e) { showToast("שגיאה בהסרת העץ", true); }
   }
 
   async function deleteRequest(id) {
