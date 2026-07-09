@@ -8,35 +8,19 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Heebo', sans-serif; direction: rtl; background: #F7F3EC; color: #2C2416; }
-
-    .header {
-      background: #2C6E35; padding: 0 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 64px; position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
+    .header { background: #2C6E35; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
     .header-logo { display: flex; align-items: center; gap: 10px; }
     .header-title { color: #fff; font-size: 20px; font-weight: 800; }
     .header-subtitle { color: rgba(255,255,255,0.7); font-size: 12px; }
     .header-user { display: flex; align-items: center; gap: 10px; }
     .header-user-name { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600; }
     .btn-logout { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Heebo', sans-serif; }
-
     .nav { background: #fff; border-bottom: 2px solid #E8E0D0; display: flex; }
-    .nav-tab {
-      flex: 1; padding: 14px 8px; text-align: center; cursor: pointer;
-      font-size: 14px; font-weight: 600; color: #888; border: none;
-      background: transparent; border-bottom: 3px solid transparent;
-      transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px;
-      font-family: 'Heebo', sans-serif;
-    }
+    .nav-tab { flex: 1; padding: 14px 8px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 600; color: #888; border: none; background: transparent; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: 'Heebo', sans-serif; }
     .nav-tab.active { color: #2C6E35; border-bottom-color: #2C6E35; background: #F7FBF7; }
-
     .main { max-width: 680px; margin: 0 auto; padding: 24px 16px; }
     .page { display: none; }
     .page.active { display: block; }
-
-    /* AUTH PAGE */
     .auth-wrap { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .auth-card { background: #fff; border-radius: 18px; padding: 32px; width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); border: 1.5px solid #EDE6D8; }
     .auth-logo { text-align: center; margin-bottom: 20px; }
@@ -46,12 +30,9 @@
     .auth-tabs { display: flex; background: #F5F0E8; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
     .auth-tab { flex: 1; padding: 8px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: #888; border: none; background: transparent; font-family: 'Heebo', sans-serif; transition: all 0.2s; }
     .auth-tab.active { background: #fff; color: #2C6E35; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-
-    .hero {
-      background: linear-gradient(135deg, #2C6E35 0%, #4A9B56 100%);
-      border-radius: 16px; padding: 28px 24px; margin-bottom: 24px;
-      color: white; position: relative; overflow: hidden;
-    }
+    .remember-row { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px; font-size: 13px; color: #666; }
+    .remember-row input { width: 16px; height: 16px; cursor: pointer; accent-color: #2C6E35; }
+    .hero { background: linear-gradient(135deg, #2C6E35 0%, #4A9B56 100%); border-radius: 16px; padding: 28px 24px; margin-bottom: 24px; color: white; position: relative; overflow: hidden; }
     .hero::after { content: '🌳'; position: absolute; left: 20px; bottom: -10px; font-size: 80px; opacity: 0.15; line-height: 1; }
     .hero h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
     .hero p { font-size: 14px; opacity: 0.85; line-height: 1.6; max-width: 320px; }
@@ -59,14 +40,10 @@
     .hero-stat { text-align: center; }
     .hero-stat-num { font-size: 26px; font-weight: 800; line-height: 1; }
     .hero-stat-label { font-size: 11px; opacity: 0.75; margin-top: 2px; }
-
-    /* FILTER BAR */
     .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
     .filter-select { flex: 1; min-width: 130px; padding: 9px 12px; border-radius: 9px; border: 1.5px solid #DDD8CC; font-size: 13px; font-family: 'Heebo', sans-serif; background: #fff; color: #2C2416; direction: rtl; }
     .filter-select:focus { outline: none; border-color: #2C6E35; }
-
     .section-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-
     .tree-card { background: #fff; border-radius: 14px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; }
     .tree-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .fruit-badge { background: #EEF7EE; color: #2C6E35; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 20px; border: 1px solid #C8E0C8; }
@@ -80,17 +57,13 @@
     .tree-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .qty-tag { font-size: 12px; color: #888; background: #F5F0E8; padding: 3px 10px; border-radius: 20px; }
     .requests-count { font-size: 12px; color: #C07820; font-weight: 600; }
-    .location-tag { font-size: 12px; color: #666; background: #F0EBE0; padding: 3px 9px; border-radius: 20px; }
-
     .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; font-family: 'Heebo', sans-serif; transition: all 0.18s; display: inline-flex; align-items: center; gap: 6px; }
     .btn-primary { background: #2C6E35; color: #fff; }
     .btn-primary:hover { background: #225629; }
-    .btn-primary:disabled { background: #9abf9e; cursor: not-allowed; }
     .btn-secondary { background: #F0EBE0; color: #2C2416; }
     .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
     .btn-danger { background: #FFF0F0; color: #C0392B; border: 1px solid #FFCDD2; }
     .btn-full { width: 100%; justify-content: center; }
-
     .form-card { background: #fff; border-radius: 14px; padding: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; margin-bottom: 20px; }
     .form-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
     .form-row { margin-bottom: 14px; }
@@ -101,7 +74,7 @@
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .price-hint { font-size: 12px; color: #888; margin-top: 4px; }
     .price-hint span { color: #E65100; font-weight: 700; }
-
+    .autofill-note { font-size: 12px; color: #4CAF50; margin-top: 4px; }
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); align-items: center; justify-content: center; z-index: 200; padding: 20px; }
     .modal-overlay.open { display: flex; }
     .modal { background: #fff; border-radius: 18px; padding: 26px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
@@ -109,10 +82,8 @@
     .modal-sub { font-size: 13px; color: #888; margin-bottom: 18px; }
     .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
     .modal-actions .btn { flex: 1; justify-content: center; }
-
     .toast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2C6E35; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 300; white-space: nowrap; }
     .toast.error { background: #C0392B; }
-
     .my-tree-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; }
     .my-tree-header { background: linear-gradient(135deg, #2C6E35, #4A9B56); padding: 14px 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .my-tree-title { font-size: 15px; font-weight: 700; }
@@ -122,16 +93,14 @@
     .request-name { font-weight: 700; font-size: 13px; }
     .request-msg { color: #666; font-size: 13px; margin-top: 2px; }
     .request-phone { color: #2C6E35; font-weight: 600; font-size: 13px; }
-
     .empty { text-align: center; padding: 48px 20px; }
     .empty-icon { font-size: 52px; margin-bottom: 12px; }
     .empty-text { font-size: 15px; font-weight: 600; color: #999; }
     .empty-sub { font-size: 13px; color: #bbb; margin-top: 6px; }
     .loading { text-align: center; padding: 40px; color: #888; font-size: 15px; }
-
     .login-prompt { background: #FFF8E1; border: 1.5px solid #FFE082; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; font-size: 13px; color: #795548; text-align: center; }
     .login-prompt a { color: #2C6E35; font-weight: 700; cursor: pointer; text-decoration: underline; }
-
+    .profile-card { background: #EEF7EE; border: 1.5px solid #C8E0C8; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #2C6E35; display: flex; align-items: center; gap: 8px; }
     @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .filter-bar { flex-direction: column; } }
   </style>
 </head>
@@ -157,6 +126,10 @@
           <label class="form-label">סיסמה</label>
           <input class="form-input" id="login-pass" type="password" placeholder="••••••••" />
         </div>
+        <div class="remember-row">
+          <input type="checkbox" id="remember-me" checked />
+          <label for="remember-me">זכור אותי</label>
+        </div>
         <button class="btn btn-primary btn-full" onclick="doLogin()">התחבר</button>
         <div style="text-align:center;margin-top:14px;font-size:13px;color:#888">
           או <a style="color:#2C6E35;font-weight:700;cursor:pointer" onclick="continueAsGuest()">המשך כאורח (צפייה בלבד)</a>
@@ -166,6 +139,10 @@
         <div class="form-row">
           <label class="form-label">שם מלא</label>
           <input class="form-input" id="signup-name" placeholder="ישראל ישראלי" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">טלפון</label>
+          <input class="form-input" id="signup-phone" placeholder="050-0000000" />
         </div>
         <div class="form-row">
           <label class="form-label">אימייל</label>
@@ -183,7 +160,6 @@
 
 <!-- MAIN APP -->
 <div id="main-app" style="display:none">
-
 <header class="header">
   <div class="header-logo">
     <span style="font-size:26px">🌳</span>
@@ -205,7 +181,6 @@
 </nav>
 
 <main class="main">
-
   <!-- BROWSE -->
   <div id="page-browse" class="page active">
     <div class="hero">
@@ -217,19 +192,11 @@
         <div class="hero-stat"><div class="hero-stat-num" id="stat-total">0</div><div class="hero-stat-label">סה"כ עצים</div></div>
       </div>
     </div>
-
     <div class="filter-bar">
-      <select class="filter-select" id="filter-city" onchange="applyFilters()">
-        <option value="">🏙️ כל הערים</option>
-      </select>
-      <select class="filter-select" id="filter-neighborhood" onchange="applyFilters()">
-        <option value="">🏘️ כל השכונות</option>
-      </select>
-      <select class="filter-select" id="filter-fruit" onchange="applyFilters()">
-        <option value="">🌿 כל הפירות</option>
-      </select>
+      <select class="filter-select" id="filter-city" onchange="applyFilters()"><option value="">🏙️ כל הערים</option></select>
+      <select class="filter-select" id="filter-neighborhood" onchange="applyFilters()"><option value="">🏘️ כל השכונות</option></select>
+      <select class="filter-select" id="filter-fruit" onchange="applyFilters()"><option value="">🌿 כל הפירות</option></select>
     </div>
-
     <div class="section-title"><span>🌿</span> עצים זמינים לקטיף</div>
     <div id="trees-list"><div class="loading">⏳ טוען עצים...</div></div>
   </div>
@@ -241,6 +208,9 @@
       כדי לפרסם עץ יש <a onclick="showAuthPage()">להתחבר או להירשם</a>
     </div>
     <div class="form-card" id="owner-form">
+      <div class="profile-card" id="profile-autofill" style="display:none">
+        ✅ הפרטים שלך מולאו אוטומטית — תוכל לערוך אם צריך
+      </div>
       <div class="form-title">🌳 פרטי העץ</div>
       <div class="form-grid">
         <div class="form-row">
@@ -276,7 +246,7 @@
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">מחיר לק"ג (₪) — אופציונלי</label>
+          <label class="form-label">מחיר לק"ג (₪)</label>
           <input class="form-input" id="o-price" type="number" min="0" step="0.5" placeholder="0 = חינם" />
           <div class="price-hint" id="price-hint"></div>
         </div>
@@ -298,7 +268,6 @@
     <div class="section-title"><span>📋</span> העצים שלי</div>
     <div id="dashboard-list"><div class="loading">⏳ טוען...</div></div>
   </div>
-
 </main>
 </div>
 
@@ -336,26 +305,33 @@
 <script>
   const SUPABASE_URL = "https://obrmyjygitkbaipqdcqb.supabase.co";
   const SUPABASE_KEY = "sb_publishable_UxLyGsF4PlFOIF3OXJgbSg_hh5MA_oM";
+  const FUNCTION_URL = SUPABASE_URL + "/functions/v1/notify-owner";
 
-  // מחירים ממוצעים בחנויות (₪ לק"ג)
-  const STORE_PRICES = {
-    "תפוח": 9, "תפוז": 7, "לימון": 12, "אגס": 11,
-    "ענב": 18, "תאנה": 25, "שזיף": 16, "אבוקדו": 20, "זית": 14, "אחר": 10
-  };
-
-  const FRUIT_EMOJIS = {
-    "תפוח":"🍎","תפוז":"🍊","לימון":"🍋","אגס":"🍐",
-    "ענב":"🍇","תאנה":"🫐","שזיף":"🍑","אבוקדו":"🥑","זית":"🫒","אחר":"🌿"
-  };
+  const STORE_PRICES = { "תפוח":9,"תפוז":7,"לימון":12,"אגס":11,"ענב":18,"תאנה":25,"שזיף":16,"אבוקדו":20,"זית":14,"אחר":10 };
+  const FRUIT_EMOJIS = { "תפוח":"🍎","תפוז":"🍊","לימון":"🍋","אגס":"🍐","ענב":"🍇","תאנה":"🫐","שזיף":"🍑","אבוקדו":"🥑","זית":"🫒","אחר":"🌿" };
 
   let trees = [];
   let currentTreeId = null;
   let currentUser = null;
   let isGuest = false;
 
+  // ===== SAVED SESSION =====
+  function saveSession(user) {
+    localStorage.setItem("prishare_user", JSON.stringify(user));
+  }
+  function loadSession() {
+    try {
+      const saved = localStorage.getItem("prishare_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch(e) { return null; }
+  }
+  function clearSession() {
+    localStorage.removeItem("prishare_user");
+  }
+
   // ===== AUTH =====
   async function sbAuth(path, body) {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/${path}`, {
+    const res = await fetch(SUPABASE_URL + "/auth/v1/" + path, {
       method: "POST",
       headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
       body: JSON.stringify(body)
@@ -375,25 +351,47 @@
   async function doLogin() {
     const email = document.getElementById("login-email").value.trim();
     const pass = document.getElementById("login-pass").value;
+    const remember = document.getElementById("remember-me").checked;
     if (!email || !pass) { showToast("נא למלא אימייל וסיסמה", true); return; }
     try {
       const data = await sbAuth("token?grant_type=password", { email, password: pass });
-      currentUser = { id: data.user.id, email: data.user.email, name: data.user.user_metadata?.name || email.split("@")[0], token: data.access_token };
+      currentUser = {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.user_metadata?.name || email.split("@")[0],
+        phone: data.user.user_metadata?.phone || "",
+        token: data.access_token
+      };
       isGuest = false;
+      if (remember) saveSession(currentUser);
       enterApp();
     } catch(e) { showToast(e.message, true); }
   }
 
   async function doSignup() {
     const name = document.getElementById("signup-name").value.trim();
+    const phone = document.getElementById("signup-phone").value.trim();
     const email = document.getElementById("signup-email").value.trim();
     const pass = document.getElementById("signup-pass").value;
     if (!name || !email || !pass) { showToast("נא למלא את כל השדות", true); return; }
     if (pass.length < 6) { showToast("הסיסמה חייבת להיות לפחות 6 תווים", true); return; }
     try {
-      await sbAuth("signup", { email, password: pass, data: { name } });
-      showToast("✅ נרשמת בהצלחה! אנא אמת את האימייל שלך ואז התחבר");
-      switchAuthTab("login");
+      const data = await sbAuth("signup", { email, password: pass, data: { name, phone } });
+      // אחרי רישום — כנס אוטומטית אם יש token
+      if (data.access_token) {
+        currentUser = { id: data.user.id, email, name, phone, token: data.access_token };
+        isGuest = false;
+        saveSession(currentUser);
+        enterApp();
+        showToast("✅ נרשמת בהצלחה! ברוך הבא");
+      } else {
+        showToast("✅ נרשמת! אמת את האימייל שלך ואז התחבר");
+        // מלא אוטומטי בטופס התחברות
+        document.getElementById("login-email").value = email;
+        switchAuthTab("login");
+        document.querySelectorAll(".auth-tab")[0].classList.add("active");
+        document.querySelectorAll(".auth-tab")[1].classList.remove("active");
+      }
     } catch(e) { showToast(e.message, true); }
   }
 
@@ -407,11 +405,13 @@
     document.getElementById("auth-page").style.display = "none";
     document.getElementById("main-app").style.display = "block";
     document.getElementById("header-username").textContent = isGuest ? "אורח" : currentUser.name;
+    autofillOwnerForm();
     loadTrees();
     updateOwnerForm();
   }
 
   function doLogout() {
+    clearSession();
     currentUser = null;
     isGuest = false;
     document.getElementById("main-app").style.display = "none";
@@ -430,6 +430,16 @@
     else { prompt.style.display = "none"; form.style.display = "block"; }
   }
 
+  // ===== AUTOFILL =====
+  function autofillOwnerForm() {
+    if (!currentUser) return;
+    if (currentUser.name) document.getElementById("o-name").value = currentUser.name;
+    if (currentUser.phone) document.getElementById("o-phone").value = currentUser.phone;
+    if (currentUser.name || currentUser.phone) {
+      document.getElementById("profile-autofill").style.display = "flex";
+    }
+  }
+
   // ===== API =====
   async function sbFetch(path, options = {}) {
     const headers = {
@@ -438,9 +448,8 @@
       "Prefer": options.prefer || "return=representation",
       ...options.headers
     };
-    if (currentUser?.token) headers["Authorization"] = `Bearer ${currentUser.token}`;
-    else headers["Authorization"] = `Bearer ${SUPABASE_KEY}`;
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { ...options, headers });
+    headers["Authorization"] = currentUser?.token ? "Bearer " + currentUser.token : "Bearer " + SUPABASE_KEY;
+    const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, { ...options, headers });
     const text = await res.text();
     return text ? JSON.parse(text) : null;
   }
@@ -466,7 +475,6 @@
     for (const key of Object.keys(FRUIT_EMOJIS)) { if (fruit.includes(key)) return key; }
     return "אחר";
   }
-
   function getFruitEmoji(fruit) { return FRUIT_EMOJIS[getFruitName(fruit)] || "🌿"; }
 
   // ===== FILTERS =====
@@ -475,29 +483,23 @@
     const fruits = [...new Set(trees.map(t => getFruitName(t.fruit)))].sort();
     const cityEl = document.getElementById("filter-city");
     const fruitEl = document.getElementById("filter-fruit");
-    const prevCity = cityEl.value;
-    const prevFruit = fruitEl.value;
-    cityEl.innerHTML = '<option value="">🏙️ כל הערים</option>' + cities.map(c => `<option ${c===prevCity?'selected':''}>${c}</option>`).join("");
-    fruitEl.innerHTML = '<option value="">🌿 כל הפירות</option>' + fruits.map(f => `<option ${f===prevFruit?'selected':''}>${getFruitEmoji(f)} ${f}</option>`).join("");
+    const prevCity = cityEl.value, prevFruit = fruitEl.value;
+    cityEl.innerHTML = '<option value="">🏙️ כל הערים</option>' + cities.map(c => `<option ${c===prevCity?"selected":""}>${c}</option>`).join("");
+    fruitEl.innerHTML = '<option value="">🌿 כל הפירות</option>' + fruits.map(f => `<option ${f===prevFruit?"selected":""}>${getFruitEmoji(f)} ${f}</option>`).join("");
   }
 
   function applyFilters() {
     const city = document.getElementById("filter-city").value;
-    const neighborhood = document.getElementById("filter-neighborhood").value.trim().toLowerCase();
     const fruit = document.getElementById("filter-fruit").value;
-
-    // update neighborhood options
     const cityTrees = city ? trees.filter(t => t.city === city) : trees;
     const neighborhoods = [...new Set(cityTrees.map(t => t.neighborhood).filter(Boolean))].sort();
     const neighEl = document.getElementById("filter-neighborhood");
     const prevNeigh = neighEl.value;
-    neighEl.innerHTML = '<option value="">🏘️ כל השכונות</option>' + neighborhoods.map(n => `<option ${n===prevNeigh?'selected':''}>${n}</option>`).join("");
-
+    neighEl.innerHTML = '<option value="">🏘️ כל השכונות</option>' + neighborhoods.map(n => `<option ${n===prevNeigh?"selected":""}>${n}</option>`).join("");
     let filtered = trees.filter(t => t.available);
     if (city) filtered = filtered.filter(t => t.city === city);
     if (prevNeigh) filtered = filtered.filter(t => t.neighborhood === prevNeigh);
-    if (fruit) filtered = filtered.filter(t => getFruitName(t.fruit) === fruit.replace(/\s*.+/,'').trim());
-
+    if (fruit) filtered = filtered.filter(t => getFruitName(t.fruit) === fruit.replace(/\s*.+/,"").trim());
     renderBrowse(filtered);
   }
 
@@ -506,7 +508,7 @@
     const el = document.getElementById("trees-list");
     if (!list) list = trees.filter(t => t.available);
     if (list.length === 0) {
-      el.innerHTML = `<div class="empty"><div class="empty-icon">🌾</div><div class="empty-text">אין עצים זמינים</div><div class="empty-sub">נסה לשנות את הסינון</div></div>`;
+      el.innerHTML = '<div class="empty"><div class="empty-icon">🌾</div><div class="empty-text">אין עצים זמינים</div><div class="empty-sub">נסה לשנות את הסינון</div></div>';
       return;
     }
     el.innerHTML = list.map(tree => {
@@ -515,98 +517,88 @@
       const treePrice = tree.price_per_kg;
       const isFree = !treePrice || treePrice == 0;
       const saving = isFree ? storePrice : (storePrice - treePrice > 0 ? storePrice - treePrice : 0);
-      return `
-        <div class="tree-card">
-          <div class="tree-card-header">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <span style="font-size:28px">${getFruitEmoji(tree.fruit)}</span>
-              <span class="fruit-badge">${fruitName}</span>
-              ${isFree ? '<span class="price-badge">חינם! 🎁</span>' : `<span class="price-badge">₪${treePrice}/ק"ג</span>`}
-              ${saving > 0 ? `<span class="saving-badge">חיסכון ₪${saving} מחנות</span>` : ""}
-            </div>
-            <div class="available-row">
-              <div class="available-dot"></div>
-              <span style="font-size:12px;color:#4CAF50;font-weight:600">זמין</span>
-            </div>
-          </div>
-          ${tree.city || tree.neighborhood ? `<div class="tree-meta">🏘️ ${[tree.neighborhood, tree.city].filter(Boolean).join(", ")}</div>` : ""}
-          <div class="tree-meta">📍 ${tree.address}</div>
-          <div class="tree-meta">👤 ${tree.owner_name}</div>
-          ${tree.owner_phone ? `<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ${tree.owner_phone}</div>` : ""}
-          ${tree.description ? `<div class="tree-desc">${tree.description}</div>` : ""}
-          <div class="tree-footer">
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-              ${tree.quantity ? `<span class="qty-tag">כמות: ${tree.quantity}</span>` : ""}
-              ${!isFree ? `<span class="store-price">מחנות: ₪${storePrice}/ק"ג</span>` : ""}
-              ${tree.requests?.length ? `<span class="requests-count">⏳ ${tree.requests.length} בקשות</span>` : ""}
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="openModal('${tree.id}')">🌿 בקש לקטוף</button>
-          </div>
-        </div>`;
+      return '<div class="tree-card">' +
+        '<div class="tree-card-header">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+            '<span style="font-size:28px">' + getFruitEmoji(tree.fruit) + '</span>' +
+            '<span class="fruit-badge">' + fruitName + '</span>' +
+            (isFree ? '<span class="price-badge">חינם! 🎁</span>' : '<span class="price-badge">₪' + treePrice + '/ק"ג</span>') +
+            (saving > 0 ? '<span class="saving-badge">חיסכון ₪' + saving + ' מחנות</span>' : '') +
+          '</div>' +
+          '<div class="available-row"><div class="available-dot"></div><span style="font-size:12px;color:#4CAF50;font-weight:600">זמין</span></div>' +
+        '</div>' +
+        ((tree.city || tree.neighborhood) ? '<div class="tree-meta">🏘️ ' + [tree.neighborhood, tree.city].filter(Boolean).join(", ") + '</div>' : '') +
+        '<div class="tree-meta">📍 ' + tree.address + '</div>' +
+        '<div class="tree-meta">👤 ' + tree.owner_name + '</div>' +
+        (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ' + tree.owner_phone + '</div>' : '') +
+        (tree.description ? '<div class="tree-desc">' + tree.description + '</div>' : '') +
+        '<div class="tree-footer">' +
+          '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
+            (tree.quantity ? '<span class="qty-tag">כמות: ' + tree.quantity + '</span>' : '') +
+            (!isFree ? '<span class="store-price">מחנות: ₪' + storePrice + '/ק"ג</span>' : '') +
+            (tree.requests && tree.requests.length ? '<span class="requests-count">⏳ ' + tree.requests.length + ' בקשות</span>' : '') +
+          '</div>' +
+          '<button class="btn btn-primary btn-sm" onclick="openModal(\'' + tree.id + '\')">🌿 בקש לקטוף</button>' +
+        '</div></div>';
     }).join("");
   }
 
   function renderDashboard() {
     const el = document.getElementById("dashboard-list");
     if (isGuest) {
-      el.innerHTML = `<div class="empty"><div class="empty-icon">🔐</div><div class="empty-text">יש להתחבר כדי לנהל עצים</div><div class="empty-sub"><a style="color:#2C6E35;font-weight:700;cursor:pointer" onclick="showAuthPage()">התחבר כאן</a></div></div>`;
+      el.innerHTML = '<div class="empty"><div class="empty-icon">🔐</div><div class="empty-text">יש להתחבר כדי לנהל עצים</div><div class="empty-sub"><a style="color:#2C6E35;font-weight:700;cursor:pointer" onclick="showAuthPage()">התחבר כאן</a></div></div>';
       return;
     }
-    const myTrees = trees.filter(t => t.user_id === currentUser?.id);
+    const myTrees = trees.filter(t => t.user_id === currentUser.id);
     if (myTrees.length === 0) {
-      el.innerHTML = `<div class="empty"><div class="empty-icon">🌱</div><div class="empty-text">עדיין לא פרסמת עצים</div><div class="empty-sub">עבור ל"הוסף עץ"</div></div>`;
+      el.innerHTML = '<div class="empty"><div class="empty-icon">🌱</div><div class="empty-text">עדיין לא פרסמת עצים</div><div class="empty-sub">עבור ל"הוסף עץ"</div></div>';
       return;
     }
-    el.innerHTML = myTrees.map(tree => `
-      <div class="my-tree-card">
-        <div class="my-tree-header">
-          <div class="my-tree-title">${getFruitEmoji(tree.fruit)} ${getFruitName(tree.fruit)} — ${tree.address}</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            ${tree.requests?.length ? `<span class="request-badge">${tree.requests.length} בקשות</span>` : ""}
-            <button onclick="toggleAvailable('${tree.id}', ${tree.available})"
-              style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:'Heebo',sans-serif;font-weight:700">
-              ${tree.available ? "✅ זמין" : "❌ לא זמין"}
-            </button>
-            <button onclick="deleteTree('${tree.id}')"
-              style="background:rgba(220,50,50,0.25);color:white;border:1px solid rgba(255,150,150,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:'Heebo',sans-serif;font-weight:700">
-              🗑️ הסר
-            </button>
-          </div>
-        </div>
-        <div class="my-tree-body">
-          <div style="font-size:13px;color:#666;margin-bottom:10px">
-            👤 ${tree.owner_name} ${tree.quantity ? "· "+tree.quantity : ""}
-            ${tree.price_per_kg ? `· ₪${tree.price_per_kg}/ק"ג` : "· חינם"}
-          </div>
-          ${!tree.requests?.length
-            ? `<div style="font-size:13px;color:#bbb;padding:8px 0">עדיין אין בקשות קטיף</div>`
-            : tree.requests.map(req => `
-              <div class="request-item">
-                <div>
-                  <div class="request-name">🌿 ${req.requester_name}</div>
-                  ${req.message ? `<div class="request-msg">"${req.message}"</div>` : ""}
-                  <div class="request-phone">📞 ${req.phone}</div>
-                </div>
-                <button class="btn btn-danger btn-sm" onclick="deleteRequest('${req.id}')">סגור</button>
-              </div>`).join("")
-          }
-        </div>
-      </div>
-    `).join("");
+    el.innerHTML = myTrees.map(tree =>
+      '<div class="my-tree-card">' +
+        '<div class="my-tree-header">' +
+          '<div class="my-tree-title">' + getFruitEmoji(tree.fruit) + ' ' + getFruitName(tree.fruit) + ' — ' + tree.address + '</div>' +
+          '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+            (tree.requests && tree.requests.length ? '<span class="request-badge">' + tree.requests.length + ' בקשות</span>' : '') +
+            '<button onclick="toggleAvailable(\'' + tree.id + '\',' + tree.available + ')" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:Heebo,sans-serif;font-weight:700">' +
+              (tree.available ? "✅ זמין" : "❌ לא זמין") +
+            '</button>' +
+            '<button onclick="deleteTree(\'' + tree.id + '\')" style="background:rgba(220,50,50,0.25);color:white;border:1px solid rgba(255,150,150,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:Heebo,sans-serif;font-weight:700">🗑️ הסר</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="my-tree-body">' +
+          '<div style="font-size:13px;color:#666;margin-bottom:10px">👤 ' + tree.owner_name + (tree.quantity ? " · " + tree.quantity : "") + (tree.price_per_kg ? ' · ₪' + tree.price_per_kg + '/ק"ג' : " · חינם") + '</div>' +
+          (!(tree.requests && tree.requests.length)
+            ? '<div style="font-size:13px;color:#bbb;padding:8px 0">עדיין אין בקשות קטיף</div>'
+            : tree.requests.map(req =>
+                '<div class="request-item">' +
+                  '<div>' +
+                    '<div class="request-name">🌿 ' + req.requester_name + '</div>' +
+                    (req.message ? '<div class="request-msg">"' + req.message + '"</div>' : '') +
+                    '<div class="request-phone">📞 ' + req.phone + '</div>' +
+                  '</div>' +
+                  '<button class="btn btn-danger btn-sm" onclick="deleteRequest(\'' + req.id + '\')">סגור</button>' +
+                '</div>'
+              ).join("")
+          ) +
+        '</div>' +
+      '</div>'
+    ).join("");
   }
 
   // ===== ACTIONS =====
   function showTab(name, el) {
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
-    document.getElementById("page-"+name).classList.add("active");
+    document.getElementById("page-" + name).classList.add("active");
     el.classList.add("active");
+    if (name === "owner") autofillOwnerForm();
   }
 
   function updatePriceHint() {
-    const fruit = document.getElementById("o-fruit").value.replace(/ .+/,"");
+    const fruit = document.getElementById("o-fruit").value.replace(/ .+/, "");
     const store = STORE_PRICES[fruit] || 10;
-    document.getElementById("price-hint").innerHTML = `מחיר ממוצע בחנויות: <span>₪${store}/ק"ג</span> — הזן 0 לחינם`;
+    document.getElementById("price-hint").innerHTML = 'מחיר ממוצע בחנויות: <span>₪' + store + '/ק"ג</span> — הזן 0 לחינם';
   }
 
   function openModal(treeId) {
@@ -615,18 +607,24 @@
     const fruitName = getFruitName(tree.fruit);
     const storePrice = STORE_PRICES[fruitName] || 10;
     document.getElementById("modal-title").textContent = getFruitEmoji(tree.fruit) + " בקשת קטיף";
-    document.getElementById("modal-sub").textContent = `${fruitName} אצל ${tree.owner_name} · ${tree.address}`;
+    document.getElementById("modal-sub").textContent = fruitName + " אצל " + tree.owner_name + " · " + tree.address;
     const priceInfo = document.getElementById("modal-price-info");
     if (tree.price_per_kg != null) {
       const isFree = tree.price_per_kg == 0;
-      document.getElementById("modal-price-badge").textContent = isFree ? "חינם! 🎁" : `₪${tree.price_per_kg}/ק"ג`;
-      document.getElementById("modal-store-price").textContent = `מחנות: ₪${storePrice}/ק"ג`;
+      document.getElementById("modal-price-badge").textContent = isFree ? "חינם! 🎁" : "₪" + tree.price_per_kg + '/ק"ג';
+      document.getElementById("modal-store-price").textContent = "מחנות: ₪" + storePrice + '/ק"ג';
       const saving = isFree ? storePrice : Math.max(0, storePrice - tree.price_per_kg);
-      document.getElementById("modal-saving").textContent = saving > 0 ? `חיסכון ₪${saving}!` : "";
+      document.getElementById("modal-saving").textContent = saving > 0 ? "חיסכון ₪" + saving + "!" : "";
       priceInfo.style.display = "block";
     } else { priceInfo.style.display = "none"; }
-    document.getElementById("r-name").value = "";
-    document.getElementById("r-phone").value = "";
+    // מלא אוטומטי פרטי המשתמש אם מחובר
+    if (currentUser && !isGuest) {
+      document.getElementById("r-name").value = currentUser.name || "";
+      document.getElementById("r-phone").value = currentUser.phone || "";
+    } else {
+      document.getElementById("r-name").value = "";
+      document.getElementById("r-phone").value = "";
+    }
     document.getElementById("r-msg").value = "";
     document.getElementById("modal").classList.add("open");
   }
@@ -643,6 +641,23 @@
     if (!name || !phone) { showToast("נא למלא שם וטלפון", true); return; }
     try {
       await sbFetch("requests", { method: "POST", body: JSON.stringify({ tree_id: currentTreeId, requester_name: name, phone, message: msg }) });
+      // שלח אימייל לבעל העץ
+      const tree = trees.find(t => t.id === currentTreeId);
+      if (tree && tree.owner_email) {
+        fetch(FUNCTION_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY },
+          body: JSON.stringify({
+            tree_owner_email: tree.owner_email,
+            tree_owner_name: tree.owner_name,
+            fruit: getFruitName(tree.fruit),
+            address: tree.address,
+            requester_name: name,
+            requester_phone: phone,
+            message: msg
+          })
+        }).catch(() => {});
+      }
       closeModal();
       await loadTrees();
       showToast("✅ בקשת הקטיף נשלחה בהצלחה!");
@@ -655,19 +670,21 @@
     const city = document.getElementById("o-city").value.trim();
     const neighborhood = document.getElementById("o-neighborhood").value.trim();
     const address = document.getElementById("o-address").value.trim();
-    const fruitRaw = document.getElementById("o-fruit").value;
-    const fruit = fruitRaw.replace(/ .+/, "");
+    const fruit = document.getElementById("o-fruit").value.replace(/ .+/, "");
     const price = document.getElementById("o-price").value;
     const quantity = document.getElementById("o-quantity").value.trim();
     const description = document.getElementById("o-desc").value.trim();
     if (!name || !phone || !city || !address) { showToast("נא למלא שם, טלפון, עיר וכתובת", true); return; }
     try {
       await sbFetch("trees", { method: "POST", body: JSON.stringify({
-        owner_name: name, owner_phone: phone, city, neighborhood, address, fruit, quantity, description,
+        owner_name: name, owner_phone: phone, owner_email: currentUser?.email,
+        city, neighborhood, address, fruit, quantity, description,
         price_per_kg: price !== "" ? parseFloat(price) : null,
         user_id: currentUser?.id
       })});
-      ["o-name","o-phone","o-city","o-neighborhood","o-address","o-quantity","o-desc","o-price"].forEach(id => document.getElementById(id).value = "");
+      // עדכן את פרטי המשתמש לשימוש עתידי
+      if (currentUser) { currentUser.phone = phone; saveSession(currentUser); }
+      ["o-city","o-neighborhood","o-address","o-quantity","o-desc","o-price"].forEach(id => document.getElementById(id).value = "");
       await loadTrees();
       showToast("🌳 העץ שלך פורסם בהצלחה!");
     } catch(e) { showToast("שגיאה בפרסום העץ", true); }
@@ -675,7 +692,7 @@
 
   async function toggleAvailable(id, current) {
     try {
-      await sbFetch(`trees?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ available: !current }) });
+      await sbFetch("trees?id=eq." + id, { method: "PATCH", body: JSON.stringify({ available: !current }) });
       await loadTrees();
     } catch(e) { showToast("שגיאה בעדכון", true); }
   }
@@ -683,8 +700,8 @@
   async function deleteTree(id) {
     if (!confirm("האם למחוק את העץ הזה? כל הבקשות שלו יימחקו גם כן.")) return;
     try {
-      await sbFetch(`requests?tree_id=eq.${id}`, { method: "DELETE", prefer: "return=minimal" });
-      await sbFetch(`trees?id=eq.${id}`, { method: "DELETE", prefer: "return=minimal" });
+      await sbFetch("requests?tree_id=eq." + id, { method: "DELETE", prefer: "return=minimal" });
+      await sbFetch("trees?id=eq." + id, { method: "DELETE", prefer: "return=minimal" });
       await loadTrees();
       showToast("✅ העץ הוסר בהצלחה");
     } catch(e) { showToast("שגיאה בהסרת העץ", true); }
@@ -692,7 +709,7 @@
 
   async function deleteRequest(id) {
     try {
-      await sbFetch(`requests?id=eq.${id}`, { method: "DELETE", prefer: "return=minimal" });
+      await sbFetch("requests?id=eq." + id, { method: "DELETE", prefer: "return=minimal" });
       await loadTrees();
       showToast("✅ הבקשה הוסרה");
     } catch(e) { showToast("שגיאה", true); }
@@ -709,6 +726,19 @@
   document.getElementById("modal").addEventListener("click", function(e) {
     if (e.target === this) closeModal();
   });
+
+  // ===== AUTO LOGIN =====
+  const saved = loadSession();
+  if (saved && saved.token) {
+    currentUser = saved;
+    isGuest = false;
+    document.getElementById("auth-page").style.display = "none";
+    document.getElementById("main-app").style.display = "block";
+    document.getElementById("header-username").textContent = currentUser.name;
+    autofillOwnerForm();
+    loadTrees();
+    updateOwnerForm();
+  }
 
   updatePriceHint();
 </script>
