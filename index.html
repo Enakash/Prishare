@@ -18,14 +18,16 @@
     .header-logo { display: flex; align-items: center; gap: 10px; }
     .header-title { color: #fff; font-size: 20px; font-weight: 800; }
     .header-subtitle { color: rgba(255,255,255,0.7); font-size: 12px; }
-    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #4CAF50; box-shadow: 0 0 0 3px rgba(76,175,80,0.3); }
+    .header-user { display: flex; align-items: center; gap: 10px; }
+    .header-user-name { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600; }
+    .btn-logout { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Heebo', sans-serif; }
 
     .nav { background: #fff; border-bottom: 2px solid #E8E0D0; display: flex; }
     .nav-tab {
       flex: 1; padding: 14px 8px; text-align: center; cursor: pointer;
-      font-size: 15px; font-weight: 600; color: #888; border: none;
+      font-size: 14px; font-weight: 600; color: #888; border: none;
       background: transparent; border-bottom: 3px solid transparent;
-      transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px;
       font-family: 'Heebo', sans-serif;
     }
     .nav-tab.active { color: #2C6E35; border-bottom-color: #2C6E35; background: #F7FBF7; }
@@ -34,15 +36,23 @@
     .page { display: none; }
     .page.active { display: block; }
 
+    /* AUTH PAGE */
+    .auth-wrap { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .auth-card { background: #fff; border-radius: 18px; padding: 32px; width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); border: 1.5px solid #EDE6D8; }
+    .auth-logo { text-align: center; margin-bottom: 20px; }
+    .auth-logo span { font-size: 52px; }
+    .auth-title { font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+    .auth-sub { font-size: 13px; color: #888; text-align: center; margin-bottom: 24px; }
+    .auth-tabs { display: flex; background: #F5F0E8; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
+    .auth-tab { flex: 1; padding: 8px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: #888; border: none; background: transparent; font-family: 'Heebo', sans-serif; transition: all 0.2s; }
+    .auth-tab.active { background: #fff; color: #2C6E35; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
     .hero {
       background: linear-gradient(135deg, #2C6E35 0%, #4A9B56 100%);
       border-radius: 16px; padding: 28px 24px; margin-bottom: 24px;
       color: white; position: relative; overflow: hidden;
     }
-    .hero::after {
-      content: '🌳'; position: absolute; left: 20px; bottom: -10px;
-      font-size: 80px; opacity: 0.15; line-height: 1;
-    }
+    .hero::after { content: '🌳'; position: absolute; left: 20px; bottom: -10px; font-size: 80px; opacity: 0.15; line-height: 1; }
     .hero h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
     .hero p { font-size: 14px; opacity: 0.85; line-height: 1.6; max-width: 320px; }
     .hero-stats { display: flex; gap: 20px; margin-top: 16px; }
@@ -50,18 +60,19 @@
     .hero-stat-num { font-size: 26px; font-weight: 800; line-height: 1; }
     .hero-stat-label { font-size: 11px; opacity: 0.75; margin-top: 2px; }
 
+    /* FILTER BAR */
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-select { flex: 1; min-width: 130px; padding: 9px 12px; border-radius: 9px; border: 1.5px solid #DDD8CC; font-size: 13px; font-family: 'Heebo', sans-serif; background: #fff; color: #2C2416; direction: rtl; }
+    .filter-select:focus { outline: none; border-color: #2C6E35; }
+
     .section-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 
-    .tree-card {
-      background: #fff; border-radius: 14px; padding: 18px;
-      margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      border: 1.5px solid #EDE6D8;
-    }
+    .tree-card { background: #fff; border-radius: 14px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; }
     .tree-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .fruit-badge {
-      background: #EEF7EE; color: #2C6E35; font-size: 13px; font-weight: 700;
-      padding: 4px 10px; border-radius: 20px; border: 1px solid #C8E0C8;
-    }
+    .fruit-badge { background: #EEF7EE; color: #2C6E35; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 20px; border: 1px solid #C8E0C8; }
+    .price-badge { background: #FFF8E1; color: #E65100; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 20px; border: 1px solid #FFE082; }
+    .store-price { font-size: 11px; color: #aaa; text-decoration: line-through; }
+    .saving-badge { background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
     .available-row { display: flex; align-items: center; gap: 6px; }
     .available-dot { width: 8px; height: 8px; border-radius: 50%; background: #4CAF50; box-shadow: 0 0 0 3px rgba(76,175,80,0.2); }
     .tree-meta { font-size: 13px; color: #666; margin-bottom: 5px; }
@@ -69,81 +80,45 @@
     .tree-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .qty-tag { font-size: 12px; color: #888; background: #F5F0E8; padding: 3px 10px; border-radius: 20px; }
     .requests-count { font-size: 12px; color: #C07820; font-weight: 600; }
+    .location-tag { font-size: 12px; color: #666; background: #F0EBE0; padding: 3px 9px; border-radius: 20px; }
 
-    .btn {
-      padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer;
-      font-size: 14px; font-weight: 700; font-family: 'Heebo', sans-serif;
-      transition: all 0.18s; display: inline-flex; align-items: center; gap: 6px;
-    }
+    .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; font-family: 'Heebo', sans-serif; transition: all 0.18s; display: inline-flex; align-items: center; gap: 6px; }
     .btn-primary { background: #2C6E35; color: #fff; }
     .btn-primary:hover { background: #225629; }
+    .btn-primary:disabled { background: #9abf9e; cursor: not-allowed; }
     .btn-secondary { background: #F0EBE0; color: #2C2416; }
     .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
     .btn-danger { background: #FFF0F0; color: #C0392B; border: 1px solid #FFCDD2; }
     .btn-full { width: 100%; justify-content: center; }
 
-    .form-card {
-      background: #fff; border-radius: 14px; padding: 22px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; margin-bottom: 20px;
-    }
+    .form-card { background: #fff; border-radius: 14px; padding: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; margin-bottom: 20px; }
     .form-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
     .form-row { margin-bottom: 14px; }
     .form-label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 5px; }
-    .form-input, .form-select, .form-textarea {
-      width: 100%; padding: 10px 13px; border-radius: 9px;
-      border: 1.5px solid #DDD8CC; font-size: 14px; font-family: 'Heebo', sans-serif;
-      background: #FDFBF8; color: #2C2416; direction: rtl;
-    }
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
-      outline: none; border-color: #2C6E35;
-      box-shadow: 0 0 0 3px rgba(44,110,53,0.1);
-    }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 13px; border-radius: 9px; border: 1.5px solid #DDD8CC; font-size: 14px; font-family: 'Heebo', sans-serif; background: #FDFBF8; color: #2C2416; direction: rtl; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #2C6E35; box-shadow: 0 0 0 3px rgba(44,110,53,0.1); }
     .form-textarea { resize: vertical; min-height: 80px; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .price-hint { font-size: 12px; color: #888; margin-top: 4px; }
+    .price-hint span { color: #E65100; font-weight: 700; }
 
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-      align-items: center; justify-content: center; z-index: 200; padding: 20px;
-    }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); align-items: center; justify-content: center; z-index: 200; padding: 20px; }
     .modal-overlay.open { display: flex; }
-    .modal {
-      background: #fff; border-radius: 18px; padding: 26px;
-      width: 100%; max-width: 420px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-    }
+    .modal { background: #fff; border-radius: 18px; padding: 26px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
     .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
     .modal-sub { font-size: 13px; color: #888; margin-bottom: 18px; }
     .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
     .modal-actions .btn { flex: 1; justify-content: center; }
 
-    .toast {
-      display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-      background: #2C6E35; color: #fff; padding: 12px 22px;
-      border-radius: 30px; font-size: 14px; font-weight: 600;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 300;
-    }
+    .toast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2C6E35; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 300; white-space: nowrap; }
     .toast.error { background: #C0392B; }
 
-    .my-tree-card {
-      background: #fff; border-radius: 14px; overflow: hidden;
-      margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8;
-    }
-    .my-tree-header {
-      background: linear-gradient(135deg, #2C6E35, #4A9B56);
-      padding: 14px 18px; color: white;
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-    }
+    .my-tree-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; }
+    .my-tree-header { background: linear-gradient(135deg, #2C6E35, #4A9B56); padding: 14px 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .my-tree-title { font-size: 15px; font-weight: 700; }
     .my-tree-body { padding: 14px 18px; }
-    .request-badge {
-      background: rgba(255,255,255,0.25); color: white;
-      font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
-    }
-    .request-item {
-      background: #F7F3EC; border-radius: 10px; padding: 12px 14px;
-      margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
-      border: 1px solid #EDE6D8; gap: 10px;
-    }
+    .request-badge { background: rgba(255,255,255,0.25); color: white; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .request-item { background: #F7F3EC; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #EDE6D8; gap: 10px; }
     .request-name { font-weight: 700; font-size: 13px; }
     .request-msg { color: #666; font-size: 13px; margin-top: 2px; }
     .request-phone { color: #2C6E35; font-weight: 600; font-size: 13px; }
@@ -154,10 +129,60 @@
     .empty-sub { font-size: 13px; color: #bbb; margin-top: 6px; }
     .loading { text-align: center; padding: 40px; color: #888; font-size: 15px; }
 
-    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
+    .login-prompt { background: #FFF8E1; border: 1.5px solid #FFE082; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; font-size: 13px; color: #795548; text-align: center; }
+    .login-prompt a { color: #2C6E35; font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .filter-bar { flex-direction: column; } }
   </style>
 </head>
 <body>
+
+<!-- AUTH PAGE -->
+<div id="auth-page">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo"><span>🌳</span></div>
+      <div class="auth-title">פירות השכונה</div>
+      <div class="auth-sub">שיתוף פירות בין שכנים</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">התחברות</button>
+        <button class="auth-tab" onclick="switchAuthTab('signup')">הרשמה</button>
+      </div>
+      <div id="auth-login">
+        <div class="form-row">
+          <label class="form-label">אימייל</label>
+          <input class="form-input" id="login-email" type="email" placeholder="your@email.com" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">סיסמה</label>
+          <input class="form-input" id="login-pass" type="password" placeholder="••••••••" />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()">התחבר</button>
+        <div style="text-align:center;margin-top:14px;font-size:13px;color:#888">
+          או <a style="color:#2C6E35;font-weight:700;cursor:pointer" onclick="continueAsGuest()">המשך כאורח (צפייה בלבד)</a>
+        </div>
+      </div>
+      <div id="auth-signup" style="display:none">
+        <div class="form-row">
+          <label class="form-label">שם מלא</label>
+          <input class="form-input" id="signup-name" placeholder="ישראל ישראלי" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">אימייל</label>
+          <input class="form-input" id="signup-email" type="email" placeholder="your@email.com" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">סיסמה</label>
+          <input class="form-input" id="signup-pass" type="password" placeholder="לפחות 6 תווים" />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doSignup()">הירשם</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app" style="display:none">
 
 <header class="header">
   <div class="header-logo">
@@ -167,13 +192,16 @@
       <div class="header-subtitle">שיתוף פירות בין שכנים</div>
     </div>
   </div>
-  <div class="status-dot"></div>
+  <div class="header-user">
+    <span class="header-user-name" id="header-username"></span>
+    <button class="btn-logout" onclick="doLogout()">יציאה</button>
+  </div>
 </header>
 
 <nav class="nav">
-  <button class="nav-tab active" onclick="showTab('browse')">🔍 עצים זמינים</button>
-  <button class="nav-tab" onclick="showTab('owner')">🌱 בעל עץ</button>
-  <button class="nav-tab" onclick="showTab('dashboard')">📋 ניהול</button>
+  <button class="nav-tab active" onclick="showTab('browse', this)">🔍 עצים</button>
+  <button class="nav-tab" onclick="showTab('owner', this)">🌱 הוסף עץ</button>
+  <button class="nav-tab" onclick="showTab('dashboard', this)">📋 הניהול שלי</button>
 </nav>
 
 <main class="main">
@@ -189,6 +217,19 @@
         <div class="hero-stat"><div class="hero-stat-num" id="stat-total">0</div><div class="hero-stat-label">סה"כ עצים</div></div>
       </div>
     </div>
+
+    <div class="filter-bar">
+      <select class="filter-select" id="filter-city" onchange="applyFilters()">
+        <option value="">🏙️ כל הערים</option>
+      </select>
+      <select class="filter-select" id="filter-neighborhood" onchange="applyFilters()">
+        <option value="">🏘️ כל השכונות</option>
+      </select>
+      <select class="filter-select" id="filter-fruit" onchange="applyFilters()">
+        <option value="">🌿 כל הפירות</option>
+      </select>
+    </div>
+
     <div class="section-title"><span>🌿</span> עצים זמינים לקטיף</div>
     <div id="trees-list"><div class="loading">⏳ טוען עצים...</div></div>
   </div>
@@ -196,7 +237,10 @@
   <!-- OWNER -->
   <div id="page-owner" class="page">
     <div class="section-title"><span>🌱</span> הוסף עץ שלך</div>
-    <div class="form-card">
+    <div id="owner-login-prompt" class="login-prompt" style="display:none">
+      כדי לפרסם עץ יש <a onclick="showAuthPage()">להתחבר או להירשם</a>
+    </div>
+    <div class="form-card" id="owner-form">
       <div class="form-title">🌳 פרטי העץ</div>
       <div class="form-grid">
         <div class="form-row">
@@ -204,23 +248,38 @@
           <input class="form-input" id="o-name" placeholder="יוסי ישראלי" />
         </div>
         <div class="form-row">
-          <label class="form-label">טלפון ליצירת קשר *</label>
+          <label class="form-label">טלפון *</label>
           <input class="form-input" id="o-phone" placeholder="050-0000000" />
         </div>
       </div>
       <div class="form-grid">
         <div class="form-row">
+          <label class="form-label">עיר/ישוב *</label>
+          <input class="form-input" id="o-city" placeholder="מודיעין" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">שכונה</label>
+          <input class="form-input" id="o-neighborhood" placeholder="שכונת..." />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">כתובת מדויקת *</label>
+        <input class="form-input" id="o-address" placeholder="רחוב, מספר בית" />
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
           <label class="form-label">סוג פרי *</label>
-          <select class="form-select" id="o-fruit">
+          <select class="form-select" id="o-fruit" onchange="updatePriceHint()">
             <option>תפוח 🍎</option><option>תפוז 🍊</option><option selected>לימון 🍋</option>
             <option>אגס 🍐</option><option>ענב 🍇</option><option>תאנה 🫐</option>
             <option>שזיף 🍑</option><option>אבוקדו 🥑</option><option>זית 🫒</option><option>אחר 🌿</option>
           </select>
         </div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">כתובת *</label>
-        <input class="form-input" id="o-address" placeholder="רחוב, מספר בית" />
+        <div class="form-row">
+          <label class="form-label">מחיר לק"ג (₪) — אופציונלי</label>
+          <input class="form-input" id="o-price" type="number" min="0" step="0.5" placeholder="0 = חינם" />
+          <div class="price-hint" id="price-hint"></div>
+        </div>
       </div>
       <div class="form-row">
         <label class="form-label">כמות משוערת</label>
@@ -236,17 +295,23 @@
 
   <!-- DASHBOARD -->
   <div id="page-dashboard" class="page">
-    <div class="section-title"><span>📋</span> ניהול עצים ובקשות</div>
+    <div class="section-title"><span>📋</span> העצים שלי</div>
     <div id="dashboard-list"><div class="loading">⏳ טוען...</div></div>
   </div>
 
 </main>
+</div>
 
 <!-- REQUEST MODAL -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <div class="modal-title" id="modal-title">🌿 בקשת קטיף</div>
     <div class="modal-sub" id="modal-sub"></div>
+    <div id="modal-price-info" style="margin-bottom:14px;display:none">
+      <span id="modal-price-badge" class="price-badge"></span>
+      <span style="margin-right:6px" id="modal-store-price" class="store-price"></span>
+      <span id="modal-saving" class="saving-badge"></span>
+    </div>
     <div class="form-row">
       <label class="form-label">שמך המלא *</label>
       <input class="form-input" id="r-name" placeholder="שם מלא" />
@@ -272,25 +337,110 @@
   const SUPABASE_URL = "https://obrmyjygitkbaipqdcqb.supabase.co";
   const SUPABASE_KEY = "sb_publishable_UxLyGsF4PlFOIF3OXJgbSg_hh5MA_oM";
 
+  // מחירים ממוצעים בחנויות (₪ לק"ג)
+  const STORE_PRICES = {
+    "תפוח": 9, "תפוז": 7, "לימון": 12, "אגס": 11,
+    "ענב": 18, "תאנה": 25, "שזיף": 16, "אבוקדו": 20, "זית": 14, "אחר": 10
+  };
+
   const FRUIT_EMOJIS = {
-    "תפוח": "🍎","תפוז": "🍊","לימון": "🍋","אגס": "🍐",
-    "ענב": "🍇","תאנה": "🫐","שזיף": "🍑","אבוקדו": "🥑","זית": "🫒","אחר": "🌿"
+    "תפוח":"🍎","תפוז":"🍊","לימון":"🍋","אגס":"🍐",
+    "ענב":"🍇","תאנה":"🫐","שזיף":"🍑","אבוקדו":"🥑","זית":"🫒","אחר":"🌿"
   };
 
   let trees = [];
   let currentTreeId = null;
+  let currentUser = null;
+  let isGuest = false;
 
-  async function sbFetch(path, options = {}) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": options.prefer || "return=representation",
-        ...options.headers
-      },
-      ...options
+  // ===== AUTH =====
+  async function sbAuth(path, body) {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/${path}`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify(body)
     });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || data.msg || "שגיאה");
+    return data;
+  }
+
+  function switchAuthTab(tab) {
+    document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+    event.currentTarget.classList.add("active");
+    document.getElementById("auth-login").style.display = tab === "login" ? "block" : "none";
+    document.getElementById("auth-signup").style.display = tab === "signup" ? "block" : "none";
+  }
+
+  async function doLogin() {
+    const email = document.getElementById("login-email").value.trim();
+    const pass = document.getElementById("login-pass").value;
+    if (!email || !pass) { showToast("נא למלא אימייל וסיסמה", true); return; }
+    try {
+      const data = await sbAuth("token?grant_type=password", { email, password: pass });
+      currentUser = { id: data.user.id, email: data.user.email, name: data.user.user_metadata?.name || email.split("@")[0], token: data.access_token };
+      isGuest = false;
+      enterApp();
+    } catch(e) { showToast(e.message, true); }
+  }
+
+  async function doSignup() {
+    const name = document.getElementById("signup-name").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
+    const pass = document.getElementById("signup-pass").value;
+    if (!name || !email || !pass) { showToast("נא למלא את כל השדות", true); return; }
+    if (pass.length < 6) { showToast("הסיסמה חייבת להיות לפחות 6 תווים", true); return; }
+    try {
+      await sbAuth("signup", { email, password: pass, data: { name } });
+      showToast("✅ נרשמת בהצלחה! אנא אמת את האימייל שלך ואז התחבר");
+      switchAuthTab("login");
+    } catch(e) { showToast(e.message, true); }
+  }
+
+  function continueAsGuest() {
+    isGuest = true;
+    currentUser = null;
+    enterApp();
+  }
+
+  function enterApp() {
+    document.getElementById("auth-page").style.display = "none";
+    document.getElementById("main-app").style.display = "block";
+    document.getElementById("header-username").textContent = isGuest ? "אורח" : currentUser.name;
+    loadTrees();
+    updateOwnerForm();
+  }
+
+  function doLogout() {
+    currentUser = null;
+    isGuest = false;
+    document.getElementById("main-app").style.display = "none";
+    document.getElementById("auth-page").style.display = "block";
+  }
+
+  function showAuthPage() {
+    document.getElementById("main-app").style.display = "none";
+    document.getElementById("auth-page").style.display = "block";
+  }
+
+  function updateOwnerForm() {
+    const prompt = document.getElementById("owner-login-prompt");
+    const form = document.getElementById("owner-form");
+    if (isGuest) { prompt.style.display = "block"; form.style.display = "none"; }
+    else { prompt.style.display = "none"; form.style.display = "block"; }
+  }
+
+  // ===== API =====
+  async function sbFetch(path, options = {}) {
+    const headers = {
+      "apikey": SUPABASE_KEY,
+      "Content-Type": "application/json",
+      "Prefer": options.prefer || "return=representation",
+      ...options.headers
+    };
+    if (currentUser?.token) headers["Authorization"] = `Bearer ${currentUser.token}`;
+    else headers["Authorization"] = `Bearer ${SUPABASE_KEY}`;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { ...options, headers });
     const text = await res.text();
     return text ? JSON.parse(text) : null;
   }
@@ -298,73 +448,119 @@
   async function loadTrees() {
     try {
       trees = await sbFetch("trees?select=*,requests(*)&order=created_at.desc") || [];
-      renderBrowse();
+      buildFilters();
+      applyFilters();
       renderDashboard();
       updateStats();
-    } catch(e) {
-      showToast("שגיאה בטעינת הנתונים", true);
-    }
+    } catch(e) { showToast("שגיאה בטעינת הנתונים", true); }
   }
 
   function updateStats() {
-    const available = trees.filter(t => t.available).length;
-    const reqs = trees.reduce((s, t) => s + (t.requests?.length || 0), 0);
-    document.getElementById("stat-available").textContent = available;
-    document.getElementById("stat-requests").textContent = reqs;
+    document.getElementById("stat-available").textContent = trees.filter(t => t.available).length;
+    document.getElementById("stat-requests").textContent = trees.reduce((s,t) => s+(t.requests?.length||0), 0);
     document.getElementById("stat-total").textContent = trees.length;
   }
 
-  function getFruitEmoji(fruit) {
-    for (const [key, val] of Object.entries(FRUIT_EMOJIS)) {
-      if (fruit && fruit.includes(key)) return val;
-    }
-    return "🌿";
+  function getFruitName(fruit) {
+    if (!fruit) return "אחר";
+    for (const key of Object.keys(FRUIT_EMOJIS)) { if (fruit.includes(key)) return key; }
+    return "אחר";
   }
 
-  function renderBrowse() {
-    const available = trees.filter(t => t.available);
+  function getFruitEmoji(fruit) { return FRUIT_EMOJIS[getFruitName(fruit)] || "🌿"; }
+
+  // ===== FILTERS =====
+  function buildFilters() {
+    const cities = [...new Set(trees.map(t => t.city).filter(Boolean))].sort();
+    const fruits = [...new Set(trees.map(t => getFruitName(t.fruit)))].sort();
+    const cityEl = document.getElementById("filter-city");
+    const fruitEl = document.getElementById("filter-fruit");
+    const prevCity = cityEl.value;
+    const prevFruit = fruitEl.value;
+    cityEl.innerHTML = '<option value="">🏙️ כל הערים</option>' + cities.map(c => `<option ${c===prevCity?'selected':''}>${c}</option>`).join("");
+    fruitEl.innerHTML = '<option value="">🌿 כל הפירות</option>' + fruits.map(f => `<option ${f===prevFruit?'selected':''}>${getFruitEmoji(f)} ${f}</option>`).join("");
+  }
+
+  function applyFilters() {
+    const city = document.getElementById("filter-city").value;
+    const neighborhood = document.getElementById("filter-neighborhood").value.trim().toLowerCase();
+    const fruit = document.getElementById("filter-fruit").value;
+
+    // update neighborhood options
+    const cityTrees = city ? trees.filter(t => t.city === city) : trees;
+    const neighborhoods = [...new Set(cityTrees.map(t => t.neighborhood).filter(Boolean))].sort();
+    const neighEl = document.getElementById("filter-neighborhood");
+    const prevNeigh = neighEl.value;
+    neighEl.innerHTML = '<option value="">🏘️ כל השכונות</option>' + neighborhoods.map(n => `<option ${n===prevNeigh?'selected':''}>${n}</option>`).join("");
+
+    let filtered = trees.filter(t => t.available);
+    if (city) filtered = filtered.filter(t => t.city === city);
+    if (prevNeigh) filtered = filtered.filter(t => t.neighborhood === prevNeigh);
+    if (fruit) filtered = filtered.filter(t => getFruitName(t.fruit) === fruit.replace(/\s*.+/,'').trim());
+
+    renderBrowse(filtered);
+  }
+
+  // ===== RENDER =====
+  function renderBrowse(list) {
     const el = document.getElementById("trees-list");
-    if (available.length === 0) {
-      el.innerHTML = `<div class="empty"><div class="empty-icon">🌾</div><div class="empty-text">אין עצים זמינים כרגע</div><div class="empty-sub">בדוק שוב מאוחר יותר</div></div>`;
+    if (!list) list = trees.filter(t => t.available);
+    if (list.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">🌾</div><div class="empty-text">אין עצים זמינים</div><div class="empty-sub">נסה לשנות את הסינון</div></div>`;
       return;
     }
-    el.innerHTML = available.map(tree => `
-      <div class="tree-card">
-        <div class="tree-card-header">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:28px">${getFruitEmoji(tree.fruit)}</span>
-            <span class="fruit-badge">${tree.fruit}</span>
+    el.innerHTML = list.map(tree => {
+      const fruitName = getFruitName(tree.fruit);
+      const storePrice = STORE_PRICES[fruitName] || 10;
+      const treePrice = tree.price_per_kg;
+      const isFree = !treePrice || treePrice == 0;
+      const saving = isFree ? storePrice : (storePrice - treePrice > 0 ? storePrice - treePrice : 0);
+      return `
+        <div class="tree-card">
+          <div class="tree-card-header">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-size:28px">${getFruitEmoji(tree.fruit)}</span>
+              <span class="fruit-badge">${fruitName}</span>
+              ${isFree ? '<span class="price-badge">חינם! 🎁</span>' : `<span class="price-badge">₪${treePrice}/ק"ג</span>`}
+              ${saving > 0 ? `<span class="saving-badge">חיסכון ₪${saving} מחנות</span>` : ""}
+            </div>
+            <div class="available-row">
+              <div class="available-dot"></div>
+              <span style="font-size:12px;color:#4CAF50;font-weight:600">זמין</span>
+            </div>
           </div>
-          <div class="available-row">
-            <div class="available-dot"></div>
-            <span style="font-size:12px;color:#4CAF50;font-weight:600">זמין</span>
+          ${tree.city || tree.neighborhood ? `<div class="tree-meta">🏘️ ${[tree.neighborhood, tree.city].filter(Boolean).join(", ")}</div>` : ""}
+          <div class="tree-meta">📍 ${tree.address}</div>
+          <div class="tree-meta">👤 ${tree.owner_name}</div>
+          ${tree.owner_phone ? `<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ${tree.owner_phone}</div>` : ""}
+          ${tree.description ? `<div class="tree-desc">${tree.description}</div>` : ""}
+          <div class="tree-footer">
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              ${tree.quantity ? `<span class="qty-tag">כמות: ${tree.quantity}</span>` : ""}
+              ${!isFree ? `<span class="store-price">מחנות: ₪${storePrice}/ק"ג</span>` : ""}
+              ${tree.requests?.length ? `<span class="requests-count">⏳ ${tree.requests.length} בקשות</span>` : ""}
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('${tree.id}')">🌿 בקש לקטוף</button>
           </div>
-        </div>
-        <div class="tree-meta">📍 ${tree.address}</div>
-        <div class="tree-meta">👤 ${tree.owner_name}</div>
-        ${tree.owner_phone ? `<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ${tree.owner_phone}</div>` : ""}
-        ${tree.description ? `<div class="tree-desc">${tree.description}</div>` : ""}
-        <div class="tree-footer">
-          <div style="display:flex;gap:8px;align-items:center">
-            ${tree.quantity ? `<span class="qty-tag">כמות: ${tree.quantity}</span>` : ""}
-            ${tree.requests?.length ? `<span class="requests-count">⏳ ${tree.requests.length} בקשות</span>` : ""}
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="openModal('${tree.id}')">🌿 בקש לקטוף</button>
-        </div>
-      </div>
-    `).join("");
+        </div>`;
+    }).join("");
   }
 
   function renderDashboard() {
     const el = document.getElementById("dashboard-list");
-    if (trees.length === 0) {
-      el.innerHTML = `<div class="empty"><div class="empty-icon">🌱</div><div class="empty-text">אין עצים עדיין</div><div class="empty-sub">עבור ל"בעל עץ" כדי להוסיף</div></div>`;
+    if (isGuest) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">🔐</div><div class="empty-text">יש להתחבר כדי לנהל עצים</div><div class="empty-sub"><a style="color:#2C6E35;font-weight:700;cursor:pointer" onclick="showAuthPage()">התחבר כאן</a></div></div>`;
       return;
     }
-    el.innerHTML = trees.map(tree => `
+    const myTrees = trees.filter(t => t.user_id === currentUser?.id);
+    if (myTrees.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">🌱</div><div class="empty-text">עדיין לא פרסמת עצים</div><div class="empty-sub">עבור ל"הוסף עץ"</div></div>`;
+      return;
+    }
+    el.innerHTML = myTrees.map(tree => `
       <div class="my-tree-card">
         <div class="my-tree-header">
-          <div class="my-tree-title">${getFruitEmoji(tree.fruit)} ${tree.fruit} — ${tree.address}</div>
+          <div class="my-tree-title">${getFruitEmoji(tree.fruit)} ${getFruitName(tree.fruit)} — ${tree.address}</div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             ${tree.requests?.length ? `<span class="request-badge">${tree.requests.length} בקשות</span>` : ""}
             <button onclick="toggleAvailable('${tree.id}', ${tree.available})"
@@ -378,7 +574,10 @@
           </div>
         </div>
         <div class="my-tree-body">
-          <div style="font-size:13px;color:#666;margin-bottom:10px">👤 ${tree.owner_name} ${tree.quantity ? "· " + tree.quantity : ""}</div>
+          <div style="font-size:13px;color:#666;margin-bottom:10px">
+            👤 ${tree.owner_name} ${tree.quantity ? "· "+tree.quantity : ""}
+            ${tree.price_per_kg ? `· ₪${tree.price_per_kg}/ק"ג` : "· חינם"}
+          </div>
           ${!tree.requests?.length
             ? `<div style="font-size:13px;color:#bbb;padding:8px 0">עדיין אין בקשות קטיף</div>`
             : tree.requests.map(req => `
@@ -389,26 +588,43 @@
                   <div class="request-phone">📞 ${req.phone}</div>
                 </div>
                 <button class="btn btn-danger btn-sm" onclick="deleteRequest('${req.id}')">סגור</button>
-              </div>
-            `).join("")
+              </div>`).join("")
           }
         </div>
       </div>
     `).join("");
   }
 
-  function showTab(name) {
+  // ===== ACTIONS =====
+  function showTab(name, el) {
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
-    document.getElementById("page-" + name).classList.add("active");
-    event.currentTarget.classList.add("active");
+    document.getElementById("page-"+name).classList.add("active");
+    el.classList.add("active");
+  }
+
+  function updatePriceHint() {
+    const fruit = document.getElementById("o-fruit").value.replace(/ .+/,"");
+    const store = STORE_PRICES[fruit] || 10;
+    document.getElementById("price-hint").innerHTML = `מחיר ממוצע בחנויות: <span>₪${store}/ק"ג</span> — הזן 0 לחינם`;
   }
 
   function openModal(treeId) {
     currentTreeId = treeId;
     const tree = trees.find(t => t.id === treeId);
+    const fruitName = getFruitName(tree.fruit);
+    const storePrice = STORE_PRICES[fruitName] || 10;
     document.getElementById("modal-title").textContent = getFruitEmoji(tree.fruit) + " בקשת קטיף";
-    document.getElementById("modal-sub").textContent = `${tree.fruit} אצל ${tree.owner_name} · ${tree.address}`;
+    document.getElementById("modal-sub").textContent = `${fruitName} אצל ${tree.owner_name} · ${tree.address}`;
+    const priceInfo = document.getElementById("modal-price-info");
+    if (tree.price_per_kg != null) {
+      const isFree = tree.price_per_kg == 0;
+      document.getElementById("modal-price-badge").textContent = isFree ? "חינם! 🎁" : `₪${tree.price_per_kg}/ק"ג`;
+      document.getElementById("modal-store-price").textContent = `מחנות: ₪${storePrice}/ק"ג`;
+      const saving = isFree ? storePrice : Math.max(0, storePrice - tree.price_per_kg);
+      document.getElementById("modal-saving").textContent = saving > 0 ? `חיסכון ₪${saving}!` : "";
+      priceInfo.style.display = "block";
+    } else { priceInfo.style.display = "none"; }
     document.getElementById("r-name").value = "";
     document.getElementById("r-phone").value = "";
     document.getElementById("r-msg").value = "";
@@ -436,18 +652,22 @@
   async function addTree() {
     const name = document.getElementById("o-name").value.trim();
     const phone = document.getElementById("o-phone").value.trim();
-    const fruit = document.getElementById("o-fruit").value.replace(/ .+/, "");
+    const city = document.getElementById("o-city").value.trim();
+    const neighborhood = document.getElementById("o-neighborhood").value.trim();
     const address = document.getElementById("o-address").value.trim();
+    const fruitRaw = document.getElementById("o-fruit").value;
+    const fruit = fruitRaw.replace(/ .+/, "");
+    const price = document.getElementById("o-price").value;
     const quantity = document.getElementById("o-quantity").value.trim();
     const description = document.getElementById("o-desc").value.trim();
-    if (!name || !address || !phone) { showToast("נא למלא שם, טלפון וכתובת", true); return; }
+    if (!name || !phone || !city || !address) { showToast("נא למלא שם, טלפון, עיר וכתובת", true); return; }
     try {
-      await sbFetch("trees", { method: "POST", body: JSON.stringify({ owner_name: name, owner_phone: phone, fruit, address, quantity, description }) });
-      document.getElementById("o-name").value = "";
-      document.getElementById("o-phone").value = "";
-      document.getElementById("o-address").value = "";
-      document.getElementById("o-quantity").value = "";
-      document.getElementById("o-desc").value = "";
+      await sbFetch("trees", { method: "POST", body: JSON.stringify({
+        owner_name: name, owner_phone: phone, city, neighborhood, address, fruit, quantity, description,
+        price_per_kg: price !== "" ? parseFloat(price) : null,
+        user_id: currentUser?.id
+      })});
+      ["o-name","o-phone","o-city","o-neighborhood","o-address","o-quantity","o-desc","o-price"].forEach(id => document.getElementById(id).value = "");
       await loadTrees();
       showToast("🌳 העץ שלך פורסם בהצלחה!");
     } catch(e) { showToast("שגיאה בפרסום העץ", true); }
@@ -475,7 +695,7 @@
       await sbFetch(`requests?id=eq.${id}`, { method: "DELETE", prefer: "return=minimal" });
       await loadTrees();
       showToast("✅ הבקשה הוסרה");
-    } catch(e) { showToast("שגיאה בהסרת הבקשה", true); }
+    } catch(e) { showToast("שגיאה", true); }
   }
 
   function showToast(msg, isError = false) {
@@ -483,14 +703,14 @@
     el.textContent = msg;
     el.className = "toast" + (isError ? " error" : "");
     el.style.display = "block";
-    setTimeout(() => el.style.display = "none", 3000);
+    setTimeout(() => el.style.display = "none", 3500);
   }
 
   document.getElementById("modal").addEventListener("click", function(e) {
     if (e.target === this) closeModal();
   });
 
-  loadTrees();
+  updatePriceHint();
 </script>
 </body>
 </html>
