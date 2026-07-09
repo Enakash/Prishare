@@ -507,6 +507,8 @@
   function renderBrowse(list) {
     const el = document.getElementById("trees-list");
     if (!list) list = trees.filter(t => t.available);
+    // הסר עצים של המשתמש המחובר
+    if (currentUser && !isGuest) { list = list.filter(t => t.user_id !== currentUser.id); }
     if (list.length === 0) {
       el.innerHTML = '<div class="empty"><div class="empty-icon">🌾</div><div class="empty-text">אין עצים זמינים</div><div class="empty-sub">נסה לשנות את הסינון</div></div>';
       return;
@@ -643,20 +645,23 @@
       await sbFetch("requests", { method: "POST", body: JSON.stringify({ tree_id: currentTreeId, requester_name: name, phone, message: msg }) });
       // שלח אימייל לבעל העץ
       const tree = trees.find(t => t.id === currentTreeId);
-      if (tree && tree.owner_email) {
-        fetch(FUNCTION_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY },
-          body: JSON.stringify({
-            tree_owner_email: tree.owner_email,
-            tree_owner_name: tree.owner_name,
-            fruit: getFruitName(tree.fruit),
-            address: tree.address,
-            requester_name: name,
-            requester_phone: phone,
-            message: msg
-          })
-        }).catch(() => {});
+      const ownerEmail = tree && (tree.owner_email || tree.owner_email_fallback);
+      if (tree && ownerEmail) {
+        try {
+          await fetch(FUNCTION_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
+            body: JSON.stringify({
+              tree_owner_email: ownerEmail,
+              tree_owner_name: tree.owner_name,
+              fruit: getFruitName(tree.fruit),
+              address: tree.address,
+              requester_name: name,
+              requester_phone: phone,
+              message: msg
+            })
+          });
+        } catch(emailErr) { console.log("email error:", emailErr); }
       }
       closeModal();
       await loadTrees();
