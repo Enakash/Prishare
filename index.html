@@ -622,7 +622,7 @@
     // מלא אוטומטי פרטי המשתמש אם מחובר
     if (currentUser && !isGuest) {
       document.getElementById("r-name").value = currentUser.name || "";
-      document.getElementById("r-phone").value = currentUser.phone || "";
+      document.getElementById("r-phone").value = currentUser.phone || "";  // טלפון מהרשמה בלבד
     } else {
       document.getElementById("r-name").value = "";
       document.getElementById("r-phone").value = "";
@@ -688,7 +688,7 @@
         user_id: currentUser?.id
       })});
       // עדכן את פרטי המשתמש לשימוש עתידי
-      if (currentUser) { currentUser.phone = phone; saveSession(currentUser); }
+      // לא שומרים טלפון מטופס העץ — רק מהרשמה
       ["o-city","o-neighborhood","o-address","o-quantity","o-desc","o-price"].forEach(id => document.getElementById(id).value = "");
       await loadTrees();
       showToast("🌳 העץ שלך פורסם בהצלחה!");
