@@ -499,7 +499,9 @@
     let filtered = trees.filter(t => t.available);
     if (city) filtered = filtered.filter(t => t.city === city);
     if (prevNeigh) filtered = filtered.filter(t => t.neighborhood === prevNeigh);
-    if (fruit) filtered = filtered.filter(t => getFruitName(t.fruit) === fruit.replace(/\s*.+/,"").trim());
+    // הערך ב־dropdown הוא 'אימוג'י שם' — נחלץ את השם העברי (לאחר הרווח)
+    const fruitName = fruit ? fruit.replace(/^.+\s/, "").trim() : "";
+    if (fruitName) filtered = filtered.filter(t => getFruitName(t.fruit) === fruitName);
     renderBrowse(filtered);
   }
 
