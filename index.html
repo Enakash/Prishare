@@ -360,7 +360,8 @@
         email: data.user.email,
         name: data.user.user_metadata?.name || email.split("@")[0],
         phone: data.user.user_metadata?.phone || "",
-        token: data.access_token
+        token: data.access_token,
+        refresh_token: data.refresh_token
       };
       isGuest = false;
       if (remember) saveSession(currentUser);
@@ -379,7 +380,7 @@
       const data = await sbAuth("signup", { email, password: pass, data: { name, phone } });
       // אחרי רישום — כנס אוטומטית אם יש token
       if (data.access_token) {
-        currentUser = { id: data.user.id, email, name, phone, token: data.access_token };
+        currentUser = { id: data.user.id, email, name, phone, token: data.access_token, refresh_token: data.refresh_token };
         isGuest = false;
         saveSession(currentUser);
         enterApp();
@@ -440,16 +441,43 @@
     }
   }
 
+  // ===== TOKEN REFRESH =====
+  async function refreshToken() {
+    if (!currentUser?.refresh_token) return false;
+    try {
+      const res = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=refresh_token", {
+        method: "POST",
+        headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: currentUser.refresh_token })
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      currentUser.token = data.access_token;
+      currentUser.refresh_token = data.refresh_token;
+      saveSession(currentUser);
+      return true;
+    } catch(e) { return false; }
+  }
+
   // ===== API =====
   async function sbFetch(path, options = {}) {
-    const headers = {
-      "apikey": SUPABASE_KEY,
-      "Content-Type": "application/json",
-      "Prefer": options.prefer || "return=representation",
-      ...options.headers
+    const makeRequest = async () => {
+      const headers = {
+        "apikey": SUPABASE_KEY,
+        "Content-Type": "application/json",
+        "Prefer": options.prefer || "return=representation",
+        ...options.headers
+      };
+      headers["Authorization"] = currentUser?.token ? "Bearer " + currentUser.token : "Bearer " + SUPABASE_KEY;
+      return await fetch(SUPABASE_URL + "/rest/v1/" + path, { ...options, headers });
     };
-    headers["Authorization"] = currentUser?.token ? "Bearer " + currentUser.token : "Bearer " + SUPABASE_KEY;
-    const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, { ...options, headers });
+    let res = await makeRequest();
+    // אם פג תוקף ה־token — נחדש אוטומטית ונשלח שוב
+    if (res.status === 401 && currentUser?.refresh_token) {
+      const refreshed = await refreshToken();
+      if (refreshed) res = await makeRequest();
+      else { doLogout(); showToast("פג תוקף החיבור — אנא התחבר שוב", true); return null; }
+    }
     const text = await res.text();
     return text ? JSON.parse(text) : null;
   }
