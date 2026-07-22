@@ -32,6 +32,20 @@
     .auth-tab.active { background: #fff; color: #2C6E35; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
     .remember-row { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px; font-size: 13px; color: #666; }
     .terms-row { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 16px; font-size: 13px; color: #555; line-height: 1.5; }
+    .notify-row { display: flex; align-items: flex-start; gap: 8px; margin: 8px 0 14px; font-size: 13px; color: #555; line-height: 1.5; }
+    .notify-row input { width: 16px; height: 16px; cursor: pointer; accent-color: #2C6E35; margin-top: 2px; flex-shrink: 0; }
+    .settings-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; margin-top: 16px; }
+    .settings-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #2C2416; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #F0EBE0; }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-label { font-size: 14px; color: #444; }
+    .toggle-sub { font-size: 12px; color: #999; margin-top: 2px; }
+    .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #DDD; border-radius: 24px; cursor: pointer; transition: 0.2s; }
+    .toggle-slider:before { content: ""; position: absolute; width: 18px; height: 18px; right: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+    .toggle input:checked + .toggle-slider { background: #2C6E35; }
+    .toggle input:checked + .toggle-slider:before { transform: translateX(-20px); }
     .terms-row input { width: 16px; height: 16px; cursor: pointer; accent-color: #2C6E35; margin-top: 2px; flex-shrink: 0; }
     .terms-row a { color: #2C6E35; font-weight: 700; text-decoration: underline; }
     .remember-row input { width: 16px; height: 16px; cursor: pointer; accent-color: #2C6E35; }
@@ -171,6 +185,12 @@
             ול<a href="privacy.html" target="_blank">מדיניות הפרטיות</a>
           </label>
         </div>
+        <div class="notify-row">
+          <input type="checkbox" id="signup-notify" />
+          <label for="signup-notify">
+            אני רוצה לקבל עדכונים במייל על עצים חדשים ושינויי זמינות בשכונה
+          </label>
+        </div>
         <button class="btn btn-primary btn-full" onclick="doSignup()">הירשם</button>
       </div>
     </div>
@@ -298,6 +318,19 @@
       <button class="btn btn-delete-account btn-full" onclick="showDeleteModal()">
         🗑️ מחיקת חשבון וכל הנתונים
       </button>
+      <div class="settings-card">
+        <h3>🔔 הגדרות התראות</h3>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">עדכונים על עצים חדשים</div>
+            <div class="toggle-sub">קבל מייל כשמתפרסם עץ חדש או עץ חוזר לזמינות</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="notify-toggle" onchange="updateNotifyPref(this.checked)" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
       <div class="legal-links">
         <a href="privacy.html">מדיניות פרטיות</a> · <a href="terms.html">תנאי שימוש</a>
       </div>
@@ -411,6 +444,7 @@
         email: data.user.email,
         name: data.user.user_metadata?.name || email.split("@")[0],
         phone: data.user.user_metadata?.phone || "",
+        notify_new_trees: data.user.user_metadata?.notify_new_trees || false,
         token: data.access_token,
         refresh_token: data.refresh_token
       };
@@ -429,7 +463,8 @@
     if (!document.getElementById("agree-terms").checked) { showToast("יש לאשר את תנאי השימוש ומדיניות הפרטיות", true); return; }
     if (pass.length < 6) { showToast("הסיסמה חייבת להיות לפחות 6 תווים", true); return; }
     try {
-      const data = await sbAuth("signup", { email, password: pass, data: { name, phone } });
+      const notify = document.getElementById("signup-notify").checked;
+      const data = await sbAuth("signup", { email, password: pass, data: { name, phone, notify_new_trees: notify } });
       // אחרי רישום — כנס אוטומטית אם יש token
       if (data.access_token) {
         currentUser = { id: data.user.id, email, name, phone, token: data.access_token, refresh_token: data.refresh_token };
@@ -633,6 +668,8 @@
     if (!isGuest && currentUser) {
       accSection.style.display = "block";
       document.getElementById("account-email").textContent = currentUser.email;
+      const notifyToggle = document.getElementById("notify-toggle");
+      if (notifyToggle) notifyToggle.checked = currentUser.notify_new_trees || false;
     } else {
       accSection.style.display = "none";
     }
@@ -809,6 +846,26 @@
     } catch(e) { showToast("שגיאה", true); }
   }
 
+  async function updateNotifyPref(val) {
+    if (!currentUser) return;
+    try {
+      const res = await fetch(SUPABASE_URL + "/auth/v1/user", {
+        method: "PUT",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + currentUser.token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ data: { name: currentUser.name, phone: currentUser.phone, notify_new_trees: val } })
+      });
+      if (res.ok) {
+        currentUser.notify_new_trees = val;
+        saveSession(currentUser);
+        showToast(val ? "✅ תקבל עדכונים על עצים חדשים" : "🔕 ביטלת קבלת עדכונים");
+      }
+    } catch(e) { showToast("שגיאה בעדכון ההגדרות", true); }
+  }
+
   function showDeleteModal() {
     document.getElementById("delete-pass").value = "";
     document.getElementById("delete-modal").classList.add("open");
@@ -873,6 +930,8 @@
     if (accSection) {
       accSection.style.display = "block";
       document.getElementById("account-email").textContent = currentUser.email;
+      const notifyToggle = document.getElementById("notify-toggle");
+      if (notifyToggle) notifyToggle.checked = currentUser.notify_new_trees || false;
     }
     loadTrees();
     updateOwnerForm();
