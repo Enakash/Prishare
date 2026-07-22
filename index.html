@@ -31,6 +31,9 @@
     .auth-tab { flex: 1; padding: 8px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: #888; border: none; background: transparent; font-family: 'Heebo', sans-serif; transition: all 0.2s; }
     .auth-tab.active { background: #fff; color: #2C6E35; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
     .remember-row { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px; font-size: 13px; color: #666; }
+    .terms-row { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 16px; font-size: 13px; color: #555; line-height: 1.5; }
+    .terms-row input { width: 16px; height: 16px; cursor: pointer; accent-color: #2C6E35; margin-top: 2px; flex-shrink: 0; }
+    .terms-row a { color: #2C6E35; font-weight: 700; text-decoration: underline; }
     .remember-row input { width: 16px; height: 16px; cursor: pointer; accent-color: #2C6E35; }
     .hero { background: linear-gradient(135deg, #2C6E35 0%, #4A9B56 100%); border-radius: 16px; padding: 28px 24px; margin-bottom: 24px; color: white; position: relative; overflow: hidden; }
     .hero::after { content: '🌳'; position: absolute; left: 20px; bottom: -10px; font-size: 80px; opacity: 0.15; line-height: 1; }
@@ -160,6 +163,13 @@
         <div class="form-row">
           <label class="form-label">סיסמה</label>
           <input class="form-input" id="signup-pass" type="password" placeholder="לפחות 6 תווים" />
+        </div>
+        <div class="terms-row">
+          <input type="checkbox" id="agree-terms" />
+          <label for="agree-terms">
+            קראתי ואני מסכים/ה ל<a href="terms.html" target="_blank">תנאי השימוש</a>
+            ול<a href="privacy.html" target="_blank">מדיניות הפרטיות</a>
+          </label>
         </div>
         <button class="btn btn-primary btn-full" onclick="doSignup()">הירשם</button>
       </div>
@@ -416,6 +426,7 @@
     const email = document.getElementById("signup-email").value.trim();
     const pass = document.getElementById("signup-pass").value;
     if (!name || !email || !pass) { showToast("נא למלא את כל השדות", true); return; }
+    if (!document.getElementById("agree-terms").checked) { showToast("יש לאשר את תנאי השימוש ומדיניות הפרטיות", true); return; }
     if (pass.length < 6) { showToast("הסיסמה חייבת להיות לפחות 6 תווים", true); return; }
     try {
       const data = await sbAuth("signup", { email, password: pass, data: { name, phone } });
