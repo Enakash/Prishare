@@ -669,7 +669,10 @@
         ((tree.city || tree.neighborhood) ? '<div class="tree-meta">🏘️ ' + [tree.neighborhood, tree.city].filter(Boolean).join(", ") + '</div>' : '') +
         '<div class="tree-meta">📍 ' + tree.address + '</div>' +
         '<div class="tree-meta">👤 ' + tree.owner_name + '</div>' +
-        (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ' + tree.owner_phone + '</div>' : '') +
+        (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap">📞 ' + tree.owner_phone +
+          ' <a href="tel:' + tree.owner_phone + '" style="background:#2C6E35;color:white;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">📲 התקשר</a>' +
+          ' <a href="https://wa.me/972' + tree.owner_phone.replace(/^0/, "").replace(/-/g, "") + '?text=' + encodeURIComponent('שלום, ראיתי את העץ שלך באפליקציית פירות השכונה ואשמח לתאם קטיף 🌿') + '" target="_blank" style="background:#25D366;color:white;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
+        '</div>' : '') +
         (tree.description ? '<div class="tree-desc">' + tree.description + '</div>' : '') +
         '<div class="tree-footer">' +
           '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
