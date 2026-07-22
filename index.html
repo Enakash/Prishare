@@ -188,7 +188,7 @@
         <div class="notify-row">
           <input type="checkbox" id="signup-notify" />
           <label for="signup-notify">
-            אני רוצה לקבל עדכונים במייל על עצים חדשים ושינויי זמינות בשכונה
+            אני רוצה לקבל עדכונים במייל על עצים חדשים בשכונה (ניתן להגדיר סינון לעיר/שכונה בהמשך)
           </label>
         </div>
         <button class="btn btn-primary btn-full" onclick="doSignup()">הירשם</button>
@@ -323,12 +323,29 @@
         <div class="toggle-row">
           <div>
             <div class="toggle-label">עדכונים על עצים חדשים</div>
-            <div class="toggle-sub">קבל מייל כשמתפרסם עץ חדש או עץ חוזר לזמינות</div>
+            <div class="toggle-sub">קבל מייל כשמתפרסם עץ חדש בשכונה</div>
           </div>
           <label class="toggle">
-            <input type="checkbox" id="notify-toggle" onchange="updateNotifyPref(this.checked)" />
+            <input type="checkbox" id="notify-toggle" onchange="toggleNotifyFields(this.checked)" />
             <span class="toggle-slider"></span>
           </label>
+        </div>
+        <div id="notify-filters" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #F0EBE0">
+          <div class="form-row" style="margin-bottom:10px">
+            <label class="form-label">קבל עדכונים רק מעיר זו (אופציונלי)</label>
+            <select class="form-select" id="notify-city" onchange="updateNotifyNeighborhoods()" style="font-size:13px">
+              <option value="">כל הערים</option>
+            </select>
+          </div>
+          <div class="form-row" style="margin-bottom:10px">
+            <label class="form-label">קבל עדכונים רק משכונה זו (אופציונלי)</label>
+            <select class="form-select" id="notify-neighborhood" style="font-size:13px">
+              <option value="">כל השכונות</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="saveNotifyFilters()">
+            💾 שמור הגדרות
+          </button>
         </div>
       </div>
       <div class="legal-links">
@@ -446,6 +463,8 @@
         name: data.user.user_metadata?.name || email.split("@")[0],
         phone: data.user.user_metadata?.phone || "",
         notify_new_trees: data.user.user_metadata?.notify_new_trees || false,
+        notify_city: data.user.user_metadata?.notify_city || "",
+        notify_neighborhood: data.user.user_metadata?.notify_neighborhood || "",
         token: data.access_token,
         refresh_token: data.refresh_token
       };
@@ -823,7 +842,7 @@
       fetch(SUBSCRIBERS_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
-        body: JSON.stringify({ owner_name: name, fruit, city, neighborhood, address })
+        body: JSON.stringify({ owner_name: name, fruit, city: city || "", neighborhood: neighborhood || "", address })
       }).catch(() => {});
     } catch(e) { showToast("שגיאה בפרסום העץ", true); }
   }
@@ -851,6 +870,58 @@
       await loadTrees();
       showToast("✅ הבקשה הוסרה");
     } catch(e) { showToast("שגיאה", true); }
+  }
+
+  function toggleNotifyFields(val) {
+    document.getElementById("notify-filters").style.display = val ? "block" : "none";
+    updateNotifyPref(val);
+    if (val) populateNotifyCityDropdown();
+  }
+
+  function populateNotifyCityDropdown() {
+    const cities = [...new Set(trees.map(t => t.city).filter(Boolean))].sort();
+    const cityEl = document.getElementById("notify-city");
+    const savedCity = currentUser?.notify_city || "";
+    cityEl.innerHTML = '<option value="">כל הערים</option>' + cities.map(c => `<option ${c===savedCity?"selected":""}>${c}</option>`).join("");
+    updateNotifyNeighborhoods();
+  }
+
+  function updateNotifyNeighborhoods() {
+    const city = document.getElementById("notify-city").value;
+    const cityTrees = city ? trees.filter(t => t.city === city) : trees;
+    const neighborhoods = [...new Set(cityTrees.map(t => t.neighborhood).filter(Boolean))].sort();
+    const neighEl = document.getElementById("notify-neighborhood");
+    const savedNeigh = currentUser?.notify_neighborhood || "";
+    neighEl.innerHTML = '<option value="">כל השכונות</option>' + neighborhoods.map(n => `<option ${n===savedNeigh?"selected":""}>${n}</option>`).join("");
+  }
+
+  async function saveNotifyFilters() {
+    if (!currentUser) return;
+    const city = document.getElementById("notify-city").value;
+    const neighborhood = document.getElementById("notify-neighborhood").value;
+    try {
+      const res = await fetch(SUPABASE_URL + "/auth/v1/user", {
+        method: "PUT",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + currentUser.token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ data: {
+          name: currentUser.name,
+          phone: currentUser.phone,
+          notify_new_trees: currentUser.notify_new_trees,
+          notify_city: city,
+          notify_neighborhood: neighborhood
+        }})
+      });
+      if (res.ok) {
+        currentUser.notify_city = city;
+        currentUser.notify_neighborhood = neighborhood;
+        saveSession(currentUser);
+        showToast("✅ הגדרות התראות נשמרו");
+      }
+    } catch(e) { showToast("שגיאה בשמירת ההגדרות", true); }
   }
 
   async function updateNotifyPref(val) {
