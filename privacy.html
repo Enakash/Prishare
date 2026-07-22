@@ -3,93 +3,865 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>פירות השכונה — מדיניות פרטיות</title>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <title>פירות השכונה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Heebo', sans-serif; direction: rtl; background: #F7F3EC; color: #2C2416; line-height: 1.7; }
-    .header { background: #2C6E35; padding: 0 24px; display: flex; align-items: center; gap: 12px; height: 60px; }
-    .header-logo { font-size: 22px; }
-    .header-title { color: #fff; font-size: 18px; font-weight: 800; }
-    .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
-    h1 { font-size: 26px; font-weight: 800; color: #2C6E35; margin-bottom: 6px; }
-    .updated { font-size: 13px; color: #aaa; margin-bottom: 32px; }
-    h2 { font-size: 16px; font-weight: 700; color: #2C2416; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 1.5px solid #EDE6D8; }
-    p { font-size: 15px; color: #444; margin-bottom: 12px; }
-    ul { padding-right: 20px; margin-bottom: 12px; }
-    li { font-size: 15px; color: #444; margin-bottom: 6px; }
-    .highlight { background: #EEF7EE; border: 1px solid #C8E0C8; border-radius: 10px; padding: 14px 18px; margin: 14px 0; }
-    .highlight p { color: #2C6E35; font-weight: 600; margin: 0; }
-    .footer { text-align: center; margin-top: 48px; padding-top: 20px; border-top: 1.5px solid #EDE6D8; font-size: 13px; color: #aaa; }
-    .footer a { color: #2C6E35; text-decoration: none; }
+    body { font-family: 'Heebo', sans-serif; direction: rtl; background: #F7F3EC; color: #2C2416; }
+    .header { background: #2C6E35; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .header-logo { display: flex; align-items: center; gap: 10px; }
+    .header-title { color: #fff; font-size: 20px; font-weight: 800; }
+    .header-subtitle { color: rgba(255,255,255,0.7); font-size: 12px; }
+    .header-user { display: flex; align-items: center; gap: 10px; }
+    .header-user-name { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600; }
+    .btn-logout { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Heebo', sans-serif; }
+    .nav { background: #fff; border-bottom: 2px solid #E8E0D0; display: flex; }
+    .nav-tab { flex: 1; padding: 14px 8px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 600; color: #888; border: none; background: transparent; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: 'Heebo', sans-serif; }
+    .nav-tab.active { color: #2C6E35; border-bottom-color: #2C6E35; background: #F7FBF7; }
+    .main { max-width: 680px; margin: 0 auto; padding: 24px 16px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .auth-wrap { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .auth-card { background: #fff; border-radius: 18px; padding: 32px; width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); border: 1.5px solid #EDE6D8; }
+    .auth-logo { text-align: center; margin-bottom: 20px; }
+    .auth-logo span { font-size: 52px; }
+    .auth-title { font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+    .auth-sub { font-size: 13px; color: #888; text-align: center; margin-bottom: 24px; }
+    .auth-tabs { display: flex; background: #F5F0E8; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
+    .auth-tab { flex: 1; padding: 8px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: #888; border: none; background: transparent; font-family: 'Heebo', sans-serif; transition: all 0.2s; }
+    .auth-tab.active { background: #fff; color: #2C6E35; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    .remember-row { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px; font-size: 13px; color: #666; }
+    .remember-row input { width: 16px; height: 16px; cursor: pointer; accent-color: #2C6E35; }
+    .hero { background: linear-gradient(135deg, #2C6E35 0%, #4A9B56 100%); border-radius: 16px; padding: 28px 24px; margin-bottom: 24px; color: white; position: relative; overflow: hidden; }
+    .hero::after { content: '🌳'; position: absolute; left: 20px; bottom: -10px; font-size: 80px; opacity: 0.15; line-height: 1; }
+    .hero h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .hero p { font-size: 14px; opacity: 0.85; line-height: 1.6; max-width: 320px; }
+    .hero-stats { display: flex; gap: 20px; margin-top: 16px; }
+    .hero-stat { text-align: center; }
+    .hero-stat-num { font-size: 26px; font-weight: 800; line-height: 1; }
+    .hero-stat-label { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-select { flex: 1; min-width: 130px; padding: 9px 12px; border-radius: 9px; border: 1.5px solid #DDD8CC; font-size: 13px; font-family: 'Heebo', sans-serif; background: #fff; color: #2C2416; direction: rtl; }
+    .filter-select:focus { outline: none; border-color: #2C6E35; }
+    .section-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .tree-card { background: #fff; border-radius: 14px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; }
+    .tree-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .fruit-badge { background: #EEF7EE; color: #2C6E35; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 20px; border: 1px solid #C8E0C8; }
+    .price-badge { background: #FFF8E1; color: #E65100; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 20px; border: 1px solid #FFE082; }
+    .store-price { font-size: 11px; color: #aaa; text-decoration: line-through; }
+    .saving-badge { background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+    .available-row { display: flex; align-items: center; gap: 6px; }
+    .available-dot { width: 8px; height: 8px; border-radius: 50%; background: #4CAF50; box-shadow: 0 0 0 3px rgba(76,175,80,0.2); }
+    .tree-meta { font-size: 13px; color: #666; margin-bottom: 5px; }
+    .tree-desc { font-size: 14px; color: #444; line-height: 1.55; margin-bottom: 10px; }
+    .tree-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .qty-tag { font-size: 12px; color: #888; background: #F5F0E8; padding: 3px 10px; border-radius: 20px; }
+    .requests-count { font-size: 12px; color: #C07820; font-weight: 600; }
+    .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; font-family: 'Heebo', sans-serif; transition: all 0.18s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: #2C6E35; color: #fff; }
+    .btn-primary:hover { background: #225629; }
+    .btn-secondary { background: #F0EBE0; color: #2C2416; }
+    .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
+    .btn-danger { background: #FFF0F0; color: #C0392B; border: 1px solid #FFCDD2; }
+    .btn-full { width: 100%; justify-content: center; }
+    .form-card { background: #fff; border-radius: 14px; padding: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; margin-bottom: 20px; }
+    .form-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+    .form-row { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 5px; }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 13px; border-radius: 9px; border: 1.5px solid #DDD8CC; font-size: 14px; font-family: 'Heebo', sans-serif; background: #FDFBF8; color: #2C2416; direction: rtl; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #2C6E35; box-shadow: 0 0 0 3px rgba(44,110,53,0.1); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .price-hint { font-size: 12px; color: #888; margin-top: 4px; }
+    .price-hint span { color: #E65100; font-weight: 700; }
+    .autofill-note { font-size: 12px; color: #4CAF50; margin-top: 4px; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 18px; padding: 26px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .modal-sub { font-size: 13px; color: #888; margin-bottom: 18px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .modal-actions .btn { flex: 1; justify-content: center; }
+    .toast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2C6E35; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 300; white-space: nowrap; }
+    .toast.error { background: #C0392B; }
+    .my-tree-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; }
+    .my-tree-header { background: linear-gradient(135deg, #2C6E35, #4A9B56); padding: 14px 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .my-tree-title { font-size: 15px; font-weight: 700; }
+    .my-tree-body { padding: 14px 18px; }
+    .request-badge { background: rgba(255,255,255,0.25); color: white; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .request-item { background: #F7F3EC; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #EDE6D8; gap: 10px; }
+    .request-name { font-weight: 700; font-size: 13px; }
+    .request-msg { color: #666; font-size: 13px; margin-top: 2px; }
+    .request-phone { color: #2C6E35; font-weight: 600; font-size: 13px; }
+    .empty { text-align: center; padding: 48px 20px; }
+    .empty-icon { font-size: 52px; margin-bottom: 12px; }
+    .empty-text { font-size: 15px; font-weight: 600; color: #999; }
+    .empty-sub { font-size: 13px; color: #bbb; margin-top: 6px; }
+    .loading { text-align: center; padding: 40px; color: #888; font-size: 15px; }
+    .login-prompt { background: #FFF8E1; border: 1.5px solid #FFE082; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; font-size: 13px; color: #795548; text-align: center; }
+    .account-section { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; margin-top: 24px; }
+    .account-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #2C2416; }
+    .btn-delete-account { background: #FFF0F0; color: #C0392B; border: 1.5px solid #FFCDD2; width: 100%; justify-content: center; margin-top: 10px; }
+    .btn-delete-account:hover { background: #FFCDD2; }
+    .legal-links { text-align: center; margin-top: 16px; font-size: 12px; color: #aaa; }
+    .legal-links a { color: #2C6E35; text-decoration: none; margin: 0 6px; }
+    .delete-confirm-modal { background: #fff; border-radius: 18px; padding: 26px; width: 100%; max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center; }
+    .delete-confirm-modal h3 { font-size: 18px; font-weight: 800; color: #C0392B; margin-bottom: 10px; }
+    .delete-confirm-modal p { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.6; }
+    .login-prompt a { color: #2C6E35; font-weight: 700; cursor: pointer; text-decoration: underline; }
+    .profile-card { background: #EEF7EE; border: 1.5px solid #C8E0C8; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #2C6E35; display: flex; align-items: center; gap: 8px; }
+    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .filter-bar { flex-direction: column; } }
   </style>
 </head>
 <body>
-<div class="header">
-  <span class="header-logo">🌳</span>
-  <div class="header-title">פירות השכונה</div>
-</div>
-<div class="container">
-  <h1>מדיניות פרטיות</h1>
-  <div class="updated">עודכן לאחרונה: 13 ביולי 2026</div>
 
-  <p>מדיניות פרטיות זו מסבירה כיצד אפליקציית "פירות השכונה" ("האפליקציה") אוספת, משתמשת ומגנה על המידע שלך.</p>
-
-  <h2>1. המידע שאנו אוספים</h2>
-  <p>האפליקציה אוספת את המידע הבא בעת הרשמה ושימוש:</p>
-  <ul>
-    <li><strong>פרטי חשבון:</strong> שם מלא, כתובת אימייל וסיסמה (מוצפנת).</li>
-    <li><strong>פרטי יצירת קשר:</strong> מספר טלפון (אופציונלי, לצורך תיאום קטיף).</li>
-    <li><strong>פרטי עצים שפרסמת:</strong> סוג פרי, כתובת, עיר, שכונה, תיאור ומחיר.</li>
-    <li><strong>בקשות קטיף:</strong> שם הקוטף, טלפון והערות.</li>
-  </ul>
-
-  <h2>2. כיצד אנו משתמשים במידע</h2>
-  <ul>
-    <li>הצגת עצים ופירות זמינים לשכנים בשכונה.</li>
-    <li>תיאום בין בעלי עצים לקוטפים.</li>
-    <li>שליחת התראות אימייל לבעל העץ כאשר מתקבלת בקשת קטיף.</li>
-    <li>ניהול חשבון המשתמש וזיהוי בעלות על עצים.</li>
-  </ul>
-
-  <h2>3. שיתוף מידע</h2>
-  <div class="highlight">
-    <p>✅ אנו לא מוכרים, משכירים או מעבירים את המידע האישי שלך לצדדים שלישיים לצרכי שיווק.</p>
-  </div>
-  <p>המידע שלך משותף רק במקרים הבאים:</p>
-  <ul>
-    <li><strong>Supabase</strong> — ספק מסד הנתונים שלנו, לצורך אחסון הנתונים בלבד.</li>
-    <li><strong>Resend</strong> — שירות שליחת אימיילים, לצורך התראות על בקשות קטיף בלבד.</li>
-    <li>כאשר הדבר נדרש על פי חוק.</li>
-  </ul>
-  <p>פרטי הקשר של בעל העץ (שם וטלפון) מוצגים לשכנים המעוניינים לקטוף, לצורך תיאום ישיר ביניהם.</p>
-
-  <h2>4. אבטחת מידע</h2>
-  <p>הסיסמאות מאוחסנות מוצפנות ולא נגישות לאף אחד, כולל מנהלי האפליקציה. החיבור לשרת מוצפן באמצעות HTTPS.</p>
-
-  <h2>5. שמירת מידע ומחיקה</h2>
-  <p>המידע שלך נשמר כל עוד חשבונך פעיל. ביכולתך למחוק את חשבונך ואת כל הנתונים הקשורים אליו בכל עת דרך לשונית "הניהול שלי" ← "מחיקת חשבון". לאחר מחיקה, כל הנתונים יוסרו תוך 30 יום.</p>
-
-  <h2>6. עוגיות וטכנולוגיות מעקב</h2>
-  <p>האפליקציה משתמשת ב־localStorage לשמירת פרטי הכניסה המקומיים בלבד (כאשר בחרת "זכור אותי"). אין שימוש בעוגיות מעקב או פרסום.</p>
-
-  <h2>7. זכויותיך</h2>
-  <ul>
-    <li>עיון במידע האישי שנאסף עליך.</li>
-    <li>תיקון מידע שגוי.</li>
-    <li>מחיקת כל המידע שלך.</li>
-    <li>הגשת תלונה לרשות הגנת הפרטיות בישראל.</li>
-  </ul>
-
-  <h2>8. שינויים במדיניות</h2>
-  <p>אנו רשאים לעדכן מדיניות זו מעת לעת. במקרה של שינוי מהותי, נודיע לך באמצעות האימייל הרשום.</p>
-
-  <h2>9. יצירת קשר</h2>
-  <p>לכל שאלה בנושא פרטיות, ניתן לפנות אלינו בכתובת: <strong>support@prishare.app</strong></p>
-
-  <div class="footer">
-    <a href="index.html">🌳 חזרה לאפליקציה</a> · <a href="terms.html">תנאי שימוש</a>
+<!-- AUTH PAGE -->
+<div id="auth-page">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo"><span>🌳</span></div>
+      <div class="auth-title">פירות השכונה</div>
+      <div class="auth-sub">שיתוף פירות בין שכנים</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">התחברות</button>
+        <button class="auth-tab" onclick="switchAuthTab('signup')">הרשמה</button>
+      </div>
+      <div id="auth-login">
+        <div class="form-row">
+          <label class="form-label">אימייל</label>
+          <input class="form-input" id="login-email" type="email" placeholder="your@email.com" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">סיסמה</label>
+          <input class="form-input" id="login-pass" type="password" placeholder="••••••••" />
+        </div>
+        <div class="remember-row">
+          <input type="checkbox" id="remember-me" checked />
+          <label for="remember-me">זכור אותי</label>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()">התחבר</button>
+        <div style="text-align:center;margin-top:14px;font-size:13px;color:#888">
+          או <a style="color:#2C6E35;font-weight:700;cursor:pointer" onclick="continueAsGuest()">המשך כאורח (צפייה בלבד)</a>
+        </div>
+      </div>
+      <div id="auth-signup" style="display:none">
+        <div class="form-row">
+          <label class="form-label">שם מלא</label>
+          <input class="form-input" id="signup-name" placeholder="ישראל ישראלי" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">טלפון</label>
+          <input class="form-input" id="signup-phone" placeholder="050-0000000" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">אימייל</label>
+          <input class="form-input" id="signup-email" type="email" placeholder="your@email.com" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">סיסמה</label>
+          <input class="form-input" id="signup-pass" type="password" placeholder="לפחות 6 תווים" />
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doSignup()">הירשם</button>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- MAIN APP -->
+<div id="main-app" style="display:none">
+<header class="header">
+  <div class="header-logo">
+    <span style="font-size:26px">🌳</span>
+    <div>
+      <div class="header-title">פירות השכונה</div>
+      <div class="header-subtitle">שיתוף פירות בין שכנים</div>
+    </div>
+  </div>
+  <div class="header-user">
+    <span class="header-user-name" id="header-username"></span>
+    <button class="btn-logout" onclick="doLogout()">יציאה</button>
+  </div>
+</header>
+
+<nav class="nav">
+  <button class="nav-tab active" onclick="showTab('browse', this)">🔍 עצים</button>
+  <button class="nav-tab" onclick="showTab('owner', this)">🌱 הוסף עץ</button>
+  <button class="nav-tab" onclick="showTab('dashboard', this)">📋 הניהול שלי</button>
+</nav>
+
+<main class="main">
+  <!-- BROWSE -->
+  <div id="page-browse" class="page active">
+    <div class="hero">
+      <h2>פירות טריים מהשכונה 🍊</h2>
+      <p>בעלי עצים מציעים פירות לקטיף — שלח בקשה וקבע מועד עם השכן שלך</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num" id="stat-available">0</div><div class="hero-stat-label">עצים זמינים</div></div>
+        <div class="hero-stat"><div class="hero-stat-num" id="stat-requests">0</div><div class="hero-stat-label">בקשות קטיף</div></div>
+        <div class="hero-stat"><div class="hero-stat-num" id="stat-total">0</div><div class="hero-stat-label">סה"כ עצים</div></div>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <select class="filter-select" id="filter-city" onchange="applyFilters()"><option value="">🏙️ כל הערים</option></select>
+      <select class="filter-select" id="filter-neighborhood" onchange="applyFilters()"><option value="">🏘️ כל השכונות</option></select>
+      <select class="filter-select" id="filter-fruit" onchange="applyFilters()"><option value="">🌿 כל הפירות</option></select>
+    </div>
+    <div class="section-title"><span>🌿</span> עצים זמינים לקטיף</div>
+    <div id="trees-list"><div class="loading">⏳ טוען עצים...</div></div>
+  </div>
+
+  <!-- OWNER -->
+  <div id="page-owner" class="page">
+    <div class="section-title"><span>🌱</span> הוסף עץ שלך</div>
+    <div id="owner-login-prompt" class="login-prompt" style="display:none">
+      כדי לפרסם עץ יש <a onclick="showAuthPage()">להתחבר או להירשם</a>
+    </div>
+    <div class="form-card" id="owner-form">
+      <div class="profile-card" id="profile-autofill" style="display:none">
+        ✅ הפרטים שלך מולאו אוטומטית — תוכל לערוך אם צריך
+      </div>
+      <div class="form-title">🌳 פרטי העץ</div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label">שמך המלא *</label>
+          <input class="form-input" id="o-name" placeholder="יוסי ישראלי" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">טלפון *</label>
+          <input class="form-input" id="o-phone" placeholder="050-0000000" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label">עיר/ישוב *</label>
+          <input class="form-input" id="o-city" placeholder="מודיעין" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">שכונה</label>
+          <input class="form-input" id="o-neighborhood" placeholder="שכונת..." />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">כתובת מדויקת *</label>
+        <input class="form-input" id="o-address" placeholder="רחוב, מספר בית" />
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label">סוג פרי *</label>
+          <select class="form-select" id="o-fruit" onchange="updatePriceHint()">
+            <option>תפוח 🍎</option><option>תפוז 🍊</option><option selected>לימון 🍋</option>
+            <option>אגס 🍐</option><option>ענב 🍇</option><option>תאנה 🫐</option>
+            <option>שזיף 🍑</option><option>אבוקדו 🥑</option><option>זית 🫒</option><option>אחר 🌿</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">מחיר לק"ג (₪)</label>
+          <input class="form-input" id="o-price" type="number" min="0" step="0.5" placeholder="0 = חינם" />
+          <div class="price-hint" id="price-hint"></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">כמות משוערת</label>
+        <input class="form-input" id="o-quantity" placeholder="~20 לימונים" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">תיאור</label>
+        <textarea class="form-textarea" id="o-desc" placeholder="ספר על הפירות — מתי הם בשלים, שעות נוחות..."></textarea>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="addTree()">🌳 פרסם את העץ שלך</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page">
+    <div class="section-title"><span>📋</span> העצים שלי</div>
+    <div id="dashboard-list"><div class="loading">⏳ טוען...</div></div>
+
+    <div class="account-section" id="account-section" style="display:none">
+      <h3>⚙️ ניהול חשבון</h3>
+      <div style="font-size:13px;color:#666;margin-bottom:14px">
+        מחובר כ: <strong id="account-email"></strong>
+      </div>
+      <button class="btn btn-secondary btn-full" onclick="doLogout()" style="margin-bottom:8px">
+        🚪 התנתקות
+      </button>
+      <button class="btn btn-delete-account btn-full" onclick="showDeleteModal()">
+        🗑️ מחיקת חשבון וכל הנתונים
+      </button>
+      <div class="legal-links">
+        <a href="privacy.html">מדיניות פרטיות</a> · <a href="terms.html">תנאי שימוש</a>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- DELETE ACCOUNT MODAL -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="delete-confirm-modal">
+    <h3>⚠️ מחיקת חשבון</h3>
+    <p>פעולה זו תמחק את חשבונך ואת כל העצים והבקשות שלך לצמיתות. לא ניתן לבטל פעולה זו.</p>
+    <div class="form-row">
+      <label class="form-label">הזן סיסמה לאישור</label>
+      <input class="form-input" type="password" id="delete-pass" placeholder="סיסמה" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="document.getElementById('delete-modal').classList.remove('open')">ביטול</button>
+      <button class="btn btn-danger" onclick="doDeleteAccount()">מחק חשבון</button>
+    </div>
+  </div>
+</div>
+
+<!-- REQUEST MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">🌿 בקשת קטיף</div>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div id="modal-price-info" style="margin-bottom:14px;display:none">
+      <span id="modal-price-badge" class="price-badge"></span>
+      <span style="margin-right:6px" id="modal-store-price" class="store-price"></span>
+      <span id="modal-saving" class="saving-badge"></span>
+    </div>
+    <div class="form-row">
+      <label class="form-label">שמך המלא *</label>
+      <input class="form-input" id="r-name" placeholder="שם מלא" />
+    </div>
+    <div class="form-row">
+      <label class="form-label">מספר טלפון *</label>
+      <input class="form-input" id="r-phone" placeholder="050-0000000" />
+    </div>
+    <div class="form-row">
+      <label class="form-label">הערה (אופציונלי)</label>
+      <textarea class="form-textarea" id="r-msg" rows="2" placeholder="זמין בסופי שבוע..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+      <button class="btn btn-primary" onclick="submitRequest()">שלח בקשה 🌿</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const SUPABASE_URL = "https://obrmyjygitkbaipqdcqb.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_UxLyGsF4PlFOIF3OXJgbSg_hh5MA_oM";
+  const FUNCTION_URL = SUPABASE_URL + "/functions/v1/notify-owner";
+
+  const STORE_PRICES = { "תפוח":9,"תפוז":7,"לימון":12,"אגס":11,"ענב":18,"תאנה":25,"שזיף":16,"אבוקדו":20,"זית":14,"אחר":10 };
+  const FRUIT_EMOJIS = { "תפוח":"🍎","תפוז":"🍊","לימון":"🍋","אגס":"🍐","ענב":"🍇","תאנה":"🫐","שזיף":"🍑","אבוקדו":"🥑","זית":"🫒","אחר":"🌿" };
+
+  let trees = [];
+  let currentTreeId = null;
+  let currentUser = null;
+  let isGuest = false;
+
+  // ===== SAVED SESSION =====
+  function saveSession(user) {
+    localStorage.setItem("prishare_user", JSON.stringify(user));
+  }
+  function loadSession() {
+    try {
+      const saved = localStorage.getItem("prishare_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch(e) { return null; }
+  }
+  function clearSession() {
+    localStorage.removeItem("prishare_user");
+  }
+
+  // ===== AUTH =====
+  async function sbAuth(path, body) {
+    const res = await fetch(SUPABASE_URL + "/auth/v1/" + path, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || data.msg || "שגיאה");
+    return data;
+  }
+
+  function switchAuthTab(tab) {
+    document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+    event.currentTarget.classList.add("active");
+    document.getElementById("auth-login").style.display = tab === "login" ? "block" : "none";
+    document.getElementById("auth-signup").style.display = tab === "signup" ? "block" : "none";
+  }
+
+  async function doLogin() {
+    const email = document.getElementById("login-email").value.trim();
+    const pass = document.getElementById("login-pass").value;
+    const remember = document.getElementById("remember-me").checked;
+    if (!email || !pass) { showToast("נא למלא אימייל וסיסמה", true); return; }
+    try {
+      const data = await sbAuth("token?grant_type=password", { email, password: pass });
+      currentUser = {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.user_metadata?.name || email.split("@")[0],
+        phone: data.user.user_metadata?.phone || "",
+        token: data.access_token,
+        refresh_token: data.refresh_token
+      };
+      isGuest = false;
+      if (remember) saveSession(currentUser);
+      enterApp();
+    } catch(e) { showToast(e.message, true); }
+  }
+
+  async function doSignup() {
+    const name = document.getElementById("signup-name").value.trim();
+    const phone = document.getElementById("signup-phone").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
+    const pass = document.getElementById("signup-pass").value;
+    if (!name || !email || !pass) { showToast("נא למלא את כל השדות", true); return; }
+    if (pass.length < 6) { showToast("הסיסמה חייבת להיות לפחות 6 תווים", true); return; }
+    try {
+      const data = await sbAuth("signup", { email, password: pass, data: { name, phone } });
+      // אחרי רישום — כנס אוטומטית אם יש token
+      if (data.access_token) {
+        currentUser = { id: data.user.id, email, name, phone, token: data.access_token, refresh_token: data.refresh_token };
+        isGuest = false;
+        saveSession(currentUser);
+        enterApp();
+        showToast("✅ נרשמת בהצלחה! ברוך הבא");
+      } else {
+        showToast("✅ נרשמת! אמת את האימייל שלך ואז התחבר");
+        // מלא אוטומטי בטופס התחברות
+        document.getElementById("login-email").value = email;
+        switchAuthTab("login");
+        document.querySelectorAll(".auth-tab")[0].classList.add("active");
+        document.querySelectorAll(".auth-tab")[1].classList.remove("active");
+      }
+    } catch(e) { showToast(e.message, true); }
+  }
+
+  function continueAsGuest() {
+    isGuest = true;
+    currentUser = null;
+    enterApp();
+  }
+
+  function enterApp() {
+    document.getElementById("auth-page").style.display = "none";
+    document.getElementById("main-app").style.display = "block";
+    document.getElementById("header-username").textContent = isGuest ? "אורח" : currentUser.name;
+    autofillOwnerForm();
+    loadTrees();
+    updateOwnerForm();
+  }
+
+  function doLogout() {
+    clearSession();
+    currentUser = null;
+    isGuest = false;
+    document.getElementById("main-app").style.display = "none";
+    document.getElementById("auth-page").style.display = "block";
+  }
+
+  function showAuthPage() {
+    document.getElementById("main-app").style.display = "none";
+    document.getElementById("auth-page").style.display = "block";
+  }
+
+  function updateOwnerForm() {
+    const prompt = document.getElementById("owner-login-prompt");
+    const form = document.getElementById("owner-form");
+    if (isGuest) { prompt.style.display = "block"; form.style.display = "none"; }
+    else { prompt.style.display = "none"; form.style.display = "block"; }
+  }
+
+  // ===== AUTOFILL =====
+  function autofillOwnerForm() {
+    if (!currentUser) return;
+    if (currentUser.name) document.getElementById("o-name").value = currentUser.name;
+    if (currentUser.phone) document.getElementById("o-phone").value = currentUser.phone;
+    if (currentUser.name || currentUser.phone) {
+      document.getElementById("profile-autofill").style.display = "flex";
+    }
+  }
+
+  // ===== TOKEN REFRESH =====
+  async function refreshToken() {
+    if (!currentUser?.refresh_token) return false;
+    try {
+      const res = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=refresh_token", {
+        method: "POST",
+        headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: currentUser.refresh_token })
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      currentUser.token = data.access_token;
+      currentUser.refresh_token = data.refresh_token;
+      saveSession(currentUser);
+      return true;
+    } catch(e) { return false; }
+  }
+
+  // ===== API =====
+  async function sbFetch(path, options = {}) {
+    const makeRequest = async () => {
+      const headers = {
+        "apikey": SUPABASE_KEY,
+        "Content-Type": "application/json",
+        "Prefer": options.prefer || "return=representation",
+        ...options.headers
+      };
+      headers["Authorization"] = currentUser?.token ? "Bearer " + currentUser.token : "Bearer " + SUPABASE_KEY;
+      return await fetch(SUPABASE_URL + "/rest/v1/" + path, { ...options, headers });
+    };
+    let res = await makeRequest();
+    // אם פג תוקף ה־token — נחדש אוטומטית ונשלח שוב
+    if (res.status === 401 && currentUser?.refresh_token) {
+      const refreshed = await refreshToken();
+      if (refreshed) res = await makeRequest();
+      else { doLogout(); showToast("פג תוקף החיבור — אנא התחבר שוב", true); return null; }
+    }
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  }
+
+  async function loadTrees() {
+    try {
+      trees = await sbFetch("trees?select=*,requests(*)&order=created_at.desc") || [];
+      buildFilters();
+      applyFilters();
+      renderDashboard();
+      updateStats();
+    } catch(e) { showToast("שגיאה בטעינת הנתונים", true); }
+  }
+
+  function updateStats() {
+    document.getElementById("stat-available").textContent = trees.filter(t => t.available).length;
+    document.getElementById("stat-requests").textContent = trees.reduce((s,t) => s+(t.requests?.length||0), 0);
+    document.getElementById("stat-total").textContent = trees.length;
+  }
+
+  function getFruitName(fruit) {
+    if (!fruit) return "אחר";
+    for (const key of Object.keys(FRUIT_EMOJIS)) { if (fruit.includes(key)) return key; }
+    return "אחר";
+  }
+  function getFruitEmoji(fruit) { return FRUIT_EMOJIS[getFruitName(fruit)] || "🌿"; }
+
+  // ===== FILTERS =====
+  function buildFilters() {
+    const cities = [...new Set(trees.map(t => t.city).filter(Boolean))].sort();
+    const fruits = [...new Set(trees.map(t => getFruitName(t.fruit)))].sort();
+    const cityEl = document.getElementById("filter-city");
+    const fruitEl = document.getElementById("filter-fruit");
+    const prevCity = cityEl.value, prevFruit = fruitEl.value;
+    cityEl.innerHTML = '<option value="">🏙️ כל הערים</option>' + cities.map(c => `<option ${c===prevCity?"selected":""}>${c}</option>`).join("");
+    fruitEl.innerHTML = '<option value="">🌿 כל הפירות</option>' + fruits.map(f => `<option ${f===prevFruit?"selected":""}>${getFruitEmoji(f)} ${f}</option>`).join("");
+  }
+
+  function applyFilters() {
+    const city = document.getElementById("filter-city").value;
+    const fruit = document.getElementById("filter-fruit").value;
+    const cityTrees = city ? trees.filter(t => t.city === city) : trees;
+    const neighborhoods = [...new Set(cityTrees.map(t => t.neighborhood).filter(Boolean))].sort();
+    const neighEl = document.getElementById("filter-neighborhood");
+    const prevNeigh = neighEl.value;
+    neighEl.innerHTML = '<option value="">🏘️ כל השכונות</option>' + neighborhoods.map(n => `<option ${n===prevNeigh?"selected":""}>${n}</option>`).join("");
+    let filtered = trees.filter(t => t.available);
+    if (city) filtered = filtered.filter(t => t.city === city);
+    if (prevNeigh) filtered = filtered.filter(t => t.neighborhood === prevNeigh);
+    // הערך ב־dropdown הוא 'אימוג'י שם' — נחלץ את השם העברי (לאחר הרווח)
+    const fruitName = fruit ? fruit.replace(/^.+\s/, "").trim() : "";
+    if (fruitName) filtered = filtered.filter(t => getFruitName(t.fruit) === fruitName);
+    renderBrowse(filtered);
+  }
+
+  // ===== RENDER =====
+  function renderBrowse(list) {
+    const el = document.getElementById("trees-list");
+    if (!list) list = trees.filter(t => t.available);
+    // הסר עצים של המשתמש המחובר
+    if (currentUser && !isGuest) { list = list.filter(t => t.user_id !== currentUser.id); }
+    if (list.length === 0) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">🌾</div><div class="empty-text">אין עצים זמינים</div><div class="empty-sub">נסה לשנות את הסינון</div></div>';
+      return;
+    }
+    el.innerHTML = list.map(tree => {
+      const fruitName = getFruitName(tree.fruit);
+      const storePrice = STORE_PRICES[fruitName] || 10;
+      const treePrice = tree.price_per_kg;
+      const isFree = !treePrice || treePrice == 0;
+      const saving = isFree ? storePrice : (storePrice - treePrice > 0 ? storePrice - treePrice : 0);
+      return '<div class="tree-card">' +
+        '<div class="tree-card-header">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+            '<span style="font-size:28px">' + getFruitEmoji(tree.fruit) + '</span>' +
+            '<span class="fruit-badge">' + fruitName + '</span>' +
+            (isFree ? '<span class="price-badge">חינם! 🎁</span>' : '<span class="price-badge">₪' + treePrice + '/ק"ג</span>') +
+            (saving > 0 ? '<span class="saving-badge">חיסכון ₪' + saving + ' מחנות</span>' : '') +
+          '</div>' +
+          '<div class="available-row"><div class="available-dot"></div><span style="font-size:12px;color:#4CAF50;font-weight:600">זמין</span></div>' +
+        '</div>' +
+        ((tree.city || tree.neighborhood) ? '<div class="tree-meta">🏘️ ' + [tree.neighborhood, tree.city].filter(Boolean).join(", ") + '</div>' : '') +
+        '<div class="tree-meta">📍 ' + tree.address + '</div>' +
+        '<div class="tree-meta">👤 ' + tree.owner_name + '</div>' +
+        (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ' + tree.owner_phone + '</div>' : '') +
+        (tree.description ? '<div class="tree-desc">' + tree.description + '</div>' : '') +
+        '<div class="tree-footer">' +
+          '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
+            (tree.quantity ? '<span class="qty-tag">כמות: ' + tree.quantity + '</span>' : '') +
+            (!isFree ? '<span class="store-price">מחנות: ₪' + storePrice + '/ק"ג</span>' : '') +
+            (tree.requests && tree.requests.length ? '<span class="requests-count">⏳ ' + tree.requests.length + ' בקשות</span>' : '') +
+          '</div>' +
+          '<button class="btn btn-primary btn-sm" onclick="openModal(\'' + tree.id + '\')">🌿 בקש לקטוף</button>' +
+        '</div></div>';
+    }).join("");
+  }
+
+  function renderDashboard() {
+    const el = document.getElementById("dashboard-list");
+    const accSection = document.getElementById("account-section");
+    if (!isGuest && currentUser) {
+      accSection.style.display = "block";
+      document.getElementById("account-email").textContent = currentUser.email;
+    } else {
+      accSection.style.display = "none";
+    }
+    if (isGuest) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">🔐</div><div class="empty-text">יש להתחבר כדי לנהל עצים</div><div class="empty-sub"><a style="color:#2C6E35;font-weight:700;cursor:pointer" onclick="showAuthPage()">התחבר כאן</a></div></div>';
+      return;
+    }
+    const myTrees = trees.filter(t => t.user_id === currentUser.id);
+    if (myTrees.length === 0) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">🌱</div><div class="empty-text">עדיין לא פרסמת עצים</div><div class="empty-sub">עבור ל"הוסף עץ"</div></div>';
+      return;
+    }
+    el.innerHTML = myTrees.map(tree =>
+      '<div class="my-tree-card">' +
+        '<div class="my-tree-header">' +
+          '<div class="my-tree-title">' + getFruitEmoji(tree.fruit) + ' ' + getFruitName(tree.fruit) + ' — ' + tree.address + '</div>' +
+          '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+            (tree.requests && tree.requests.length ? '<span class="request-badge">' + tree.requests.length + ' בקשות</span>' : '') +
+            '<button onclick="toggleAvailable(\'' + tree.id + '\',' + tree.available + ')" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:Heebo,sans-serif;font-weight:700">' +
+              (tree.available ? "✅ זמין" : "❌ לא זמין") +
+            '</button>' +
+            '<button onclick="deleteTree(\'' + tree.id + '\')" style="background:rgba(220,50,50,0.25);color:white;border:1px solid rgba(255,150,150,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:Heebo,sans-serif;font-weight:700">🗑️ הסר</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="my-tree-body">' +
+          '<div style="font-size:13px;color:#666;margin-bottom:10px">👤 ' + tree.owner_name + (tree.quantity ? " · " + tree.quantity : "") + (tree.price_per_kg ? ' · ₪' + tree.price_per_kg + '/ק"ג' : " · חינם") + '</div>' +
+          (!(tree.requests && tree.requests.length)
+            ? '<div style="font-size:13px;color:#bbb;padding:8px 0">עדיין אין בקשות קטיף</div>'
+            : tree.requests.map(req =>
+                '<div class="request-item">' +
+                  '<div>' +
+                    '<div class="request-name">🌿 ' + req.requester_name + '</div>' +
+                    (req.message ? '<div class="request-msg">"' + req.message + '"</div>' : '') +
+                    '<div class="request-phone">📞 ' + req.phone + '</div>' +
+                  '</div>' +
+                  '<button class="btn btn-danger btn-sm" onclick="deleteRequest(\'' + req.id + '\')">סגור</button>' +
+                '</div>'
+              ).join("")
+          ) +
+        '</div>' +
+      '</div>'
+    ).join("");
+  }
+
+  // ===== ACTIONS =====
+  function showTab(name, el) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+    document.getElementById("page-" + name).classList.add("active");
+    el.classList.add("active");
+    if (name === "owner") autofillOwnerForm();
+  }
+
+  function updatePriceHint() {
+    const fruit = document.getElementById("o-fruit").value.replace(/ .+/, "");
+    const store = STORE_PRICES[fruit] || 10;
+    document.getElementById("price-hint").innerHTML = 'מחיר ממוצע בחנויות: <span>₪' + store + '/ק"ג</span> — הזן 0 לחינם';
+  }
+
+  function openModal(treeId) {
+    currentTreeId = treeId;
+    const tree = trees.find(t => t.id === treeId);
+    const fruitName = getFruitName(tree.fruit);
+    const storePrice = STORE_PRICES[fruitName] || 10;
+    document.getElementById("modal-title").textContent = getFruitEmoji(tree.fruit) + " בקשת קטיף";
+    document.getElementById("modal-sub").textContent = fruitName + " אצל " + tree.owner_name + " · " + tree.address;
+    const priceInfo = document.getElementById("modal-price-info");
+    if (tree.price_per_kg != null) {
+      const isFree = tree.price_per_kg == 0;
+      document.getElementById("modal-price-badge").textContent = isFree ? "חינם! 🎁" : "₪" + tree.price_per_kg + '/ק"ג';
+      document.getElementById("modal-store-price").textContent = "מחנות: ₪" + storePrice + '/ק"ג';
+      const saving = isFree ? storePrice : Math.max(0, storePrice - tree.price_per_kg);
+      document.getElementById("modal-saving").textContent = saving > 0 ? "חיסכון ₪" + saving + "!" : "";
+      priceInfo.style.display = "block";
+    } else { priceInfo.style.display = "none"; }
+    // מלא אוטומטי פרטי המשתמש אם מחובר
+    if (currentUser && !isGuest) {
+      document.getElementById("r-name").value = currentUser.name || "";
+      document.getElementById("r-phone").value = currentUser.phone || "";  // טלפון מהרשמה בלבד
+    } else {
+      document.getElementById("r-name").value = "";
+      document.getElementById("r-phone").value = "";
+    }
+    document.getElementById("r-msg").value = "";
+    document.getElementById("modal").classList.add("open");
+  }
+
+  function closeModal() {
+    document.getElementById("modal").classList.remove("open");
+    currentTreeId = null;
+  }
+
+  async function submitRequest() {
+    const name = document.getElementById("r-name").value.trim();
+    const phone = document.getElementById("r-phone").value.trim();
+    const msg = document.getElementById("r-msg").value.trim();
+    if (!name || !phone) { showToast("נא למלא שם וטלפון", true); return; }
+    try {
+      await sbFetch("requests", { method: "POST", body: JSON.stringify({ tree_id: currentTreeId, requester_name: name, phone, message: msg }) });
+      // שלח אימייל לבעל העץ
+      const tree = trees.find(t => t.id === currentTreeId);
+      const ownerEmail = tree && (tree.owner_email || tree.owner_email_fallback);
+      if (tree && ownerEmail) {
+        try {
+          await fetch(FUNCTION_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
+            body: JSON.stringify({
+              tree_owner_email: ownerEmail,
+              tree_owner_name: tree.owner_name,
+              fruit: getFruitName(tree.fruit),
+              address: tree.address,
+              requester_name: name,
+              requester_phone: phone,
+              message: msg
+            })
+          });
+        } catch(emailErr) { console.log("email error:", emailErr); }
+      }
+      closeModal();
+      await loadTrees();
+      showToast("✅ בקשת הקטיף נשלחה בהצלחה!");
+    } catch(e) { showToast("שגיאה בשליחת הבקשה", true); }
+  }
+
+  async function addTree() {
+    const name = document.getElementById("o-name").value.trim();
+    const phone = document.getElementById("o-phone").value.trim();
+    const city = document.getElementById("o-city").value.trim();
+    const neighborhood = document.getElementById("o-neighborhood").value.trim();
+    const address = document.getElementById("o-address").value.trim();
+    const fruit = document.getElementById("o-fruit").value.replace(/ .+/, "");
+    const price = document.getElementById("o-price").value;
+    const quantity = document.getElementById("o-quantity").value.trim();
+    const description = document.getElementById("o-desc").value.trim();
+    if (!name || !phone || !city || !address) { showToast("נא למלא שם, טלפון, עיר וכתובת", true); return; }
+    try {
+      await sbFetch("trees", { method: "POST", body: JSON.stringify({
+        owner_name: name, owner_phone: phone, owner_email: currentUser?.email,
+        city, neighborhood, address, fruit, quantity, description,
+        price_per_kg: price !== "" ? parseFloat(price) : null,
+        user_id: currentUser?.id
+      })});
+      // עדכן את פרטי המשתמש לשימוש עתידי
+      // לא שומרים טלפון מטופס העץ — רק מהרשמה
+      ["o-city","o-neighborhood","o-address","o-quantity","o-desc","o-price"].forEach(id => document.getElementById(id).value = "");
+      await loadTrees();
+      showToast("🌳 העץ שלך פורסם בהצלחה!");
+    } catch(e) { showToast("שגיאה בפרסום העץ", true); }
+  }
+
+  async function toggleAvailable(id, current) {
+    try {
+      await sbFetch("trees?id=eq." + id, { method: "PATCH", body: JSON.stringify({ available: !current }) });
+      await loadTrees();
+    } catch(e) { showToast("שגיאה בעדכון", true); }
+  }
+
+  async function deleteTree(id) {
+    if (!confirm("האם למחוק את העץ הזה? כל הבקשות שלו יימחקו גם כן.")) return;
+    try {
+      await sbFetch("requests?tree_id=eq." + id, { method: "DELETE", prefer: "return=minimal" });
+      await sbFetch("trees?id=eq." + id, { method: "DELETE", prefer: "return=minimal" });
+      await loadTrees();
+      showToast("✅ העץ הוסר בהצלחה");
+    } catch(e) { showToast("שגיאה בהסרת העץ", true); }
+  }
+
+  async function deleteRequest(id) {
+    try {
+      await sbFetch("requests?id=eq." + id, { method: "DELETE", prefer: "return=minimal" });
+      await loadTrees();
+      showToast("✅ הבקשה הוסרה");
+    } catch(e) { showToast("שגיאה", true); }
+  }
+
+  function showDeleteModal() {
+    document.getElementById("delete-pass").value = "";
+    document.getElementById("delete-modal").classList.add("open");
+  }
+
+  async function doDeleteAccount() {
+    const pass = document.getElementById("delete-pass").value;
+    if (!pass) { showToast("נא להזין סיסמה", true); return; }
+    try {
+      // מחק את כל עצי המשתמש ובקשותיהם
+      const myTrees = trees.filter(t => t.user_id === currentUser.id);
+      for (const tree of myTrees) {
+        await sbFetch("requests?tree_id=eq." + tree.id, { method: "DELETE", prefer: "return=minimal" });
+        await sbFetch("trees?id=eq." + tree.id, { method: "DELETE", prefer: "return=minimal" });
+      }
+      // מחק את המשתמש מ־Supabase Auth
+      const res = await fetch(SUPABASE_URL + "/auth/v1/user", {
+        method: "DELETE",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + currentUser.token,
+          "Content-Type": "application/json"
+        }
+      });
+      if (!res.ok) {
+        // אם מחיקה ישירה לא נתמכת — התנתק לפחות
+        showToast("החשבון נמחק. אנא צור קשר לאישור סופי.", false);
+      } else {
+        showToast("✅ החשבון נמחק בהצלחה");
+      }
+      clearSession();
+      setTimeout(() => {
+        document.getElementById("delete-modal").classList.remove("open");
+        doLogout();
+      }, 2000);
+    } catch(e) { showToast("שגיאה במחיקת החשבון", true); }
+  }
+
+  function showToast(msg, isError = false) {
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.className = "toast" + (isError ? " error" : "");
+    el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 3500);
+  }
+
+  document.getElementById("modal").addEventListener("click", function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ===== AUTO LOGIN =====
+  const saved = loadSession();
+  if (saved && saved.token) {
+    currentUser = saved;
+    isGuest = false;
+    document.getElementById("auth-page").style.display = "none";
+    document.getElementById("main-app").style.display = "block";
+    document.getElementById("header-username").textContent = currentUser.name;
+    autofillOwnerForm();
+    loadTrees();
+    updateOwnerForm();
+  }
+
+  updatePriceHint();
+</script>
 </body>
 </html>
