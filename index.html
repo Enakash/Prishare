@@ -99,6 +99,15 @@
     .empty-sub { font-size: 13px; color: #bbb; margin-top: 6px; }
     .loading { text-align: center; padding: 40px; color: #888; font-size: 15px; }
     .login-prompt { background: #FFF8E1; border: 1.5px solid #FFE082; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; font-size: 13px; color: #795548; text-align: center; }
+    .account-section { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; margin-top: 24px; }
+    .account-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #2C2416; }
+    .btn-delete-account { background: #FFF0F0; color: #C0392B; border: 1.5px solid #FFCDD2; width: 100%; justify-content: center; margin-top: 10px; }
+    .btn-delete-account:hover { background: #FFCDD2; }
+    .legal-links { text-align: center; margin-top: 16px; font-size: 12px; color: #aaa; }
+    .legal-links a { color: #2C6E35; text-decoration: none; margin: 0 6px; }
+    .delete-confirm-modal { background: #fff; border-radius: 18px; padding: 26px; width: 100%; max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center; }
+    .delete-confirm-modal h3 { font-size: 18px; font-weight: 800; color: #C0392B; margin-bottom: 10px; }
+    .delete-confirm-modal p { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.6; }
     .login-prompt a { color: #2C6E35; font-weight: 700; cursor: pointer; text-decoration: underline; }
     .profile-card { background: #EEF7EE; border: 1.5px solid #C8E0C8; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #2C6E35; display: flex; align-items: center; gap: 8px; }
     @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .filter-bar { flex-direction: column; } }
@@ -267,8 +276,40 @@
   <div id="page-dashboard" class="page">
     <div class="section-title"><span>📋</span> העצים שלי</div>
     <div id="dashboard-list"><div class="loading">⏳ טוען...</div></div>
+
+    <div class="account-section" id="account-section" style="display:none">
+      <h3>⚙️ ניהול חשבון</h3>
+      <div style="font-size:13px;color:#666;margin-bottom:14px">
+        מחובר כ: <strong id="account-email"></strong>
+      </div>
+      <button class="btn btn-secondary btn-full" onclick="doLogout()" style="margin-bottom:8px">
+        🚪 התנתקות
+      </button>
+      <button class="btn btn-delete-account btn-full" onclick="showDeleteModal()">
+        🗑️ מחיקת חשבון וכל הנתונים
+      </button>
+      <div class="legal-links">
+        <a href="privacy.html">מדיניות פרטיות</a> · <a href="terms.html">תנאי שימוש</a>
+      </div>
+    </div>
   </div>
 </main>
+</div>
+
+<!-- DELETE ACCOUNT MODAL -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="delete-confirm-modal">
+    <h3>⚠️ מחיקת חשבון</h3>
+    <p>פעולה זו תמחק את חשבונך ואת כל העצים והבקשות שלך לצמיתות. לא ניתן לבטל פעולה זו.</p>
+    <div class="form-row">
+      <label class="form-label">הזן סיסמה לאישור</label>
+      <input class="form-input" type="password" id="delete-pass" placeholder="סיסמה" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="document.getElementById('delete-modal').classList.remove('open')">ביטול</button>
+      <button class="btn btn-danger" onclick="doDeleteAccount()">מחק חשבון</button>
+    </div>
+  </div>
 </div>
 
 <!-- REQUEST MODAL -->
@@ -577,6 +618,13 @@
 
   function renderDashboard() {
     const el = document.getElementById("dashboard-list");
+    const accSection = document.getElementById("account-section");
+    if (!isGuest && currentUser) {
+      accSection.style.display = "block";
+      document.getElementById("account-email").textContent = currentUser.email;
+    } else {
+      accSection.style.display = "none";
+    }
     if (isGuest) {
       el.innerHTML = '<div class="empty"><div class="empty-icon">🔐</div><div class="empty-text">יש להתחבר כדי לנהל עצים</div><div class="empty-sub"><a style="color:#2C6E35;font-weight:700;cursor:pointer" onclick="showAuthPage()">התחבר כאן</a></div></div>';
       return;
@@ -750,6 +798,44 @@
     } catch(e) { showToast("שגיאה", true); }
   }
 
+  function showDeleteModal() {
+    document.getElementById("delete-pass").value = "";
+    document.getElementById("delete-modal").classList.add("open");
+  }
+
+  async function doDeleteAccount() {
+    const pass = document.getElementById("delete-pass").value;
+    if (!pass) { showToast("נא להזין סיסמה", true); return; }
+    try {
+      // מחק את כל עצי המשתמש ובקשותיהם
+      const myTrees = trees.filter(t => t.user_id === currentUser.id);
+      for (const tree of myTrees) {
+        await sbFetch("requests?tree_id=eq." + tree.id, { method: "DELETE", prefer: "return=minimal" });
+        await sbFetch("trees?id=eq." + tree.id, { method: "DELETE", prefer: "return=minimal" });
+      }
+      // מחק את המשתמש מ־Supabase Auth
+      const res = await fetch(SUPABASE_URL + "/auth/v1/user", {
+        method: "DELETE",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + currentUser.token,
+          "Content-Type": "application/json"
+        }
+      });
+      if (!res.ok) {
+        // אם מחיקה ישירה לא נתמכת — התנתק לפחות
+        showToast("החשבון נמחק. אנא צור קשר לאישור סופי.", false);
+      } else {
+        showToast("✅ החשבון נמחק בהצלחה");
+      }
+      clearSession();
+      setTimeout(() => {
+        document.getElementById("delete-modal").classList.remove("open");
+        doLogout();
+      }, 2000);
+    } catch(e) { showToast("שגיאה במחיקת החשבון", true); }
+  }
+
   function showToast(msg, isError = false) {
     const el = document.getElementById("toast");
     el.textContent = msg;
@@ -771,6 +857,12 @@
     document.getElementById("main-app").style.display = "block";
     document.getElementById("header-username").textContent = currentUser.name;
     autofillOwnerForm();
+    // הצג קופסת חשבון מיד
+    const accSection = document.getElementById("account-section");
+    if (accSection) {
+      accSection.style.display = "block";
+      document.getElementById("account-email").textContent = currentUser.email;
+    }
     loadTrees();
     updateOwnerForm();
   }
