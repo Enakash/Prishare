@@ -390,6 +390,7 @@
   const SUPABASE_URL = "https://obrmyjygitkbaipqdcqb.supabase.co";
   const SUPABASE_KEY = "sb_publishable_UxLyGsF4PlFOIF3OXJgbSg_hh5MA_oM";
   const FUNCTION_URL = SUPABASE_URL + "/functions/v1/notify-owner";
+  const SUBSCRIBERS_URL = SUPABASE_URL + "/functions/v1/notify-subscribers";
 
   const STORE_PRICES = { "תפוח":9,"תפוז":7,"לימון":12,"אגס":11,"ענב":18,"תאנה":25,"שזיף":16,"אבוקדו":20,"זית":14,"אחר":10 };
   const FRUIT_EMOJIS = { "תפוח":"🍎","תפוז":"🍊","לימון":"🍋","אגס":"🍐","ענב":"🍇","תאנה":"🫐","שזיף":"🍑","אבוקדו":"🥑","זית":"🫒","אחר":"🌿" };
@@ -818,6 +819,12 @@
       ["o-city","o-neighborhood","o-address","o-quantity","o-desc","o-price"].forEach(id => document.getElementById(id).value = "");
       await loadTrees();
       showToast("🌳 העץ שלך פורסם בהצלחה!");
+      // שלח עדכון למנויים
+      fetch(SUBSCRIBERS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
+        body: JSON.stringify({ owner_name: name, fruit, city, neighborhood, address })
+      }).catch(() => {});
     } catch(e) { showToast("שגיאה בפרסום העץ", true); }
   }
 
