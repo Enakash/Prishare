@@ -282,7 +282,10 @@
       <div class="form-grid">
         <div class="form-row">
           <label class="form-label">עיר/ישוב *</label>
-          <input class="form-input" id="o-city" placeholder="מודיעין" oninput="updateOwnerNeighborhoods()" />
+          <select class="form-select" id="o-city" onchange="updateOwnerNeighborhoods()">
+              <option value="">בחר עיר...</option>
+            </select>
+            <input class="form-input" id="o-city-new" placeholder="עיר חדשה (אם לא ברשימה)" style="margin-top:6px;font-size:13px" />
         </div>
         <div class="form-row">
           <label class="form-label">שכונה</label>
@@ -712,6 +715,7 @@
       applyFilters();
       renderDashboard();
       updateStats();
+      populateOwnerCityDropdown();
     } catch(e) { showToast("שגיאה בטעינת הנתונים", true); }
   }
 
@@ -859,15 +863,25 @@
     document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
     document.getElementById("page-" + name).classList.add("active");
     el.classList.add("active");
-    if (name === "owner") autofillOwnerForm();
+    if (name === "owner") { autofillOwnerForm(); populateOwnerCityDropdown(); }
   }
 
   function updateOwnerNeighborhoods() {
-    const city = document.getElementById("o-city").value.trim();
+    const citySelect = document.getElementById("o-city").value.trim();
+    const cityNew = document.getElementById("o-city-new").value.trim();
+    const city = cityNew || citySelect;
     const neighEl = document.getElementById("o-neighborhood");
     const cityTrees = city ? trees.filter(t => t.city === city) : trees;
     const neighborhoods = [...new Set(cityTrees.map(t => t.neighborhood).filter(Boolean))].sort();
     neighEl.innerHTML = '<option value="">בחר שכונה...</option>' + neighborhoods.map(n => `<option>${n}</option>`).join("");
+  }
+
+  function populateOwnerCityDropdown() {
+    const cities = [...new Set(trees.map(t => t.city).filter(Boolean))].sort();
+    const cityEl = document.getElementById("o-city");
+    if (!cityEl) return;
+    const current = cityEl.value;
+    cityEl.innerHTML = '<option value="">בחר עיר...</option>' + cities.map(c => '<option' + (c===current?' selected':'') + '>' + c + '</option>').join("");
   }
 
   function updatePriceHint() {
@@ -945,7 +959,9 @@
   async function addTree() {
     const name = document.getElementById("o-name").value.trim();
     const phone = document.getElementById("o-phone").value.trim();
-    const city = document.getElementById("o-city").value.trim();
+    const citySelect = document.getElementById("o-city").value.trim();
+    const cityNew = document.getElementById("o-city-new").value.trim();
+    const city = cityNew || citySelect;
     const neighSelect = document.getElementById("o-neighborhood").value.trim();
     const neighNew = document.getElementById("o-neighborhood-new").value.trim();
     const neighborhood = neighNew || neighSelect;
@@ -964,7 +980,9 @@
       })});
       // עדכן את פרטי המשתמש לשימוש עתידי
       // לא שומרים טלפון מטופס העץ — רק מהרשמה
-      ["o-city","o-address","o-quantity","o-desc","o-price","o-neighborhood-new"].forEach(id => document.getElementById(id).value = "");
+      ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new"].forEach(id => document.getElementById(id).value = "");
+      document.getElementById("o-city").value = "";
+      document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
       await loadTrees();
       showToast("🌳 העץ שלך פורסם בהצלחה!");
@@ -981,6 +999,17 @@
     try {
       await sbFetch("trees?id=eq." + id, { method: "PATCH", body: JSON.stringify({ available: !current }) });
       await loadTrees();
+      // שלח התראה למנויים כשעץ חוזר לזמינות
+      if (current === false) {
+        const tree = trees.find(t => t.id === id);
+        if (tree) {
+          fetch(SUBSCRIBERS_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
+            body: JSON.stringify({ owner_name: tree.owner_name, fruit: getFruitName(tree.fruit), city: tree.city || "", neighborhood: tree.neighborhood || "", address: tree.address, type: "available" })
+          }).catch(() => {});
+        }
+      }
     } catch(e) { showToast("שגיאה בעדכון", true); }
   }
 
