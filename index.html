@@ -1169,19 +1169,8 @@
     makeCheckboxes("notify-neighborhood-checkboxes", neighborhoods.map(function(n){return {value:n,label:'🏘️ '+n};}), savedNeighs);
   }
 
-  function updateNotifyNeighborhoods() {
-    const city = document.getElementById("notify-city").value;
-    const cityTrees = city ? trees.filter(t => t.city === city) : trees;
-    const neighborhoods = [...new Set(cityTrees.map(t => t.neighborhood).filter(Boolean))].sort();
-    const neighEl = document.getElementById("notify-neighborhood");
-    const savedNeigh = currentUser?.notify_neighborhood || "";
-    neighEl.innerHTML = '<option value="">כל השכונות</option>' + neighborhoods.map(n => `<option ${n===savedNeigh?"selected":""}>${n}</option>`).join("");
-  }
-
   async function saveNotifyFilters() {
     if (!currentUser) return;
-    const city = document.getElementById("notify-city").value;
-    const neighborhood = document.getElementById("notify-neighborhood").value;
     try {
       const res = await fetch(SUPABASE_URL + "/auth/v1/user", {
         method: "PUT",
