@@ -43,6 +43,13 @@
     .notify-row { display: flex; align-items: flex-start; gap: 8px; margin: 8px 0 14px; font-size: 13px; color: #555; line-height: 1.5; }
     .notify-row input { width: 16px; height: 16px; cursor: pointer; accent-color: #2C6E35; margin-top: 2px; flex-shrink: 0; }
     .settings-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; margin-top: 16px; }
+    .tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; min-height: 28px; }
+    .tag-item { background: #EEF7EE; color: #2C6E35; border: 1px solid #C8E0C8; border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+    .tag-item button { background: none; border: none; cursor: pointer; color: #2C6E35; font-size: 14px; line-height: 1; padding: 0; font-weight: 700; }
+    .tag-empty { font-size: 12px; color: #bbb; font-style: italic; }
+    .edit-filters-btn { background: transparent; border: 1px solid #C8D8C0; color: #2C6E35; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 8px; cursor: pointer; font-family: "Heebo", sans-serif; margin-top: 8px; }
+    .filters-editor { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #F0EBE0; }
+    .filters-editor.open { display: block; }
     .settings-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #2C2416; }
     .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #F0EBE0; }
     .toggle-row:last-child { border-bottom: none; }
@@ -355,24 +362,41 @@
           </label>
         </div>
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid #F0EBE0">
-          <div style="font-size:12px;color:#888;margin-bottom:12px">חובה לבחור לפחות עיר אחת. החזק Ctrl לבחירה מרובה.</div>
-          <div class="form-row" style="margin-bottom:10px">
-            <label class="form-label">🏙️ ערים (חובה)</label>
-            <select class="form-select" id="notify-city" multiple size="3" onchange="updateNotifyNeighborhoods()" style="font-size:13px"></select>
+          <!-- תצוגת בחירות נוכחיות -->
+          <div style="margin-bottom:10px">
+            <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:4px">🏙️ ערים נבחרות:</div>
+            <div class="tags-row" id="selected-cities-tags"><span class="tag-empty">לא נבחרו ערים — לא יתקבלו עדכונים</span></div>
           </div>
-          <div class="form-row" style="margin-bottom:10px">
-            <label class="form-label">🏘️ שכונות (אופציונלי)</label>
-            <select class="form-select" id="notify-neighborhood" multiple size="3" style="font-size:13px"></select>
-            <div style="font-size:11px;color:#aaa;margin-top:3px">לא לבחור = כל השכונות</div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:4px">🏘️ שכונות נבחרות:</div>
+            <div class="tags-row" id="selected-neighborhoods-tags"><span class="tag-empty">כל השכונות</span></div>
           </div>
-          <div class="form-row" style="margin-bottom:14px">
-            <label class="form-label">🌿 פירות (אופציונלי)</label>
-            <select class="form-select" id="notify-fruit" multiple size="3" style="font-size:13px"></select>
-            <div style="font-size:11px;color:#aaa;margin-top:3px">לא לבחור = כל הפירות</div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:4px">🌿 פירות נבחרים:</div>
+            <div class="tags-row" id="selected-fruits-tags"><span class="tag-empty">כל הפירות</span></div>
           </div>
-          <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="saveNotifyFilters()">
-            💾 שמור הגדרות
-          </button>
+          <button class="edit-filters-btn" onclick="toggleFiltersEditor()">✏️ ערוך הגדרות</button>
+          <!-- עורך הגדרות -->
+          <div class="filters-editor" id="filters-editor">
+            <div style="font-size:12px;color:#888;margin-bottom:10px">החזק Ctrl לבחירה מרובה</div>
+            <div class="form-row" style="margin-bottom:10px">
+              <label class="form-label">🏙️ ערים (חובה)</label>
+              <select class="form-select" id="notify-city" multiple size="4" onchange="updateNotifyNeighborhoods()" style="font-size:13px"></select>
+            </div>
+            <div class="form-row" style="margin-bottom:10px">
+              <label class="form-label">🏘️ שכונות (אופציונלי)</label>
+              <select class="form-select" id="notify-neighborhood" multiple size="4" style="font-size:13px"></select>
+              <div style="font-size:11px;color:#aaa;margin-top:3px">לא לבחור = כל השכונות</div>
+            </div>
+            <div class="form-row" style="margin-bottom:12px">
+              <label class="form-label">🌿 פירות (אופציונלי)</label>
+              <select class="form-select" id="notify-fruit" multiple size="4" style="font-size:13px"></select>
+              <div style="font-size:11px;color:#aaa;margin-top:3px">לא לבחור = כל הפירות</div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="saveNotifyFilters()">
+              💾 שמור הגדרות
+            </button>
+          </div>
         </div>
       </div>
       <div class="legal-links">
@@ -1038,7 +1062,73 @@
 
 
 
+  function toggleFiltersEditor() {
+    const editor = document.getElementById("filters-editor");
+    if (!editor) return;
+    editor.classList.toggle("open");
+    const btn = document.querySelector(".edit-filters-btn");
+    if (btn) btn.textContent = editor.classList.contains("open") ? "✖ סגור עורך" : "✏️ ערוך הגדרות";
+  }
+
+  function updateSelectedTags() {
+    const cities = currentUser ? (currentUser.notify_cities || []) : [];
+    const neighborhoods = currentUser ? (currentUser.notify_neighborhoods || []) : [];
+    const fruits = currentUser ? (currentUser.notify_fruits || []) : [];
+
+    const citiesEl = document.getElementById("selected-cities-tags");
+    const neighsEl = document.getElementById("selected-neighborhoods-tags");
+    const fruitsEl = document.getElementById("selected-fruits-tags");
+
+    if (citiesEl) {
+      citiesEl.innerHTML = cities.length === 0
+        ? '<span class="tag-empty">לא נבחרו ערים — לא יתקבלו עדכונים</span>'
+        : cities.map(function(c) { return '<span class="tag-item">🏙️ ' + c + ' <button onclick="removeNotifyItem('city','' + c + '')">×</button></span>'; }).join("");
+    }
+    if (neighsEl) {
+      neighsEl.innerHTML = neighborhoods.length === 0
+        ? '<span class="tag-empty">כל השכונות</span>'
+        : neighborhoods.map(function(n) { return '<span class="tag-item">🏘️ ' + n + ' <button onclick="removeNotifyItem('neighborhood','' + n + '')">×</button></span>'; }).join("");
+    }
+    if (fruitsEl) {
+      fruitsEl.innerHTML = fruits.length === 0
+        ? '<span class="tag-empty">כל הפירות</span>'
+        : fruits.map(function(f) { return '<span class="tag-item">' + getFruitEmoji(f) + ' ' + f + ' <button onclick="removeNotifyItem('fruit','' + f + '')">×</button></span>'; }).join("");
+    }
+  }
+
+  async function removeNotifyItem(type, val) {
+    if (!currentUser) return;
+    if (type === "city") currentUser.notify_cities = (currentUser.notify_cities || []).filter(function(v){return v!==val;});
+    if (type === "neighborhood") currentUser.notify_neighborhoods = (currentUser.notify_neighborhoods || []).filter(function(v){return v!==val;});
+    if (type === "fruit") currentUser.notify_fruits = (currentUser.notify_fruits || []).filter(function(v){return v!==val;});
+    try {
+      await fetch(SUPABASE_URL + "/auth/v1/user", {
+        method: "PUT",
+        headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + currentUser.token, "Content-Type": "application/json" },
+        body: JSON.stringify({ data: { name: currentUser.name, phone: currentUser.phone, notify_new_trees: currentUser.notify_new_trees, notify_cities: currentUser.notify_cities, notify_neighborhoods: currentUser.notify_neighborhoods, notify_fruits: currentUser.notify_fruits }})
+      });
+      saveSession(currentUser);
+      updateSelectedTags();
+      populateNotifyCityDropdown();
+      showToast("✅ עודכן");
+    } catch(e) { showToast("שגיאה", true); }
+  }
+
   function populateNotifyCityDropdown() {
+    updateSelectedTags();
+    // פתח עורך אוטומטית אם אין בחירות, סגור אם יש
+    const editor = document.getElementById("filters-editor");
+    const btn = document.querySelector(".edit-filters-btn");
+    const hasCities = currentUser && currentUser.notify_cities && currentUser.notify_cities.length > 0;
+    if (editor) {
+      if (!hasCities) {
+        editor.classList.add("open");
+        if (btn) btn.textContent = "✖ סגור עורך";
+      } else {
+        editor.classList.remove("open");
+        if (btn) btn.textContent = "✏️ ערוך הגדרות";
+      }
+    }
     if (!document.getElementById("notify-city")) return;
     const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
     const savedNeighs = currentUser ? (currentUser.notify_neighborhoods || []) : [];
