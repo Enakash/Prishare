@@ -346,35 +346,29 @@
         <h3>🔔 הגדרות התראות</h3>
         <div class="toggle-row">
           <div>
-            <div class="toggle-label">עדכונים על עצים חדשים</div>
-            <div class="toggle-sub">קבל מייל כשמתפרסם עץ חדש בשכונה</div>
+            <div class="toggle-label">קבלת עדכונים במייל</div>
+            <div class="toggle-sub">עצים חדשים ועצים שחוזרים לזמינות</div>
           </div>
           <label class="toggle">
-            <input type="checkbox" id="notify-toggle" onchange="toggleNotifyFields(this.checked)" />
+            <input type="checkbox" id="notify-toggle" onchange="updateNotifyPref(this.checked)" />
             <span class="toggle-slider"></span>
           </label>
         </div>
-        <div id="notify-filters" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #F0EBE0">
-          <div style="font-size:12px;color:#888;margin-bottom:12px">
-            בחר לפי אילו קריטריונים לקבל התראות. חובה לבחור לפחות עיר.
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #F0EBE0">
+          <div style="font-size:12px;color:#888;margin-bottom:12px">חובה לבחור לפחות עיר אחת. החזק Ctrl לבחירה מרובה.</div>
+          <div class="form-row" style="margin-bottom:10px">
+            <label class="form-label">🏙️ ערים (חובה)</label>
+            <select class="form-select" id="notify-city" multiple size="3" onchange="updateNotifyNeighborhoods()" style="font-size:13px"></select>
           </div>
           <div class="form-row" style="margin-bottom:10px">
-            <label class="form-label">🏙️ עיר (חובה)</label>
-            <select class="form-select" id="notify-city" onchange="updateNotifyNeighborhoods()" style="font-size:13px">
-              <option value="">בחר עיר...</option>
-            </select>
-          </div>
-          <div class="form-row" style="margin-bottom:10px">
-            <label class="form-label">🏘️ שכונה (אופציונלי)</label>
-            <select class="form-select" id="notify-neighborhood" style="font-size:13px">
-              <option value="">כל השכונות</option>
-            </select>
+            <label class="form-label">🏘️ שכונות (אופציונלי)</label>
+            <select class="form-select" id="notify-neighborhood" multiple size="3" style="font-size:13px"></select>
+            <div style="font-size:11px;color:#aaa;margin-top:3px">לא לבחור = כל השכונות</div>
           </div>
           <div class="form-row" style="margin-bottom:14px">
-            <label class="form-label">🌿 סוג פרי (אופציונלי)</label>
-            <select class="form-select" id="notify-fruit" style="font-size:13px">
-              <option value="">כל הפירות</option>
-            </select>
+            <label class="form-label">🌿 פירות (אופציונלי)</label>
+            <select class="form-select" id="notify-fruit" multiple size="3" style="font-size:13px"></select>
+            <div style="font-size:11px;color:#aaa;margin-top:3px">לא לבחור = כל הפירות</div>
           </div>
           <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="saveNotifyFilters()">
             💾 שמור הגדרות
@@ -539,9 +533,9 @@
         name: data.user.user_metadata?.name || email.split("@")[0],
         phone: data.user.user_metadata?.phone || "",
         notify_new_trees: data.user.user_metadata?.notify_new_trees || false,
-        notify_city: data.user.user_metadata?.notify_city || "",
-        notify_neighborhood: data.user.user_metadata?.notify_neighborhood || "",
-        notify_fruit: data.user.user_metadata?.notify_fruit || "",
+        notify_cities: (data.user.user_metadata && data.user.user_metadata.notify_cities) ? data.user.user_metadata.notify_cities : [],
+        notify_neighborhoods: (data.user.user_metadata && data.user.user_metadata.notify_neighborhoods) ? data.user.user_metadata.notify_neighborhoods : [],
+        notify_fruits: (data.user.user_metadata && data.user.user_metadata.notify_fruits) ? data.user.user_metadata.notify_fruits : [],
         token: data.access_token,
         refresh_token: data.refresh_token
       };
@@ -1041,25 +1035,33 @@
     } catch(e) { showToast("שגיאה", true); }
   }
 
-  function toggleNotifyFields(val) {
-    document.getElementById("notify-filters").style.display = val ? "block" : "none";
-    updateNotifyPref(val);
-    if (val) populateNotifyCityDropdown();
-  }
+
 
   function populateNotifyCityDropdown() {
-    const cities = [...new Set(trees.map(t => t.city).filter(Boolean))].sort();
+    if (!document.getElementById("notify-city")) return;
+    const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
+    const savedNeighs = currentUser ? (currentUser.notify_neighborhoods || []) : [];
+    const savedFruits = currentUser ? (currentUser.notify_fruits || []) : [];
+    const cities = [...new Set(trees.map(function(t){return t.city;}).filter(Boolean))].sort();
     const cityEl = document.getElementById("notify-city");
-    const savedCity = currentUser ? (currentUser.notify_city || "") : "";
-    cityEl.innerHTML = '<option value="">בחר עיר...</option>' + cities.map(function(c) { return '<option' + (c===savedCity?' selected':'') + '>' + c + '</option>'; }).join("");
-    updateNotifyNeighborhoods();
-    // populate fruits
-    const fruits = [...new Set(trees.map(t => getFruitName(t.fruit)).filter(Boolean))].sort();
+    cityEl.innerHTML = cities.map(function(c){return '<option value="'+c+'"'+(savedCities.indexOf(c)>-1?' selected':'')+'>'+c+'</option>';}).join("");
+    const neighborhoods = [...new Set(trees.map(function(t){return t.neighborhood;}).filter(Boolean))].sort();
+    const neighEl = document.getElementById("notify-neighborhood");
+    if (neighEl) neighEl.innerHTML = neighborhoods.map(function(n){return '<option value="'+n+'"'+(savedNeighs.indexOf(n)>-1?' selected':'')+'>'+n+'</option>';}).join("");
+    const fruits = [...new Set(trees.map(function(t){return getFruitName(t.fruit);}).filter(Boolean))].sort();
     const fruitEl = document.getElementById("notify-fruit");
-    if (fruitEl) {
-      const savedFruit = currentUser ? (currentUser.notify_fruit || "") : "";
-      fruitEl.innerHTML = '<option value="">כל הפירות</option>' + fruits.map(function(f) { return '<option' + (f===savedFruit?' selected':'') + '>' + getFruitEmoji(f) + ' ' + f + '</option>'; }).join("");
-    }
+    if (fruitEl) fruitEl.innerHTML = fruits.map(function(f){return '<option value="'+f+'"'+(savedFruits.indexOf(f)>-1?' selected':'')+'>'+ getFruitEmoji(f)+' '+f+'</option>';}).join("");
+  }
+
+  function updateNotifyNeighborhoods() {
+    const cityEl = document.getElementById("notify-city");
+    if (!cityEl) return;
+    const selectedCities = Array.from(cityEl.selectedOptions).map(function(o){return o.value;});
+    const cityTrees = selectedCities.length ? trees.filter(function(t){return selectedCities.indexOf(t.city)>-1;}) : trees;
+    const neighborhoods = [...new Set(cityTrees.map(function(t){return t.neighborhood;}).filter(Boolean))].sort();
+    const neighEl = document.getElementById("notify-neighborhood");
+    const savedNeighs = currentUser ? (currentUser.notify_neighborhoods || []) : [];
+    if (neighEl) neighEl.innerHTML = neighborhoods.map(function(n){return '<option value="'+n+'"'+(savedNeighs.indexOf(n)>-1?' selected':'')+'>'+n+'</option>';}).join("");
   }
 
   function updateNotifyNeighborhoods() {
