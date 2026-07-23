@@ -967,12 +967,14 @@
 
   function updateOwnerNeighborhoods() {
     const citySelect = document.getElementById("o-city").value.trim();
-    const cityNew = document.getElementById("o-city-new").value.trim();
+    const cityNew = document.getElementById("o-city-new") ? document.getElementById("o-city-new").value.trim() : "";
     const city = cityNew || citySelect;
     const neighEl = document.getElementById("o-neighborhood");
-    const cityTrees = city ? trees.filter(t => t.city === city) : trees;
-    const neighborhoods = [...new Set(cityTrees.map(t => t.neighborhood).filter(Boolean))].sort();
-    neighEl.innerHTML = '<option value="">בחר שכונה...</option>' + neighborhoods.map(n => `<option>${n}</option>`).join("");
+    if (!neighEl) return;
+    const predefined = (city && ISRAEL_CITIES[city]) ? ISRAEL_CITIES[city] : [];
+    const fromTrees = city ? trees.filter(function(t){return t.city===city;}).map(function(t){return t.neighborhood;}).filter(Boolean) : [];
+    const all = [...new Set([...predefined, ...fromTrees])].sort();
+    neighEl.innerHTML = '<option value="">בחר שכונה...</option>' + all.map(function(n){return '<option value="'+n+'">'+n+'</option>';}).join("");
   }
 
   function populateOwnerCityDropdown() {
