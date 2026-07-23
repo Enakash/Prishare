@@ -1313,12 +1313,22 @@
     makeCheckboxes("notify-fruit-checkboxes", fruits.map(function(f){return {value:f,label:getFruitEmoji(f)+' '+f};}), savedFruits);
   }
 
+  function updateNotifyNeighborhoodsDropdown() { updateNotifyNeighborhoods(); }
+
   function updateNotifyNeighborhoods() {
-    const selectedCities = getChecked("notify-city-checkboxes");
-    const cityTrees = selectedCities.length ? trees.filter(function(t){return selectedCities.indexOf(t.city)>-1;}) : trees;
-    const neighborhoods = [...new Set(cityTrees.map(function(t){return t.neighborhood;}).filter(Boolean))].sort();
-    const savedNeighs = currentUser ? (currentUser.notify_neighborhoods || []) : [];
-    makeCheckboxes("notify-neighborhood-checkboxes", neighborhoods.map(function(n){return {value:n,label:'🏘️ '+n};}), savedNeighs);
+    var cityEl = document.getElementById("notify-city-select");
+    var neighEl = document.getElementById("notify-neighborhood-select");
+    if (!neighEl) return;
+    var selectedCities = cityEl ? Array.from(cityEl.selectedOptions).map(function(o){return o.value;}).filter(Boolean) : [];
+    if (selectedCities.length === 0) {
+      neighEl.innerHTML = '<option value="">בחר עיר קודם</option>';
+      return;
+    }
+    var predefined = selectedCities.reduce(function(acc,c){return acc.concat(ISRAEL_CITIES[c]||[]);}, []);
+    var fromTrees = trees.filter(function(t){return selectedCities.indexOf(t.city)>-1;}).map(function(t){return t.neighborhood;}).filter(Boolean);
+    var neighborhoods = [...new Set([...predefined, ...fromTrees])].sort();
+    var savedArr = currentUser ? (currentUser.notify_neighborhoods || []) : [];
+    neighEl.innerHTML = '<option value="">כל השכונות</option>' + neighborhoods.map(function(n){return '<option value="'+n+'"'+(savedArr.indexOf(n)>-1?' selected':'')+'>'+n+'</option>';}).join("");
   }
 
   async function saveNotifyFilters() {
