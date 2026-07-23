@@ -1171,17 +1171,17 @@
     if (citiesEl) {
       citiesEl.innerHTML = !cityVal
         ? '<span class="tag-empty">לא נבחרה עיר — לא יתקבלו עדכונים</span>'
-        : '<span class="tag-item">🏙️ ' + cityVal + ' <button onclick="clearNotifyItem('city')">×</button></span>';
+        : '<span class="tag-item">🏙️ ' + cityVal + ' <button onclick="clearNotifyItem(&quot;city&quot;)">×</button></span>';
     }
     if (neighsEl) {
       neighsEl.innerHTML = !neighVal
         ? '<span class="tag-empty">כל השכונות</span>'
-        : '<span class="tag-item">🏘️ ' + neighVal + ' <button onclick="clearNotifyItem('neighborhood')">×</button></span>';
+        : '<span class="tag-item">🏘️ ' + neighVal + ' <button onclick="clearNotifyItem(&quot;neighborhood&quot;)">×</button></span>';
     }
     if (fruitsEl) {
       fruitsEl.innerHTML = !fruitVal
         ? '<span class="tag-empty">כל הפירות והירקות</span>'
-        : '<span class="tag-item">' + getFruitEmoji(fruitVal) + ' ' + fruitVal + ' <button onclick="clearNotifyItem('fruit')">×</button></span>';
+        : '<span class="tag-item">' + getFruitEmoji(fruitVal) + ' ' + fruitVal + ' <button onclick="clearNotifyItem(&quot;fruit&quot;)">×</button></span>';
     }
   }
 
