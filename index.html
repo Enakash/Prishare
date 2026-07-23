@@ -354,17 +354,26 @@
             <span class="toggle-slider"></span>
           </label>
         </div>
-        <div id="notify-filters" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #F0EBE0">
+        <div id="notify-filters" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #F0EBE0">
+          <div style="font-size:12px;color:#888;margin-bottom:12px">
+            בחר לפי אילו קריטריונים לקבל התראות. חובה לבחור לפחות עיר.
+          </div>
           <div class="form-row" style="margin-bottom:10px">
-            <label class="form-label">קבל עדכונים רק מעיר זו (אופציונלי)</label>
+            <label class="form-label">🏙️ עיר (חובה)</label>
             <select class="form-select" id="notify-city" onchange="updateNotifyNeighborhoods()" style="font-size:13px">
-              <option value="">כל הערים</option>
+              <option value="">בחר עיר...</option>
             </select>
           </div>
           <div class="form-row" style="margin-bottom:10px">
-            <label class="form-label">קבל עדכונים רק משכונה זו (אופציונלי)</label>
+            <label class="form-label">🏘️ שכונה (אופציונלי)</label>
             <select class="form-select" id="notify-neighborhood" style="font-size:13px">
               <option value="">כל השכונות</option>
+            </select>
+          </div>
+          <div class="form-row" style="margin-bottom:14px">
+            <label class="form-label">🌿 סוג פרי (אופציונלי)</label>
+            <select class="form-select" id="notify-fruit" style="font-size:13px">
+              <option value="">כל הפירות</option>
             </select>
           </div>
           <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="saveNotifyFilters()">
@@ -532,6 +541,7 @@
         notify_new_trees: data.user.user_metadata?.notify_new_trees || false,
         notify_city: data.user.user_metadata?.notify_city || "",
         notify_neighborhood: data.user.user_metadata?.notify_neighborhood || "",
+        notify_fruit: data.user.user_metadata?.notify_fruit || "",
         token: data.access_token,
         refresh_token: data.refresh_token
       };
@@ -1040,9 +1050,16 @@
   function populateNotifyCityDropdown() {
     const cities = [...new Set(trees.map(t => t.city).filter(Boolean))].sort();
     const cityEl = document.getElementById("notify-city");
-    const savedCity = currentUser?.notify_city || "";
-    cityEl.innerHTML = '<option value="">כל הערים</option>' + cities.map(c => `<option ${c===savedCity?"selected":""}>${c}</option>`).join("");
+    const savedCity = currentUser ? (currentUser.notify_city || "") : "";
+    cityEl.innerHTML = '<option value="">בחר עיר...</option>' + cities.map(function(c) { return '<option' + (c===savedCity?' selected':'') + '>' + c + '</option>'; }).join("");
     updateNotifyNeighborhoods();
+    // populate fruits
+    const fruits = [...new Set(trees.map(t => getFruitName(t.fruit)).filter(Boolean))].sort();
+    const fruitEl = document.getElementById("notify-fruit");
+    if (fruitEl) {
+      const savedFruit = currentUser ? (currentUser.notify_fruit || "") : "";
+      fruitEl.innerHTML = '<option value="">כל הפירות</option>' + fruits.map(function(f) { return '<option' + (f===savedFruit?' selected':'') + '>' + getFruitEmoji(f) + ' ' + f + '</option>'; }).join("");
+    }
   }
 
   function updateNotifyNeighborhoods() {
