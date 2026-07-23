@@ -49,6 +49,9 @@
     .tag-empty { font-size: 12px; color: #bbb; font-style: italic; }
     .edit-filters-btn { background: transparent; border: 1px solid #C8D8C0; color: #2C6E35; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 8px; cursor: pointer; font-family: "Heebo", sans-serif; margin-top: 8px; }
     .filters-editor { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #F0EBE0; }
+    .check-item { display: flex; align-items: center; gap: 5px; background: #F7F3EC; border: 1px solid #EDE6D8; border-radius: 8px; padding: 4px 10px; font-size: 13px; cursor: pointer; }
+    .check-item input { accent-color: #2C6E35; cursor: pointer; }
+    .check-item.checked { background: #EEF7EE; border-color: #C8E0C8; color: #2C6E35; font-weight: 600; }
     .filters-editor.open { display: block; }
     .settings-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #2C2416; }
     .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #F0EBE0; }
@@ -378,20 +381,19 @@
           <button class="edit-filters-btn" onclick="toggleFiltersEditor()">✏️ ערוך הגדרות</button>
           <!-- עורך הגדרות -->
           <div class="filters-editor" id="filters-editor">
-            <div style="font-size:12px;color:#888;margin-bottom:10px">החזק Ctrl לבחירה מרובה</div>
             <div class="form-row" style="margin-bottom:10px">
               <label class="form-label">🏙️ ערים (חובה)</label>
-              <select class="form-select" id="notify-city" multiple size="4" onchange="updateNotifyNeighborhoods()" style="font-size:13px"></select>
+              <div id="notify-city-checkboxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px"></div>
             </div>
             <div class="form-row" style="margin-bottom:10px">
               <label class="form-label">🏘️ שכונות (אופציונלי)</label>
-              <select class="form-select" id="notify-neighborhood" multiple size="4" style="font-size:13px"></select>
-              <div style="font-size:11px;color:#aaa;margin-top:3px">לא לבחור = כל השכונות</div>
+              <div id="notify-neighborhood-checkboxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px"></div>
+              <div style="font-size:11px;color:#aaa;margin-top:4px">ריק = כל השכונות</div>
             </div>
             <div class="form-row" style="margin-bottom:12px">
               <label class="form-label">🌿 פירות (אופציונלי)</label>
-              <select class="form-select" id="notify-fruit" multiple size="4" style="font-size:13px"></select>
-              <div style="font-size:11px;color:#aaa;margin-top:3px">לא לבחור = כל הפירות</div>
+              <div id="notify-fruit-checkboxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px"></div>
+              <div style="font-size:11px;color:#aaa;margin-top:4px">ריק = כל הפירות</div>
             </div>
             <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="saveNotifyFilters()">
               💾 שמור הגדרות
@@ -1114,45 +1116,57 @@
     } catch(e) { showToast("שגיאה", true); }
   }
 
+  function makeCheckboxes(containerId, items, saved, onchange) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (items.length === 0) { el.innerHTML = '<span style="font-size:12px;color:#bbb">אין אפשרויות</span>'; return; }
+    el.innerHTML = items.map(function(item) {
+      const checked = saved.indexOf(item.value) > -1;
+      return '<label class="check-item' + (checked?' checked':'') + '" id="lbl-'+containerId+'-'+item.value.replace(/\s/g,'_')+'">'
+        + '<input type="checkbox" value="'+item.value+'"' + (checked?' checked':'') + ' onchange="toggleCheckItem(this,''+containerId+'')" />'
+        + item.label + '</label>';
+    }).join("");
+  }
+
+  function toggleCheckItem(el, containerId) {
+    const lbl = el.parentElement;
+    if (el.checked) lbl.classList.add("checked");
+    else lbl.classList.remove("checked");
+    if (containerId === "notify-city-checkboxes") updateNotifyNeighborhoods();
+  }
+
+  function getChecked(containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return [];
+    return Array.from(el.querySelectorAll("input:checked")).map(function(i){return i.value;});
+  }
+
   function populateNotifyCityDropdown() {
     updateSelectedTags();
-    // פתח עורך אוטומטית אם אין בחירות, סגור אם יש
     const editor = document.getElementById("filters-editor");
     const btn = document.querySelector(".edit-filters-btn");
     const hasCities = currentUser && currentUser.notify_cities && currentUser.notify_cities.length > 0;
     if (editor) {
-      if (!hasCities) {
-        editor.classList.add("open");
-        if (btn) btn.textContent = "✖ סגור עורך";
-      } else {
-        editor.classList.remove("open");
-        if (btn) btn.textContent = "✏️ ערוך הגדרות";
-      }
+      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ סגור עורך"; }
+      else { editor.classList.remove("open"); if (btn) btn.textContent = "✏️ ערוך הגדרות"; }
     }
-    if (!document.getElementById("notify-city")) return;
     const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
     const savedNeighs = currentUser ? (currentUser.notify_neighborhoods || []) : [];
     const savedFruits = currentUser ? (currentUser.notify_fruits || []) : [];
     const cities = [...new Set(trees.map(function(t){return t.city;}).filter(Boolean))].sort();
-    const cityEl = document.getElementById("notify-city");
-    cityEl.innerHTML = cities.map(function(c){return '<option value="'+c+'"'+(savedCities.indexOf(c)>-1?' selected':'')+'>'+c+'</option>';}).join("");
     const neighborhoods = [...new Set(trees.map(function(t){return t.neighborhood;}).filter(Boolean))].sort();
-    const neighEl = document.getElementById("notify-neighborhood");
-    if (neighEl) neighEl.innerHTML = neighborhoods.map(function(n){return '<option value="'+n+'"'+(savedNeighs.indexOf(n)>-1?' selected':'')+'>'+n+'</option>';}).join("");
     const fruits = [...new Set(trees.map(function(t){return getFruitName(t.fruit);}).filter(Boolean))].sort();
-    const fruitEl = document.getElementById("notify-fruit");
-    if (fruitEl) fruitEl.innerHTML = fruits.map(function(f){return '<option value="'+f+'"'+(savedFruits.indexOf(f)>-1?' selected':'')+'>'+ getFruitEmoji(f)+' '+f+'</option>';}).join("");
+    makeCheckboxes("notify-city-checkboxes", cities.map(function(c){return {value:c,label:'🏙️ '+c};}), savedCities);
+    makeCheckboxes("notify-neighborhood-checkboxes", neighborhoods.map(function(n){return {value:n,label:'🏘️ '+n};}), savedNeighs);
+    makeCheckboxes("notify-fruit-checkboxes", fruits.map(function(f){return {value:f,label:getFruitEmoji(f)+' '+f};}), savedFruits);
   }
 
   function updateNotifyNeighborhoods() {
-    const cityEl = document.getElementById("notify-city");
-    if (!cityEl) return;
-    const selectedCities = Array.from(cityEl.selectedOptions).map(function(o){return o.value;});
+    const selectedCities = getChecked("notify-city-checkboxes");
     const cityTrees = selectedCities.length ? trees.filter(function(t){return selectedCities.indexOf(t.city)>-1;}) : trees;
     const neighborhoods = [...new Set(cityTrees.map(function(t){return t.neighborhood;}).filter(Boolean))].sort();
-    const neighEl = document.getElementById("notify-neighborhood");
     const savedNeighs = currentUser ? (currentUser.notify_neighborhoods || []) : [];
-    if (neighEl) neighEl.innerHTML = neighborhoods.map(function(n){return '<option value="'+n+'"'+(savedNeighs.indexOf(n)>-1?' selected':'')+'>'+n+'</option>';}).join("");
+    makeCheckboxes("notify-neighborhood-checkboxes", neighborhoods.map(function(n){return {value:n,label:'🏘️ '+n};}), savedNeighs);
   }
 
   function updateNotifyNeighborhoods() {
