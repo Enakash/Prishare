@@ -302,7 +302,7 @@
           <select class="form-select" id="o-neighborhood">
               <option value="">בחר שכונה...</option>
             </select>
-            <input class="form-input" id="o-neighborhood-new" placeholder="שכונה חדשה (אם לא ברשימה)" style="margin-top:6px;font-size:13px" />
+            <input class="form-input" id="o-neighborhood-new" placeholder="שכונה שאינה ברשימה" style="margin-top:6px;font-size:13px" />
         </div>
       </div>
       <div class="form-row">
@@ -313,10 +313,9 @@
         <div class="form-row">
           <label class="form-label">סוג פרי *</label>
           <select class="form-select" id="o-fruit" onchange="updatePriceHint()">
-            <option>תפוח 🍎</option><option>תפוז 🍊</option><option selected>לימון 🍋</option>
-            <option>אגס 🍐</option><option>ענב 🍇</option><option>תאנה 🫐</option>
-            <option>שזיף 🍑</option><option>אבוקדו 🥑</option><option>זית 🫒</option><option>אחר 🌿</option>
+            <option value="">בחר פרי/ירק...</option>
           </select>
+          <input class="form-input" id="o-fruit-new" placeholder="פרי/ירק שאינו ברשימה" style="margin-top:6px;font-size:13px" />
         </div>
         <div class="form-row">
           <label class="form-label">מחיר לק"ג (₪)</label>
@@ -483,6 +482,72 @@
   function clearSession() {
     localStorage.removeItem("prishare_user");
   }
+
+
+  // ===== נתוני ערים, שכונות ופירות/ירקות =====
+  const ISRAEL_CITIES = {
+    "תל אביב-יפו": ["צפון תל אביב","הצפון הישן","נווה אביבים","רמת אביב","רמת אביב ג","אפקה","מרכז תל אביב","לב תל אביב","נווה צדק","פלורנטין","שפירא","כרם התימנים","נווה שאנן","התקווה","עג'מי","יפו","גבעת עמל","בבלי","מונטיפיורי","ורדיה"],
+    "ירושלים": ["רחביה","קטמון","גילה","פסגת זאב","ארנונה","בית הכרם","קרית יובל","גבעת שאול","מלחה","בקעה","גוננים","טלביה","הר נוף","רמות","נווה יעקב","גבעת משואה","ריינס","שכונת רסקו","מזרח ירושלים"],
+    "חיפה": ["הכרמל","נווה שאנן","רמת שפרינצק","אדר","מרכז הכרמל","כרמליה","בת גלים","הדר הכרמל","חליסה","עיר תחתית","וואדי ניסנאס","שכונת גורדון"],
+    "ראשון לציון": ["נחלת יהודה","אבן גבירול","ויצמן","רמת אליהו","גני דן","מרכז העיר","שכונה ד","שכונה ה","אם המושבות","נאות אפקה"],
+    "פתח תקווה": ["סגולה","כפר גנים","נחלת גנים","קריית ספיר","שיכון המזרח","אם המושבות","מרכז העיר","שכונת הפועלים","ורדיה"],
+    "אשדוד": ["גני טל","שכונה א","שכונה ב","שכונה ג","שכונה ד","שכונה ה","שכונה ו","שכונה ז","שכונה ח","שכונה ט","שכונה י","שכונה יא","שכונה יב","שכונה יג","שכונה יד","שכונה טו","שכונה טז","לד הנחל"],
+    "נתניה": ["קריית נורדאו","שכונת המייסדים","עיר ימים","נאות גנים","גבעת השרון","קריית השרון","שכונה ב","שכונה ג","שכונה ד","שכונה ה","שכונה ו"],
+    "באר שבע": ["נחל עשן","נאות לון","נווה זאב","נאות אשקר","שכונה ד","שכונה ה","נאות הדרים","גבעות בר","מרכז העיר","נאות שקד","נאות אילן","רמות"],
+    "בני ברק": ["קריית הרצוג","קריית וייצמן","קריית זינה","קריית ביאליסטוק","מרכז הכרך","שכונה ג","שכונה ד","שכונה ה","ויז'ניץ","גור"],
+    "רמת גן": ["מרכז רמת גן","קריית קריניצי","גבעת שמואל","שיכון ותיקים","גבעת עדה","נאות גנים","רמת עדן"],
+    "גבעתיים": ["מרכז גבעתיים","שכונת ורד","שכונת הדר","שכונת השקד","כפר אז"ר"],
+    "חולון": ["שכונת ב","שכונת ג","שכונת ד","שכונת ה","קריית בן גוריון","קריית שרת","קריית מנחם"],
+    "בת ים": ["מרכז בת ים","שכונת ים","שכונת קוממיות","שכונת אברהם","שכונת שינקין","שכונת הרצל"],
+    "אשקלון": ["מיגדל","ברנע","אפרידר","זיקים","שפירים","קסם","גבעת ציון","ממשית","שכונת השקד"],
+    "הרצליה": ["הרצליה פיתוח","שכונת ב","שכונת ג","נאות השרון","שכונת רמז","כפר שמריהו"],
+    "חדרה": ["גבעת אולגה","נווה חיים","אחוזת הנשיא","שכונת ב","שכונת ג","נאות שרון","גבעת אלונים"],
+    "רחובות": ["שכונת הדר","שכונת ב","שכונת ג","נאות נובנה","קריית ויצמן","גינות"],
+    "מודיעין-מכבים-רעות": ["מכבים","נאות גנים","פרחים","אמנים","ענבים","אורנים","מגדלים","מודיעין מרכז","רעות"],
+    "לוד": ["מרכז לוד","נחלת יהודה","שכונת ב","שכונת ג","שכונת ד","שכונת ה"],
+    "רמלה": ["מרכז רמלה","שכונת ב","שכונת ג","שכונת ד","גן רמלה"],
+    "עכו": ["מרכז עכו","שכונת ב","שכונת ג","שכונה חדשה"],
+    "אילת": ["שחמון","נאות הנחל","אזור א","אזור ב","אזור ג","אזור ד","מרכז העיר","שכונת ספיר","שכונת אורנים"],
+    "בית שמש": ["רמה א","רמה ב","רמה ג","רמה ד","מרכז","גבעת שרת"],
+    "נהריה": ["מרכז","שכונת ב","שכונת ג","גבעת ציון","סנהדריה"],
+    "טבריה": ["מרכז","קריית שמואל","שכונת ב","שכונת ג"],
+    "צפת": ["מרכז","הצנחנים","שכונת ב","שכונת ג","קנדה"],
+    "קריית גת": ["מרכז","שכונת ב","שכונת ג","שכונת ד"],
+    "קריית מוצקין": ["מרכז","שכונת ב","שכונת ג"],
+    "קריית אתא": ["מרכז","שכונת ב","שכונת ג"],
+    "קריית ביאליק": ["מרכז","שכונת ב","שכונת ג"],
+    "קריית ים": ["מרכז","שכונת ב","שכונת ג"],
+    "כפר סבא": ["מרכז","שכונת ב","שכונת ג","נווה מזרחי","גן חיים"],
+    "הוד השרון": ["מרכז","שכונת ב","שכונת ג"],
+    "יבנה": ["מרכז","שכונת ב","שכונת ג","אביאל"],
+    "רעננה": ["מרכז","שכונת ב","שכונת ג","נווה גן"],
+    "מגדל העמק": ["מרכז","שכונת ב","שכונת ג"],
+    "אום אל-פחם": ["מרכז","שכונת ב"],
+    "סכנין": ["מרכז"],
+    "טייבה": ["מרכז"],
+    "שפרעם": ["מרכז","שכונת ב"],
+    "רהט": ["מרכז"],
+    "אלעד": ["מרכז","שכונת ב","שכונת ג"],
+    "ביתר עילית": ["מרכז","שכונת ב","שכונת ג"],
+    "נצרת עילית": ["מרכז","שכונת ב","שכונת ג","רמה"],
+    "מעלה אדומים": ["מרכז","שכונת ב","שכונת ג"],
+    "אריאל": ["מרכז","שכונת ב"],
+    "עפולה": ["מרכז","שכונת ב","שכונת ג"],
+    "קרית שמונה": ["מרכז","שכונת ב","שכונת ג"],
+    "דימונה": ["מרכז","שכונת ב","שכונת ג"],
+    "ישוב/מושב אחר": []
+  };
+
+  const ALL_PRODUCE = [
+    "אבוקדו","אגוז","אגס","אננס","אפרסמון","אפרסק","אשכולית",
+    "בננה","גויאבה","גפן/ענב","דובדבן","דלעת","זית",
+    "חבוש","חציל","טנג'רין","כרוב","לימון","לימון מאייר",
+    "מנגו","מלון","נקטרינה","ענב","עגבניה שרי","פסיפלורה",
+    "פפאיה","פלפל","פסיפלורה","קישוא","קלמנטינה","רימון",
+    "שזיף","שסק","תאנה","תותים","תמר","תפוח","תפוז",
+    "בטטה","גזר","בצל","שום","ברוקולי","כרובית","תרד","חסה",
+    "אחר"
+  ];
 
   // ===== GOOGLE AUTH =====
   async function doGoogleLogin() {
@@ -911,15 +976,23 @@
   }
 
   function populateOwnerCityDropdown() {
-    const cities = [...new Set(trees.map(t => t.city).filter(Boolean))].sort();
     const cityEl = document.getElementById("o-city");
     if (!cityEl) return;
     const current = cityEl.value;
-    cityEl.innerHTML = '<option value="">בחר עיר...</option>' + cities.map(c => '<option' + (c===current?' selected':'') + '>' + c + '</option>').join("");
+    const allCities = Object.keys(ISRAEL_CITIES).sort();
+    cityEl.innerHTML = '<option value="">בחר עיר/ישוב...</option>' + allCities.map(function(c){return '<option value="'+c+'"'+(c===current?' selected':'')+'>'+c+'</option>';}).join("");
+    // populate fruit/veggie dropdown
+    const fruitEl = document.getElementById("o-fruit");
+    if (fruitEl) {
+      const currentFruit = fruitEl.value;
+      fruitEl.innerHTML = '<option value="">בחר פרי/ירק...</option>' + ALL_PRODUCE.map(function(f){return '<option value="'+f+'"'+(f===currentFruit?' selected':'')+'>'+f+'</option>';}).join("");
+    }
   }
 
   function updatePriceHint() {
-    const fruit = document.getElementById("o-fruit").value.replace(/ .+/, "");
+    const fruitSelect = document.getElementById("o-fruit").value.trim();
+    const fruitNew = document.getElementById("o-fruit-new") ? document.getElementById("o-fruit-new").value.trim() : "";
+    const fruit = fruitNew || fruitSelect;
     const store = STORE_PRICES[fruit] || 10;
     document.getElementById("price-hint").innerHTML = 'מחיר ממוצע בחנויות: <span>₪' + store + '/ק"ג</span> — הזן 0 לחינם';
   }
@@ -1000,7 +1073,9 @@
     const neighNew = document.getElementById("o-neighborhood-new").value.trim();
     const neighborhood = neighNew || neighSelect;
     const address = document.getElementById("o-address").value.trim();
-    const fruit = document.getElementById("o-fruit").value.replace(/ .+/, "");
+    const fruitSelect = document.getElementById("o-fruit").value.trim();
+    const fruitNew = document.getElementById("o-fruit-new") ? document.getElementById("o-fruit-new").value.trim() : "";
+    const fruit = fruitNew || fruitSelect;
     const price = document.getElementById("o-price").value;
     const quantity = document.getElementById("o-quantity").value.trim();
     const description = document.getElementById("o-desc").value.trim();
@@ -1014,7 +1089,7 @@
       })});
       // עדכן את פרטי המשתמש לשימוש עתידי
       // לא שומרים טלפון מטופס העץ — רק מהרשמה
-      ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new"].forEach(id => document.getElementById(id).value = "");
+      ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new","o-fruit-new"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
       document.getElementById("o-city").value = "";
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
@@ -1156,9 +1231,14 @@
     const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
     const savedNeighs = currentUser ? (currentUser.notify_neighborhoods || []) : [];
     const savedFruits = currentUser ? (currentUser.notify_fruits || []) : [];
-    const cities = [...new Set(trees.map(function(t){return t.city;}).filter(Boolean))].sort();
-    const neighborhoods = [...new Set(trees.map(function(t){return t.neighborhood;}).filter(Boolean))].sort();
-    const fruits = [...new Set(trees.map(function(t){return getFruitName(t.fruit);}).filter(Boolean))].sort();
+    const treeCities = [...new Set(trees.map(function(t){return t.city;}).filter(Boolean))];
+    const allIsraelCities = Object.keys(ISRAEL_CITIES).sort();
+    const cities = [...new Set([...allIsraelCities, ...treeCities])].sort();
+    const treeNeighs = [...new Set(trees.map(function(t){return t.neighborhood;}).filter(Boolean))];
+    const israelNeighs = cities.reduce(function(acc,c){return acc.concat(ISRAEL_CITIES[c]||[]);}, []);
+    const neighborhoods = [...new Set([...israelNeighs, ...treeNeighs])].sort();
+    const treeFruits = [...new Set(trees.map(function(t){return getFruitName(t.fruit);}).filter(Boolean))];
+    const fruits = [...new Set([...ALL_PRODUCE, ...treeFruits])].filter(function(f){return f!=="אחר";}).sort().concat(["אחר"]);
     makeCheckboxes("notify-city-checkboxes", cities.map(function(c){return {value:c,label:'🏙️ '+c};}), savedCities);
     makeCheckboxes("notify-neighborhood-checkboxes", neighborhoods.map(function(n){return {value:n,label:'🏘️ '+n};}), savedNeighs);
     makeCheckboxes("notify-fruit-checkboxes", fruits.map(function(f){return {value:f,label:getFruitEmoji(f)+' '+f};}), savedFruits);
