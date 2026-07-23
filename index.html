@@ -139,6 +139,18 @@
     .btn-delete-account { background: #FFF0F0; color: #C0392B; border: 1.5px solid #FFCDD2; width: 100%; justify-content: center; margin-top: 10px; }
     .btn-delete-account:hover { background: #FFCDD2; }
     .legal-links { text-align: center; margin-top: 16px; font-size: 12px; color: #aaa; }
+    .fav-btn { background: none; border: none; cursor: pointer; font-size: 20px; padding: 0 4px; transition: transform 0.2s; line-height: 1; }
+    .fav-btn:hover { transform: scale(1.2); }
+    .history-item { background: #fff; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; border: 1.5px solid #EDE6D8; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .history-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .history-fruit { font-size: 15px; font-weight: 700; color: #2C2416; display: flex; align-items: center; gap: 6px; }
+    .history-date { font-size: 12px; color: #aaa; }
+    .history-status { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
+    .status-pending { background: #FFF8E1; color: #E65100; }
+    .status-closed { background: #F5F5F5; color: #999; }
+    .fav-card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1.5px solid #EDE6D8; box-shadow: 0 2px 6px rgba(0,0,0,0.05); position: relative; }
+    .fav-remove { position: absolute; top: 12px; left: 12px; background: none; border: none; cursor: pointer; font-size: 18px; color: #ccc; }
+    .fav-remove:hover { color: #C0392B; }
     .legal-links a { color: #2C6E35; text-decoration: none; margin: 0 6px; }
     .delete-confirm-modal { background: #fff; border-radius: 18px; padding: 26px; width: 100%; max-width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center; }
     .delete-confirm-modal h3 { font-size: 18px; font-weight: 800; color: #C0392B; margin-bottom: 10px; }
@@ -243,8 +255,10 @@
 
 <nav class="nav">
   <button class="nav-tab active" onclick="showTab('browse', this)">🔍 עצים</button>
+  <button class="nav-tab" onclick="showTab('favorites', this)">⭐ מועדפים</button>
+  <button class="nav-tab" onclick="showTab('history', this)">📜 היסטוריה</button>
   <button class="nav-tab" onclick="showTab('owner', this)">🌱 הוסף עץ</button>
-  <button class="nav-tab" onclick="showTab('dashboard', this)">📋 הניהול שלי</button>
+  <button class="nav-tab" onclick="showTab('dashboard', this)">📋 ניהול</button>
 </nav>
 
 <main class="main">
@@ -323,9 +337,15 @@
           <div class="price-hint" id="price-hint"></div>
         </div>
       </div>
-      <div class="form-row">
-        <label class="form-label">כמות משוערת</label>
-        <input class="form-input" id="o-quantity" placeholder="~20 לימונים" />
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label">כמות משוערת</label>
+          <input class="form-input" id="o-quantity" placeholder="~20 לימונים" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">מספר עצים</label>
+          <input class="form-input" id="o-tree-count" type="number" min="1" max="10" value="1" placeholder="1" />
+        </div>
       </div>
       <div class="form-row">
         <label class="form-label">תיאור</label>
@@ -333,6 +353,18 @@
       </div>
       <button class="btn btn-primary btn-full" onclick="addTree()">🌳 פרסם את העץ שלך</button>
     </div>
+  </div>
+
+  <!-- FAVORITES -->
+  <div id="page-favorites" class="page">
+    <div class="section-title"><span>⭐</span> עצים מועדפים</div>
+    <div id="favorites-list"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="page-history" class="page">
+    <div class="section-title"><span>📜</span> היסטוריית הזמנות</div>
+    <div id="history-list"></div>
   </div>
 
   <!-- DASHBOARD -->
@@ -995,6 +1027,8 @@
     el.classList.add("active");
     if (name === "owner") { autofillOwnerForm(); populateOwnerCityDropdown(); }
     if (name === "dashboard") { populateNotifyCityDropdown(); }
+    if (name === "favorites") { renderFavorites(); }
+    if (name === "history") { renderHistory(); }
   }
 
   function updateOwnerNeighborhoods() {
@@ -1091,8 +1125,12 @@
           });
         } catch(emailErr) { console.log("email error:", emailErr); }
       }
+      // שמור בהיסטוריה
+      const reqTree = trees.find(function(t){return t.id === currentTreeId;});
+      if (reqTree) addToHistory(reqTree, name, phone, msg);
       closeModal();
       await loadTrees();
+      renderHistory();
       showToast("✅ בקשת הקטיף נשלחה בהצלחה!");
     } catch(e) { showToast("שגיאה בשליחת הבקשה", true); }
   }
@@ -1113,14 +1151,18 @@
     const price = document.getElementById("o-price").value;
     const quantity = document.getElementById("o-quantity").value.trim();
     const description = document.getElementById("o-desc").value.trim();
+    const treeCount = parseInt(document.getElementById("o-tree-count") ? document.getElementById("o-tree-count").value : "1") || 1;
     if (!name || !phone || !city || !address) { showToast("נא למלא שם, טלפון, עיר וכתובת", true); return; }
     try {
+      // הוסף מספר עצים
+      for (var ti = 0; ti < treeCount; ti++) {
       await sbFetch("trees", { method: "POST", body: JSON.stringify({
         owner_name: name, owner_phone: phone, owner_email: currentUser?.email,
         city, neighborhood, address, fruit, quantity, description,
         price_per_kg: price !== "" ? parseFloat(price) : null,
         user_id: currentUser?.id
       })});
+      } // end loop
       // הוסף פרי/ירק חדש לרשימה אם הוזן
       if (fruitNew && ALL_PRODUCE.indexOf(fruitNew) === -1) {
         ALL_PRODUCE.push(fruitNew);
@@ -1140,7 +1182,7 @@
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
       await loadTrees();
-      showToast("🌳 העץ שלך פורסם בהצלחה!");
+      showToast("🌳 " + (treeCount > 1 ? treeCount + " עצים פורסמו בהצלחה!" : "העץ שלך פורסם בהצלחה!"));
       // שלח עדכון למנויים
       fetch(SUBSCRIBERS_URL, {
         method: "POST",
@@ -1471,6 +1513,113 @@
         doLogout();
       }, 2000);
     } catch(e) { showToast("שגיאה במחיקת החשבון", true); }
+  }
+
+  // ===== FAVORITES =====
+  function getFavorites() {
+    try { return JSON.parse(localStorage.getItem("prishare_favorites") || "[]"); } catch(e) { return []; }
+  }
+  function saveFavorites(favs) {
+    localStorage.setItem("prishare_favorites", JSON.stringify(favs));
+  }
+  function isFavorite(treeId) {
+    return getFavorites().indexOf(treeId) > -1;
+  }
+  function toggleFavorite(treeId) {
+    var favs = getFavorites();
+    var idx = favs.indexOf(treeId);
+    if (idx > -1) { favs.splice(idx, 1); showToast("הוסר מהמועדפים"); }
+    else { favs.push(treeId); showToast("⭐ נוסף למועדפים!"); }
+    saveFavorites(favs);
+    renderBrowse();
+    renderFavorites();
+  }
+  function renderFavorites() {
+    var el = document.getElementById("favorites-list");
+    if (!el) return;
+    var favIds = getFavorites();
+    var favTrees = trees.filter(function(t){ return favIds.indexOf(t.id) > -1; });
+    if (favTrees.length === 0) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">☆</div><div class="empty-text">אין עצים מועדפים</div><div class="empty-sub">לחץ ☆ על עץ כדי להוסיפו</div></div>';
+      return;
+    }
+    el.innerHTML = favTrees.map(function(tree) {
+      var fruitName = getFruitName(tree.fruit);
+      var storePrice = STORE_PRICES[fruitName] || 10;
+      var isFree = !tree.price_per_kg || tree.price_per_kg == 0;
+      return '<div class="fav-card">' +
+        '<button class="fav-remove" onclick="toggleFavorite('' + tree.id + '')">✕</button>' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+          '<span style="font-size:24px">' + getFruitEmoji(tree.fruit) + '</span>' +
+          '<div><div style="font-weight:700;font-size:15px">' + fruitName + '</div>' +
+          '<div style="font-size:12px;color:#888">' + tree.owner_name + '</div></div>' +
+          (isFree ? '<span class="price-badge">חינם!</span>' : '<span class="price-badge">₪'+tree.price_per_kg+'/ק"ג</span>') +
+        '</div>' +
+        (tree.city || tree.neighborhood ? '<div class="tree-meta">🏘️ ' + [tree.neighborhood,tree.city].filter(Boolean).join(", ") + '</div>' : '') +
+        '<div class="tree-meta">📍 ' + tree.address + '</div>' +
+        (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ' + tree.owner_phone + '</div>' : '') +
+        '<div style="display:flex;gap:8px;margin-top:10px">' +
+          (tree.owner_phone ? '<a href="tel:' + tree.owner_phone + '" class="btn btn-secondary btn-sm">📲 התקשר</a>' : '') +
+          '<button class="btn btn-primary btn-sm" onclick="openModal('' + tree.id + '')">🌿 בקש לקטוף</button>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  // ===== HISTORY =====
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem("prishare_history") || "[]"); } catch(e) { return []; }
+  }
+  function addToHistory(tree, reqName, reqPhone, reqMsg) {
+    var history = getHistory();
+    history.unshift({
+      id: Date.now(),
+      treeId: tree.id,
+      fruit: getFruitName(tree.fruit),
+      fruitEmoji: getFruitEmoji(tree.fruit),
+      ownerName: tree.owner_name,
+      ownerPhone: tree.owner_phone || "",
+      address: tree.address,
+      city: tree.city || "",
+      neighborhood: tree.neighborhood || "",
+      requesterName: reqName,
+      requesterPhone: reqPhone,
+      message: reqMsg,
+      date: new Date().toLocaleDateString("he-IL"),
+      status: "pending"
+    });
+    // שמור רק 50 אחרונות
+    if (history.length > 50) history = history.slice(0, 50);
+    localStorage.setItem("prishare_history", JSON.stringify(history));
+  }
+  function renderHistory() {
+    var el = document.getElementById("history-list");
+    if (!el) return;
+    var history = getHistory();
+    if (history.length === 0) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">📜</div><div class="empty-text">אין היסטוריית הזמנות</div><div class="empty-sub">בקשות קטיף שתשלח יופיעו כאן</div></div>';
+      return;
+    }
+    el.innerHTML = history.map(function(item) {
+      return '<div class="history-item">' +
+        '<div class="history-item-header">' +
+          '<div class="history-fruit">' + item.fruitEmoji + ' ' + item.fruit + '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px">' +
+            '<span class="history-status ' + (item.status==="pending"?"status-pending":"status-closed") + '">' + (item.status==="pending"?"ממתין":"נסגר") + '</span>' +
+            '<span class="history-date">' + item.date + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:13px;color:#555;margin-bottom:4px">👤 ' + item.ownerName + (item.ownerPhone ? ' · 📞 <a href="tel:'+item.ownerPhone+'" style="color:#2C6E35">'+item.ownerPhone+'</a>' : '') + '</div>' +
+        '<div style="font-size:13px;color:#888">📍 ' + [item.neighborhood,item.city,item.address].filter(Boolean).join(", ") + '</div>' +
+        (item.message ? '<div style="font-size:12px;color:#aaa;margin-top:4px">הערה: ' + item.message + '</div>' : '') +
+        '<button class="btn btn-danger btn-sm" style="margin-top:10px" onclick="removeHistory(' + item.id + ')">הסר</button>' +
+      '</div>';
+    }).join("");
+  }
+  function removeHistory(id) {
+    var history = getHistory().filter(function(h){ return h.id !== id; });
+    localStorage.setItem("prishare_history", JSON.stringify(history));
+    renderHistory();
   }
 
   function showToast(msg, isError = false) {
