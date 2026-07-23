@@ -868,6 +868,7 @@
     document.getElementById("page-" + name).classList.add("active");
     el.classList.add("active");
     if (name === "owner") { autofillOwnerForm(); populateOwnerCityDropdown(); }
+    if (name === "dashboard") { populateNotifyCityDropdown(); }
   }
 
   function updateOwnerNeighborhoods() {
