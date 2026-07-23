@@ -1171,6 +1171,10 @@
 
   async function saveNotifyFilters() {
     if (!currentUser) return;
+    const cities = getChecked("notify-city-checkboxes");
+    const neighborhoods = getChecked("notify-neighborhood-checkboxes");
+    const fruits = getChecked("notify-fruit-checkboxes");
+    if (cities.length === 0) { showToast("יש לבחור עיר אחת לפחות", true); return; }
     try {
       const res = await fetch(SUPABASE_URL + "/auth/v1/user", {
         method: "PUT",
@@ -1183,14 +1187,18 @@
           name: currentUser.name,
           phone: currentUser.phone,
           notify_new_trees: currentUser.notify_new_trees,
-          notify_city: city,
-          notify_neighborhood: neighborhood
+          notify_cities: cities,
+          notify_neighborhoods: neighborhoods,
+          notify_fruits: fruits
         }})
       });
       if (res.ok) {
-        currentUser.notify_city = city;
-        currentUser.notify_neighborhood = neighborhood;
+        currentUser.notify_cities = cities;
+        currentUser.notify_neighborhoods = neighborhoods;
+        currentUser.notify_fruits = fruits;
         saveSession(currentUser);
+        updateSelectedTags();
+        populateNotifyCityDropdown();
         showToast("✅ הגדרות התראות נשמרו");
       }
     } catch(e) { showToast("שגיאה בשמירת ההגדרות", true); }
