@@ -1185,17 +1185,17 @@
     if (citiesEl) {
       citiesEl.innerHTML = !cities || cities.length===0
         ? '<span class="tag-empty">לא נבחרה עיר — לא יתקבלו עדכונים</span>'
-        : cities.map(function(c){return '<span class="tag-item">🏙️ '+c+' <button onclick="removeFromNotify('cities','"+c+"')">×</button></span>';}).join("");
+        : cities.map(function(c){var b='<button onclick="removeFromNotify(&quot;cities&quot;,&quot;'+c+'&quot;)">×</button>';return '<span class="tag-item">🏙️ '+c+' '+b+'</span>';}).join("");
     }
     if (neighsEl) {
       neighsEl.innerHTML = !neighborhoods || neighborhoods.length===0
         ? '<span class="tag-empty">כל השכונות</span>'
-        : neighborhoods.map(function(n){return '<span class="tag-item">🏘️ '+n+' <button onclick="removeFromNotify('neighborhoods','"+n+"')">×</button></span>';}).join("");
+        : neighborhoods.map(function(n){var b='<button onclick="removeFromNotify(&quot;neighborhoods&quot;,&quot;'+n+'&quot;)">×</button>';return '<span class="tag-item">🏘️ '+n+' '+b+'</span>';}).join("");
     }
     if (fruitsEl) {
       fruitsEl.innerHTML = !fruits || fruits.length===0
         ? '<span class="tag-empty">כל הפירות והירקות</span>'
-        : fruits.map(function(f){return '<span class="tag-item">'+getFruitEmoji(f)+' '+f+' <button onclick="removeFromNotify('fruits','"+f+"')">×</button></span>';}).join("");
+        : fruits.map(function(f){var b='<button onclick="removeFromNotify(&quot;fruits&quot;,&quot;'+f+'&quot;)">×</button>';return '<span class="tag-item">'+getFruitEmoji(f)+' '+f+' '+b+'</span>';}).join("");
     }
   }
 
