@@ -414,12 +414,20 @@
 
 <!-- DELETE ACCOUNT MODAL -->
 <div class="modal-overlay" id="delete-modal">
-  <div class="delete-confirm-modal">
-    <h3>⚠️ מחיקת חשבון</h3>
-    <p>פעולה זו תמחק את חשבונך ואת כל העצים והבקשות שלך לצמיתות. לא ניתן לבטל פעולה זו.</p>
-    <div class="form-row">
+  <div class="delete-confirm-modal" style="text-align:right">
+    <h3 style="text-align:center">⚠️ מחיקת חשבון</h3>
+    <p style="margin-bottom:12px">פעולה זו תמחק את חשבונך ואת כל העצים והבקשות שלך לצמיתות. לא ניתן לבטל פעולה זו.</p>
+    <div style="background:#FFF8E1;border:1.5px solid #FFD54F;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#795548;line-height:1.6">
+      📱 <strong>שים לב:</strong> אם הורדת את האפליקציה דרך <strong>Google Play</strong> — יש לבטל את המנוי שם בנפרד.<br/>
+      <span style="font-size:11px;color:#999">Google Play Store ← מנויים ← פירות השכונה ← בטל מנוי</span>
+    </div>
+    <div class="form-row" style="margin-bottom:10px">
       <label class="form-label">הזן סיסמה לאישור</label>
       <input class="form-input" type="password" id="delete-pass" placeholder="סיסמה" />
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;font-size:13px;color:#555">
+      <input type="checkbox" id="delete-confirm-check" style="margin-top:3px;accent-color:#C0392B;width:16px;height:16px;flex-shrink:0" />
+      <label for="delete-confirm-check">הבנתי שהמחיקה לצמיתות ואני מאשר/ת ביטול מנוי ב־Google Play בנפרד אם רלוונטי</label>
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="document.getElementById('delete-modal').classList.remove('open')">ביטול</button>
@@ -1397,12 +1405,16 @@
 
   function showDeleteModal() {
     document.getElementById("delete-pass").value = "";
+    const check = document.getElementById("delete-confirm-check");
+    if (check) check.checked = false;
     document.getElementById("delete-modal").classList.add("open");
   }
 
   async function doDeleteAccount() {
     const pass = document.getElementById("delete-pass").value;
+    const confirmed = document.getElementById("delete-confirm-check").checked;
     if (!pass) { showToast("נא להזין סיסמה", true); return; }
+    if (!confirmed) { showToast("יש לסמן את תיבת האישור", true); return; }
     try {
       // מחק את כל עצי המשתמש ובקשותיהם
       const myTrees = trees.filter(t => t.user_id === currentUser.id);
