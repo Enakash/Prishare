@@ -421,9 +421,12 @@
       📱 <strong>שים לב:</strong> אם הורדת את האפליקציה דרך <strong>Google Play</strong> — יש לבטל את המנוי שם בנפרד.<br/>
       <span style="font-size:11px;color:#999">Google Play Store ← מנויים ← פירות השכונה ← בטל מנוי</span>
     </div>
-    <div class="form-row" style="margin-bottom:10px">
+    <div class="form-row" id="delete-pass-row" style="margin-bottom:10px">
       <label class="form-label">הזן סיסמה לאישור</label>
       <input class="form-input" type="password" id="delete-pass" placeholder="סיסמה" />
+    </div>
+    <div id="delete-google-note" style="display:none;background:#E8F5E9;border:1px solid #C8E0C8;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;color:#2C6E35">
+      🔐 חשבונך מנוהל דרך Google — אין צורך בסיסמה לאישור המחיקה.
     </div>
     <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;font-size:13px;color:#555">
       <input type="checkbox" id="delete-confirm-check" style="margin-top:3px;accent-color:#C0392B;width:16px;height:16px;flex-shrink:0" />
@@ -589,6 +592,7 @@
         email: user.email,
         name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split("@")[0],
         phone: user.user_metadata?.phone || "",
+        provider: "google",
         notify_new_trees: user.user_metadata?.notify_new_trees || false,
         notify_cities: user.user_metadata?.notify_cities || [],
         notify_neighborhoods: user.user_metadata?.notify_neighborhoods || [],
@@ -635,6 +639,7 @@
         email: data.user.email,
         name: data.user.user_metadata?.name || email.split("@")[0],
         phone: data.user.user_metadata?.phone || "",
+        provider: "email",
         notify_new_trees: data.user.user_metadata?.notify_new_trees || false,
         notify_cities: (data.user.user_metadata && data.user.user_metadata.notify_cities) ? data.user.user_metadata.notify_cities : [],
         notify_neighborhoods: (data.user.user_metadata && data.user.user_metadata.notify_neighborhoods) ? data.user.user_metadata.notify_neighborhoods : [],
@@ -1407,6 +1412,12 @@
     document.getElementById("delete-pass").value = "";
     const check = document.getElementById("delete-confirm-check");
     if (check) check.checked = false;
+    // בדוק אם משתמש Google (אין סיסמה)
+    const isGoogle = currentUser && currentUser.provider === "google";
+    const passRow = document.getElementById("delete-pass-row");
+    const googleNote = document.getElementById("delete-google-note");
+    if (passRow) passRow.style.display = isGoogle ? "none" : "block";
+    if (googleNote) googleNote.style.display = isGoogle ? "block" : "none";
     document.getElementById("delete-modal").classList.add("open");
   }
 
