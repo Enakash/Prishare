@@ -752,16 +752,11 @@
   }
 
   function doLogout() {
-    const wasGoogleUser = currentUser?.email;
     clearSession();
     currentUser = null;
     isGuest = false;
     document.getElementById("main-app").style.display = "none";
     document.getElementById("auth-page").style.display = "block";
-    // הצג הודעה על ביטול מנוי גוגל
-    setTimeout(() => {
-      showToast("👋 התנתקת בהצלחה. אם רכשת דרך Google Play — בטל את המנוי בנפרד דרך Google Play Store → מנויים", false);
-    }, 300);
   }
 
   function showAuthPage() {
