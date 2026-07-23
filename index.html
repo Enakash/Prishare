@@ -315,7 +315,7 @@
           <select class="form-select" id="o-fruit" onchange="updatePriceHint()">
             <option value="">בחר פרי/ירק...</option>
           </select>
-          <input class="form-input" id="o-fruit-new" placeholder="פרי/ירק שאינו ברשימה" style="margin-top:6px;font-size:13px" />
+          <input class="form-input" id="o-fruit-new" placeholder="פרי/ירק חדש — יתווסף לרשימה" style="margin-top:6px;font-size:13px" />
         </div>
         <div class="form-row">
           <label class="form-label">מחיר לק"ג (₪)</label>
@@ -547,10 +547,9 @@
     "בננה","גויאבה","גפן/ענב","דובדבן","דלעת","זית",
     "חבוש","חציל","טנג'רין","כרוב","לימון","לימון מאייר",
     "מנגו","מלון","נקטרינה","ענב","עגבניה שרי","פסיפלורה",
-    "פפאיה","פלפל","פסיפלורה","קישוא","קלמנטינה","רימון",
+    "פפאיה","פלפל","קישוא","קלמנטינה","רימון",
     "שזיף","שסק","תאנה","תותים","תמר","תפוח","תפוז",
-    "בטטה","גזר","בצל","שום","ברוקולי","כרובית","תרד","חסה",
-    "אחר"
+    "בטטה","גזר","בצל","שום","ברוקולי","כרובית","תרד","חסה"
   ];
 
   // ===== GOOGLE AUTH =====
@@ -1111,8 +1110,20 @@
         price_per_kg: price !== "" ? parseFloat(price) : null,
         user_id: currentUser?.id
       })});
-      // עדכן את פרטי המשתמש לשימוש עתידי
-      // לא שומרים טלפון מטופס העץ — רק מהרשמה
+      // הוסף פרי/ירק חדש לרשימה אם הוזן
+      if (fruitNew && ALL_PRODUCE.indexOf(fruitNew) === -1) {
+        ALL_PRODUCE.push(fruitNew);
+        ALL_PRODUCE.sort();
+      }
+      // הוסף עיר חדשה לרשימה אם הוזנה
+      if (cityNew && !ISRAEL_CITIES[cityNew]) {
+        ISRAEL_CITIES[cityNew] = [];
+      }
+      // הוסף שכונה חדשה לעיר
+      if (city && neighborhood && ISRAEL_CITIES[city] && ISRAEL_CITIES[city].indexOf(neighborhood) === -1) {
+        ISRAEL_CITIES[city].push(neighborhood);
+        ISRAEL_CITIES[city].sort();
+      }
       ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new","o-fruit-new"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
       document.getElementById("o-city").value = "";
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
