@@ -1154,6 +1154,21 @@
     editor.classList.toggle("open");
     const btn = document.querySelector(".edit-filters-btn");
     if (btn) btn.textContent = editor.classList.contains("open") ? "✖ סגור עורך" : "✏️ ערוך הגדרות";
+    if (editor.classList.contains("open")) {
+      // מלא את הדרופדאונים כשנפתח
+      const savedCity = currentUser && currentUser.notify_cities && currentUser.notify_cities[0] ? currentUser.notify_cities[0] : "";
+      const savedFruit = currentUser && currentUser.notify_fruits && currentUser.notify_fruits[0] ? currentUser.notify_fruits[0] : "";
+      const cityEl = document.getElementById("notify-city-select");
+      if (cityEl) {
+        const allCities = Object.keys(ISRAEL_CITIES).sort();
+        cityEl.innerHTML = '<option value="">בחר עיר/ישוב...</option>' + allCities.map(function(c){return '<option value="'+c+'"'+(c===savedCity?' selected':'')+'>'+c+'</option>';}).join("");
+      }
+      const fruitEl = document.getElementById("notify-fruit-select");
+      if (fruitEl) {
+        fruitEl.innerHTML = '<option value="">כל הפירות והירקות</option>' + ALL_PRODUCE.map(function(f){return '<option value="'+f+'"'+(f===savedFruit?' selected':'')+'>'+f+'</option>';}).join("");
+      }
+      updateNotifyNeighborhoodsDropdown();
+    }
   }
 
   function updateSelectedTags() {
