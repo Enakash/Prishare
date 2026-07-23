@@ -962,7 +962,8 @@
             (!isFree ? '<span class="store-price">מחנות: ₪' + storePrice + '/ק"ג</span>' : '') +
             (tree.requests && tree.requests.length ? '<span class="requests-count">⏳ ' + tree.requests.length + ' בקשות</span>' : '') +
           '</div>' +
-          '<button class="btn btn-primary btn-sm" onclick="openModal(\'' + tree.id + '\')">🌿 בקש לקטוף</button>' +
+          '<button class="fav-btn" onclick="toggleFavorite(&quot;' + tree.id + '&quot;)" title="הוסף למועדפים">' + (isFavorite(tree.id) ? '⭐' : '☆') + '</button>' +
+          '<button class="btn btn-primary btn-sm" onclick="openModal(&quot;' + tree.id + '&quot;)">🌿 בקש לקטוף</button>' +
         '</div></div>';
     }).join("");
   }
@@ -1560,7 +1561,7 @@
         (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ' + tree.owner_phone + '</div>' : '') +
         '<div style="display:flex;gap:8px;margin-top:10px">' +
           (tree.owner_phone ? '<a href="tel:' + tree.owner_phone + '" class="btn btn-secondary btn-sm">📲 התקשר</a>' : '') +
-          '<button class="btn btn-primary btn-sm" onclick="openModal(&quot;tree.id&quot;)">🌿 בקש לקטוף</button>' +
+          '<button class="btn btn-primary btn-sm" onclick="openModal(&quot;' + tree.id + '&quot;)">🌿 בקש לקטוף</button>' +
         '</div>' +
       '</div>';
     }).join("");
