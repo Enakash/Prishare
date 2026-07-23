@@ -1000,7 +1000,7 @@
       fetch(SUBSCRIBERS_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
-        body: JSON.stringify({ owner_name: name, fruit, city: city || "", neighborhood: neighborhood || "", address: address })
+        body: JSON.stringify({ owner_name: name, fruit, city: city || "", neighborhood: neighborhood || "", address: address, phone: phone || "", price: price ? price + " ₪/ק\"ג" : "" })
       }).catch(() => {});
     } catch(e) { showToast("שגיאה בפרסום העץ", true); }
   }
