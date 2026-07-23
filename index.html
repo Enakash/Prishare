@@ -734,6 +734,24 @@
     updateOwnerForm();
   }
 
+  function refreshUserMeta() {
+    if (!currentUser || !currentUser.token) return;
+    fetch(SUPABASE_URL + "/auth/v1/user", {
+      headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + currentUser.token }
+    }).then(function(r){ return r.json(); }).then(function(user) {
+      if (user && user.id) {
+        currentUser.notify_new_trees = (user.user_metadata && user.user_metadata.notify_new_trees) || false;
+        currentUser.notify_cities = (user.user_metadata && user.user_metadata.notify_cities) || [];
+        currentUser.notify_neighborhoods = (user.user_metadata && user.user_metadata.notify_neighborhoods) || [];
+        currentUser.notify_fruits = (user.user_metadata && user.user_metadata.notify_fruits) || [];
+        saveSession(currentUser);
+        populateNotifyCityDropdown();
+        var notifyToggle = document.getElementById("notify-toggle");
+        if (notifyToggle) notifyToggle.checked = currentUser.notify_new_trees;
+      }
+    }).catch(function(){});
+  }
+
   function doLogout() {
     const wasGoogleUser = currentUser?.email;
     clearSession();
@@ -1416,24 +1434,6 @@
     if (handled) return;
 
   // helper to refresh metadata
-  function refreshUserMeta() {
-    if (!currentUser || !currentUser.token) return;
-    fetch(SUPABASE_URL + "/auth/v1/user", {
-      headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + currentUser.token }
-    }).then(function(r){ return r.json(); }).then(function(user) {
-      if (user && user.id) {
-        currentUser.notify_new_trees = (user.user_metadata && user.user_metadata.notify_new_trees) || false;
-        currentUser.notify_cities = (user.user_metadata && user.user_metadata.notify_cities) || [];
-        currentUser.notify_neighborhoods = (user.user_metadata && user.user_metadata.notify_neighborhoods) || [];
-        currentUser.notify_fruits = (user.user_metadata && user.user_metadata.notify_fruits) || [];
-        saveSession(currentUser);
-        populateNotifyCityDropdown();
-        var notifyToggle = document.getElementById("notify-toggle");
-        if (notifyToggle) notifyToggle.checked = currentUser.notify_new_trees;
-      }
-    }).catch(function(){});
-  }
-
   // ===== AUTO LOGIN =====
   const saved = loadSession();
   if (saved && saved.token) {
