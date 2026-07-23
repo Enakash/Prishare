@@ -382,21 +382,21 @@
           <div class="filters-editor" id="filters-editor">
             <div class="form-row" style="margin-bottom:10px">
               <label class="form-label">🏙️ עיר (חובה)</label>
-              <select class="form-select" id="notify-city-select" onchange="updateNotifyNeighborhoodsDropdown()" style="font-size:13px">
-                <option value="">בחר עיר/ישוב...</option>
+              <select class="form-select" id="notify-city-select" multiple size="4" onchange="updateNotifyNeighborhoodsDropdown()" style="font-size:13px">
               </select>
+              <div style="font-size:11px;color:#aaa;margin-top:3px">Ctrl + לחיצה לבחירה מרובה</div>
             </div>
             <div class="form-row" style="margin-bottom:10px">
-              <label class="form-label">🏘️ שכונה (אופציונלי)</label>
-              <select class="form-select" id="notify-neighborhood-select" style="font-size:13px">
-                <option value="">כל השכונות</option>
+              <label class="form-label">🏘️ שכונות (אופציונלי)</label>
+              <select class="form-select" id="notify-neighborhood-select" multiple size="3" style="font-size:13px">
               </select>
+              <div style="font-size:11px;color:#aaa;margin-top:3px">ריק = כל השכונות</div>
             </div>
             <div class="form-row" style="margin-bottom:12px">
-              <label class="form-label">🌿 פרי/ירק (אופציונלי)</label>
-              <select class="form-select" id="notify-fruit-select" style="font-size:13px">
-                <option value="">כל הפירות והירקות</option>
+              <label class="form-label">🌿 פירות/ירקות (אופציונלי)</label>
+              <select class="form-select" id="notify-fruit-select" multiple size="4" style="font-size:13px">
               </select>
+              <div style="font-size:11px;color:#aaa;margin-top:3px">ריק = כל הפירות</div>
             </div>
             <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="saveNotifyFilters()">
               💾 שמור הגדרות
@@ -1161,11 +1161,13 @@
       const cityEl = document.getElementById("notify-city-select");
       if (cityEl) {
         const allCities = Object.keys(ISRAEL_CITIES).sort();
-        cityEl.innerHTML = '<option value="">בחר עיר/ישוב...</option>' + allCities.map(function(c){return '<option value="'+c+'"'+(c===savedCity?' selected':'')+'>'+c+'</option>';}).join("");
+        const savedCitiesArr = currentUser ? (currentUser.notify_cities || []) : [];
+        cityEl.innerHTML = allCities.map(function(c){return '<option value="'+c+'"'+(savedCitiesArr.indexOf(c)>-1?' selected':'')+'>'+c+'</option>';}).join("");
       }
       const fruitEl = document.getElementById("notify-fruit-select");
       if (fruitEl) {
-        fruitEl.innerHTML = '<option value="">כל הפירות והירקות</option>' + ALL_PRODUCE.map(function(f){return '<option value="'+f+'"'+(f===savedFruit?' selected':'')+'>'+f+'</option>';}).join("");
+        const savedFruitsArr = currentUser ? (currentUser.notify_fruits || []) : [];
+        fruitEl.innerHTML = ALL_PRODUCE.map(function(f){return '<option value="'+f+'"'+(savedFruitsArr.indexOf(f)>-1?' selected':'')+'>'+f+'</option>';}).join("");
       }
       updateNotifyNeighborhoodsDropdown();
     }
@@ -1180,24 +1182,32 @@
     const neighsEl = document.getElementById("selected-neighborhoods-tags");
     const fruitsEl = document.getElementById("selected-fruits-tags");
 
-    const cityVal = cities && cities[0] ? cities[0] : "";
-    const neighVal = neighborhoods && neighborhoods[0] ? neighborhoods[0] : "";
-    const fruitVal = fruits && fruits[0] ? fruits[0] : "";
     if (citiesEl) {
-      citiesEl.innerHTML = !cityVal
+      citiesEl.innerHTML = !cities || cities.length===0
         ? '<span class="tag-empty">לא נבחרה עיר — לא יתקבלו עדכונים</span>'
-        : '<span class="tag-item">🏙️ ' + cityVal + ' <button onclick="clearNotifyItem(&quot;city&quot;)">×</button></span>';
+        : cities.map(function(c){return '<span class="tag-item">🏙️ '+c+' <button onclick="removeFromNotify('cities','"+c+"')">×</button></span>';}).join("");
     }
     if (neighsEl) {
-      neighsEl.innerHTML = !neighVal
+      neighsEl.innerHTML = !neighborhoods || neighborhoods.length===0
         ? '<span class="tag-empty">כל השכונות</span>'
-        : '<span class="tag-item">🏘️ ' + neighVal + ' <button onclick="clearNotifyItem(&quot;neighborhood&quot;)">×</button></span>';
+        : neighborhoods.map(function(n){return '<span class="tag-item">🏘️ '+n+' <button onclick="removeFromNotify('neighborhoods','"+n+"')">×</button></span>';}).join("");
     }
     if (fruitsEl) {
-      fruitsEl.innerHTML = !fruitVal
+      fruitsEl.innerHTML = !fruits || fruits.length===0
         ? '<span class="tag-empty">כל הפירות והירקות</span>'
-        : '<span class="tag-item">' + getFruitEmoji(fruitVal) + ' ' + fruitVal + ' <button onclick="clearNotifyItem(&quot;fruit&quot;)">×</button></span>';
+        : fruits.map(function(f){return '<span class="tag-item">'+getFruitEmoji(f)+' '+f+' <button onclick="removeFromNotify('fruits','"+f+"')">×</button></span>';}).join("");
     }
+  }
+
+  async function removeFromNotify(field, val) {
+    if (!currentUser) return;
+    currentUser['notify_'+field] = (currentUser['notify_'+field]||[]).filter(function(v){return v!==val;});
+    try {
+      await fetch(SUPABASE_URL+"/auth/v1/user",{method:"PUT",headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+currentUser.token,"Content-Type":"application/json"},body:JSON.stringify({data:{name:currentUser.name,phone:currentUser.phone,notify_new_trees:currentUser.notify_new_trees,notify_cities:currentUser.notify_cities||[],notify_neighborhoods:currentUser.notify_neighborhoods||[],notify_fruits:currentUser.notify_fruits||[]}})});
+      saveSession(currentUser);
+      populateNotifyCityDropdown();
+      showToast("✅ עודכן");
+    } catch(e){showToast("שגיאה",true);}
   }
 
   async function clearNotifyItem(type) {
@@ -1298,13 +1308,10 @@
     const cityEl = document.getElementById("notify-city-select");
     const neighEl = document.getElementById("notify-neighborhood-select");
     const fruitEl = document.getElementById("notify-fruit-select");
-    const city = cityEl ? cityEl.value : "";
-    const neigh = neighEl ? neighEl.value : "";
-    const fruit = fruitEl ? fruitEl.value : "";
-    if (!city) { showToast("יש לבחור עיר לפחות", true); return; }
-    const cities = [city];
-    const neighborhoods = neigh ? [neigh] : [];
-    const fruits = fruit ? [fruit] : [];
+    const cities = cityEl ? Array.from(cityEl.selectedOptions).map(function(o){return o.value;}).filter(Boolean) : [];
+    const neighborhoods = neighEl ? Array.from(neighEl.selectedOptions).map(function(o){return o.value;}).filter(Boolean) : [];
+    const fruits = fruitEl ? Array.from(fruitEl.selectedOptions).map(function(o){return o.value;}).filter(Boolean) : [];
+    if (cities.length === 0) { showToast("יש לבחור עיר לפחות", true); return; }
     try {
       const res = await fetch(SUPABASE_URL + "/auth/v1/user", {
         method: "PUT",
