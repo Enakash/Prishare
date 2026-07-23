@@ -1560,7 +1560,7 @@
         (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ' + tree.owner_phone + '</div>' : '') +
         '<div style="display:flex;gap:8px;margin-top:10px">' +
           (tree.owner_phone ? '<a href="tel:' + tree.owner_phone + '" class="btn btn-secondary btn-sm">📲 התקשר</a>' : '') +
-          '<button class="btn btn-primary btn-sm" onclick="openModal('' + tree.id + '')">🌿 בקש לקטוף</button>' +
+          '<button class="btn btn-primary btn-sm" onclick="openModal(&quot;tree.id&quot;)">🌿 בקש לקטוף</button>' +
         '</div>' +
       '</div>';
     }).join("");
