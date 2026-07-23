@@ -756,6 +756,9 @@
         currentUser.notify_cities = (user.user_metadata && user.user_metadata.notify_cities) || [];
         currentUser.notify_neighborhoods = (user.user_metadata && user.user_metadata.notify_neighborhoods) || [];
         currentUser.notify_fruits = (user.user_metadata && user.user_metadata.notify_fruits) || [];
+        if (user.app_metadata && user.app_metadata.provider) {
+          currentUser.provider = user.app_metadata.provider;
+        }
         saveSession(currentUser);
         populateNotifyCityDropdown();
         var notifyToggle = document.getElementById("notify-toggle");
@@ -1412,13 +1415,27 @@
     document.getElementById("delete-pass").value = "";
     const check = document.getElementById("delete-confirm-check");
     if (check) check.checked = false;
-    // בדוק אם משתמש Google (אין סיסמה)
-    const isGoogle = currentUser && currentUser.provider === "google";
+    // בדוק אם משתמש Google — לפי provider שנשמר או לפי app_metadata מהטוקן
+    const provider = currentUser && currentUser.provider;
+    const isGoogle = provider === "google";
     const passRow = document.getElementById("delete-pass-row");
     const googleNote = document.getElementById("delete-google-note");
     if (passRow) passRow.style.display = isGoogle ? "none" : "block";
     if (googleNote) googleNote.style.display = isGoogle ? "block" : "none";
     document.getElementById("delete-modal").classList.add("open");
+    // אם provider לא ידוע — שאל את Supabase
+    if (!provider && currentUser && currentUser.token) {
+      fetch(SUPABASE_URL + "/auth/v1/user", {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + currentUser.token }
+      }).then(function(r){return r.json();}).then(function(u){
+        const prov = u.app_metadata && u.app_metadata.provider;
+        currentUser.provider = prov || "email";
+        saveSession(currentUser);
+        const isG = currentUser.provider === "google";
+        if (passRow) passRow.style.display = isG ? "none" : "block";
+        if (googleNote) googleNote.style.display = isG ? "block" : "none";
+      }).catch(function(){});
+    }
   }
 
   async function doDeleteAccount() {
