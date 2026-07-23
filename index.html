@@ -1123,7 +1123,7 @@
     el.innerHTML = items.map(function(item) {
       const checked = saved.indexOf(item.value) > -1;
       return '<label class="check-item' + (checked?' checked':'') + '" id="lbl-'+containerId+'-'+item.value.replace(/\s/g,'_')+'">'
-        + '<input type="checkbox" value="'+item.value+'"' + (checked?' checked':'') + ' onchange="toggleCheckItem(this,''+containerId+'')" />'
+        + '<input type="checkbox" value="'+item.value+'"' + (checked?' checked':'') + ' onchange="toggleCheckItem(this,\'' + containerId + '\')" />'
         + item.label + '</label>';
     }).join("");
   }
