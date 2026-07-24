@@ -1071,8 +1071,10 @@
             '<button onclick="deleteTree(\'' + tree.id + '\')" style="background:rgba(220,50,50,0.25);color:white;border:1px solid rgba(255,150,150,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:Heebo,sans-serif;font-weight:700">🗑️ הסר</button>' +
           '</div>' +
         '</div>' +
-        '<div class="my-tree-body">' +
-          '<div style="font-size:13px;color:#666;margin-bottom:10px">👤 ' + tree.owner_name + (tree.quantity ? " · " + tree.quantity : "") + (tree.price_per_kg ? ' · ₪' + tree.price_per_kg + '/ק"ג' : " · חינם") + '</div>' +
+'<div class="my-tree-body">' +
+          '<div style="font-size:13px;color:#666;margin-bottom:6px">👤 ' + tree.owner_name + (tree.quantity ? " · " + tree.quantity : "") + (tree.price_per_kg ? ' · ₪' + tree.price_per_kg + '/ק"ג' : " · חינם") + '</div>' +
+          ((tree.city || tree.neighborhood) ? '<div style="font-size:13px;color:#888;margin-bottom:6px">🏘️ ' + [tree.neighborhood, tree.city].filter(Boolean).join(", ") + '</div>' : '') +
+          (tree.description ? '<div style="font-size:13px;color:#555;margin-bottom:10px;line-height:1.5">' + tree.description + '</div>' : '') +
           (!(tree.requests && tree.requests.length)
             ? '<div style="font-size:13px;color:#bbb;padding:8px 0">עדיין אין בקשות קטיף</div>'
             : tree.requests.map(req =>
