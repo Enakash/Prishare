@@ -276,7 +276,7 @@
     <div class="filter-bar">
       <select class="filter-select" id="filter-city" onchange="applyFilters()"><option value="">🏙️ כל הערים</option></select>
       <select class="filter-select" id="filter-neighborhood" onchange="applyFilters()"><option value="">🏘️ כל השכונות</option></select>
-      <select class="filter-select" id="filter-fruit" onchange="applyFilters()"><option value="">🌿 כל הפירות</option></select>
+      <select class="filter-select" id="filter-fruit" onchange="applyFilters()"><option value="">🌿 כל הפירות והירקות</option></select>
     </div>
     <div class="section-title"><span>🌿</span> עצים זמינים לקטיף</div>
     <div id="trees-list"><div class="loading">⏳ טוען עצים...</div></div>
@@ -906,29 +906,48 @@
 
   // ===== FILTERS =====
   function buildFilters() {
-    const cities = [...new Set(trees.map(t => t.city).filter(Boolean))].sort();
-    const fruits = [...new Set(trees.map(t => getFruitName(t.fruit)))].sort();
-    const cityEl = document.getElementById("filter-city");
-    const fruitEl = document.getElementById("filter-fruit");
-    const prevCity = cityEl.value, prevFruit = fruitEl.value;
-    cityEl.innerHTML = '<option value="">🏙️ כל הערים</option>' + cities.map(c => `<option ${c===prevCity?"selected":""}>${c}</option>`).join("");
-    fruitEl.innerHTML = '<option value="">🌿 כל הפירות</option>' + fruits.map(f => `<option ${f===prevFruit?"selected":""}>${getFruitEmoji(f)} ${f}</option>`).join("");
+    // בנה רשימות לפי כל העצים הזמינים ללא משתמש נוכחי
+    const available = trees.filter(function(t){ return t.available && (!currentUser || !isGuest || t.user_id !== currentUser.id); });
+    const city = document.getElementById("filter-city").value;
+    const neigh = document.getElementById("filter-neighborhood").value;
+    const fruit = document.getElementById("filter-fruit").value;
+
+    // ערים: אם נבחר פרי — רק ערים בהן הפרי קיים
+    var cityPool = fruit
+      ? available.filter(function(t){ return getFruitName(t.fruit) === fruit; })
+      : available;
+    var cities = [...new Set(cityPool.map(function(t){return t.city;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
+    var cityEl = document.getElementById("filter-city");
+    cityEl.innerHTML = '<option value="">🏙️ כל הערים</option>' + cities.map(function(c){return '<option'+(c===city?' selected':'')+'>'+c+'</option>';}).join("");
+
+    // שכונות: לפי עיר ופרי נבחרים
+    var neighPool = available;
+    if (city) neighPool = neighPool.filter(function(t){return t.city === city;});
+    if (fruit) neighPool = neighPool.filter(function(t){return getFruitName(t.fruit) === fruit;});
+    var neighborhoods = [...new Set(neighPool.map(function(t){return t.neighborhood;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
+    var neighEl = document.getElementById("filter-neighborhood");
+    neighEl.innerHTML = '<option value="">🏘️ כל השכונות</option>' + neighborhoods.map(function(n){return '<option'+(n===neigh?' selected':'')+'>'+n+'</option>';}).join("");
+
+    // פירות: אם נבחרה עיר/שכונה — רק פירות קיימים שם
+    var fruitPool = available;
+    if (city) fruitPool = fruitPool.filter(function(t){return t.city === city;});
+    if (neigh) fruitPool = fruitPool.filter(function(t){return t.neighborhood === neigh;});
+    var fruits = [...new Set(fruitPool.map(function(t){return getFruitName(t.fruit);}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
+    var fruitEl = document.getElementById("filter-fruit");
+    fruitEl.innerHTML = '<option value="">🌿 כל הפירות</option>' + fruits.map(function(f){return '<option'+(f===fruit?' selected':'')+'>'+getFruitEmoji(f)+' '+f+'</option>';}).join("");
   }
 
   function applyFilters() {
+    buildFilters(); // מעדכן את הדרופדאונים בהתאם לבחירה
     const city = document.getElementById("filter-city").value;
-    const fruit = document.getElementById("filter-fruit").value;
-    const cityTrees = city ? trees.filter(t => t.city === city) : trees;
-    const neighborhoods = [...new Set(cityTrees.map(t => t.neighborhood).filter(Boolean))].sort();
-    const neighEl = document.getElementById("filter-neighborhood");
-    const prevNeigh = neighEl.value;
-    neighEl.innerHTML = '<option value="">🏘️ כל השכונות</option>' + neighborhoods.map(n => `<option ${n===prevNeigh?"selected":""}>${n}</option>`).join("");
-    let filtered = trees.filter(t => t.available);
-    if (city) filtered = filtered.filter(t => t.city === city);
-    if (prevNeigh) filtered = filtered.filter(t => t.neighborhood === prevNeigh);
-    // הערך ב־dropdown הוא 'אימוג'י שם' — נחלץ את השם העברי (לאחר הרווח)
-    const fruitName = fruit ? fruit.replace(/^.+\s/, "").trim() : "";
-    if (fruitName) filtered = filtered.filter(t => getFruitName(t.fruit) === fruitName);
+    const neigh = document.getElementById("filter-neighborhood").value;
+    const fruitRaw = document.getElementById("filter-fruit").value;
+    const fruit = fruitRaw ? fruitRaw.replace(/^.+\s/, "").trim() : "";
+    var filtered = trees.filter(function(t){ return t.available; });
+    if (currentUser && !isGuest) filtered = filtered.filter(function(t){ return t.user_id !== currentUser.id; });
+    if (city) filtered = filtered.filter(function(t){ return t.city === city; });
+    if (neigh) filtered = filtered.filter(function(t){ return t.neighborhood === neigh; });
+    if (fruit) filtered = filtered.filter(function(t){ return getFruitName(t.fruit) === fruit; });
     renderBrowse(filtered);
   }
 
