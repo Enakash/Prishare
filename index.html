@@ -598,6 +598,47 @@
     "בטטה","גזר","בצל","שום","ברוקולי","כרובית","תרד","חסה"
   ];
 
+  // ===== CUSTOM ITEMS (localStorage) =====
+  function loadCustomItems() {
+    try {
+      var customCities = JSON.parse(localStorage.getItem("prishare_custom_cities") || "{}");
+      var customFruits = JSON.parse(localStorage.getItem("prishare_custom_fruits") || "[]");
+      // הוסף ערים מותאמות ל-ISRAEL_CITIES
+      Object.keys(customCities).forEach(function(city) {
+        if (!ISRAEL_CITIES[city]) ISRAEL_CITIES[city] = [];
+        customCities[city].forEach(function(n) {
+          if (ISRAEL_CITIES[city].indexOf(n) === -1) ISRAEL_CITIES[city].push(n);
+        });
+      });
+      // הוסף פירות מותאמים ל-ALL_PRODUCE
+      customFruits.forEach(function(f) {
+        if (ALL_PRODUCE.indexOf(f) === -1) ALL_PRODUCE.push(f);
+      });
+      ALL_PRODUCE.sort(function(a,b){return a.localeCompare(b,'he');});
+    } catch(e) {}
+  }
+
+  function saveCustomCity(cityName, neighborhood) {
+    try {
+      var customCities = JSON.parse(localStorage.getItem("prishare_custom_cities") || "{}");
+      if (!customCities[cityName]) customCities[cityName] = [];
+      if (neighborhood && customCities[cityName].indexOf(neighborhood) === -1) {
+        customCities[cityName].push(neighborhood);
+      }
+      localStorage.setItem("prishare_custom_cities", JSON.stringify(customCities));
+    } catch(e) {}
+  }
+
+  function saveCustomFruit(fruitName) {
+    try {
+      var customFruits = JSON.parse(localStorage.getItem("prishare_custom_fruits") || "[]");
+      if (customFruits.indexOf(fruitName) === -1) {
+        customFruits.push(fruitName);
+        localStorage.setItem("prishare_custom_fruits", JSON.stringify(customFruits));
+      }
+    } catch(e) {}
+  }
+
   // ===== GOOGLE AUTH =====
   async function doGoogleLogin() {
     try {
@@ -1197,23 +1238,26 @@
         price_per_kg: price !== "" ? parseFloat(price) : null,
         user_id: currentUser?.id
       })});
-      // הוסף פרי/ירק חדש לרשימה אם הוזן
+      // הוסף פרי/ירק חדש לרשימה
       if (fruitNew && ALL_PRODUCE.indexOf(fruitNew) === -1) {
         ALL_PRODUCE.push(fruitNew);
         ALL_PRODUCE.sort(function(a,b){return a.localeCompare(b,'he');});
+        saveCustomFruit(fruitNew);
       }
-      // הוסף עיר חדשה לרשימה אם הוזנה
-      if (cityNew && !ISRAEL_CITIES[cityNew]) {
-        ISRAEL_CITIES[cityNew] = [];
-      }
-      // הוסף שכונה חדשה לעיר
+      // הוסף עיר חדשה לרשימה
       var finalCity = cityNew || citySelect;
       var finalNeigh = neighNew || neighSelect;
+      if (cityNew && !ISRAEL_CITIES[cityNew]) {
+        ISRAEL_CITIES[cityNew] = [];
+        saveCustomCity(cityNew, finalNeigh);
+      }
+      // הוסף שכונה חדשה לעיר
       if (finalCity && finalNeigh) {
         if (!ISRAEL_CITIES[finalCity]) ISRAEL_CITIES[finalCity] = [];
         if (ISRAEL_CITIES[finalCity].indexOf(finalNeigh) === -1) {
           ISRAEL_CITIES[finalCity].push(finalNeigh);
           ISRAEL_CITIES[finalCity].sort(function(a,b){return a.localeCompare(b,'he');});
+          saveCustomCity(finalCity, finalNeigh);
         }
       }
       ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new","o-fruit-new"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
@@ -1705,6 +1749,7 @@
   }); // end handleOAuthCallback
 
   handleOAuthRedirect();
+  loadCustomItems();
   updatePriceHint();
 </script>
 </body>
