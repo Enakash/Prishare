@@ -1073,9 +1073,13 @@
     const fruitSelect = document.getElementById("o-fruit").value.trim();
     const fruitNew = document.getElementById("o-fruit-new") ? document.getElementById("o-fruit-new").value.trim() : "";
     const fruit = fruitNew || fruitSelect;
-    if (!fruit) { showToast("נא לבחור או להזין סוג פרי/ירק", true); return; }
-    const store = STORE_PRICES[fruit] || 10;
-    document.getElementById("price-hint").innerHTML = 'מחיר ממוצע בחנויות: <span>₪' + store + '/ק"ג</span> — הזן 0 לחינם';
+    const hint = document.getElementById("price-hint");
+    if (!hint) return;
+    if (!fruit) { hint.innerHTML = 'הזן 0 לחינם'; return; }
+    const store = STORE_PRICES[fruit] || STORE_PRICES[getFruitName(fruit)] || null;
+    hint.innerHTML = store
+      ? 'מחיר ממוצע בחנויות: <span>₪' + store + '/ק"ג</span> — הזן 0 לחינם'
+      : 'הזן 0 לחינם';
   }
 
   function openModal(treeId) {
