@@ -1565,10 +1565,11 @@
     }
   }
 
-  async function doDeleteAccount() {
+async function doDeleteAccount() {
     const pass = document.getElementById("delete-pass").value;
     const confirmed = document.getElementById("delete-confirm-check").checked;
-    if (!pass) { showToast("נא להזין סיסמה", true); return; }
+    const isGoogleUser = currentUser && currentUser.provider === "google";
+    if (!isGoogleUser && !pass) { showToast("נא להזין סיסמה", true); return; }
     if (!confirmed) { showToast("יש לסמן את תיבת האישור", true); return; }
     try {
       // מחק את כל עצי המשתמש ובקשותיהם
