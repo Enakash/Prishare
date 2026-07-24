@@ -1058,13 +1058,14 @@
     const cityEl = document.getElementById("o-city");
     if (!cityEl) return;
     const current = cityEl.value;
-    const allCities = Object.keys(ISRAEL_CITIES).sort();
+    const allCities = Object.keys(ISRAEL_CITIES).sort(function(a,b){return a.localeCompare(b,'he');});
     cityEl.innerHTML = '<option value="">בחר עיר/ישוב...</option>' + allCities.map(function(c){return '<option value="'+c+'"'+(c===current?' selected':'')+'>'+c+'</option>';}).join("");
     // populate fruit/veggie dropdown
     const fruitEl = document.getElementById("o-fruit");
     if (fruitEl) {
       const currentFruit = fruitEl.value;
-      fruitEl.innerHTML = '<option value="">בחר פרי/ירק...</option>' + ALL_PRODUCE.map(function(f){return '<option value="'+f+'"'+(f===currentFruit?' selected':'')+'>'+f+'</option>';}).join("");
+      const sortedProduce = [...ALL_PRODUCE].sort(function(a,b){return a.localeCompare(b,'he');});
+      fruitEl.innerHTML = '<option value="">בחר פרי/ירק...</option>' + sortedProduce.map(function(f){return '<option value="'+f+'"'+(f===currentFruit?' selected':'')+'>'+f+'</option>';}).join("");
     }
   }
 
@@ -1072,7 +1073,7 @@
     const fruitSelect = document.getElementById("o-fruit").value.trim();
     const fruitNew = document.getElementById("o-fruit-new") ? document.getElementById("o-fruit-new").value.trim() : "";
     const fruit = fruitNew || fruitSelect;
-    if (!fruit) { showToast("נא לבחור סוג פרי/ירק", true); return; }
+    if (!fruit) { showToast("נא לבחור או להזין סוג פרי/ירק", true); return; }
     const store = STORE_PRICES[fruit] || 10;
     document.getElementById("price-hint").innerHTML = 'מחיר ממוצע בחנויות: <span>₪' + store + '/ק"ג</span> — הזן 0 לחינם';
   }
@@ -1160,11 +1161,11 @@
     const fruitSelect = document.getElementById("o-fruit").value.trim();
     const fruitNew = document.getElementById("o-fruit-new") ? document.getElementById("o-fruit-new").value.trim() : "";
     const fruit = fruitNew || fruitSelect;
-    if (!fruit) { showToast("נא לבחור סוג פרי/ירק", true); return; }
     const price = document.getElementById("o-price").value;
     const quantity = document.getElementById("o-quantity").value.trim();
     const description = document.getElementById("o-desc").value.trim();
     if (!name || !phone || !city || !address) { showToast("נא למלא שם, טלפון, עיר וכתובת", true); return; }
+    if (!fruit) { showToast("נא לבחור או להזין סוג פרי/ירק", true); return; }
     try {
       await sbFetch("trees", { method: "POST", body: JSON.stringify({
         owner_name: name, owner_phone: phone, owner_email: currentUser?.email,
@@ -1175,18 +1176,25 @@
       // הוסף פרי/ירק חדש לרשימה אם הוזן
       if (fruitNew && ALL_PRODUCE.indexOf(fruitNew) === -1) {
         ALL_PRODUCE.push(fruitNew);
-        ALL_PRODUCE.sort();
+        ALL_PRODUCE.sort(function(a,b){return a.localeCompare(b,'he');});
       }
       // הוסף עיר חדשה לרשימה אם הוזנה
       if (cityNew && !ISRAEL_CITIES[cityNew]) {
         ISRAEL_CITIES[cityNew] = [];
       }
       // הוסף שכונה חדשה לעיר
-      if (city && neighborhood && ISRAEL_CITIES[city] && ISRAEL_CITIES[city].indexOf(neighborhood) === -1) {
-        ISRAEL_CITIES[city].push(neighborhood);
-        ISRAEL_CITIES[city].sort();
+      var finalCity = cityNew || citySelect;
+      var finalNeigh = neighNew || neighSelect;
+      if (finalCity && finalNeigh) {
+        if (!ISRAEL_CITIES[finalCity]) ISRAEL_CITIES[finalCity] = [];
+        if (ISRAEL_CITIES[finalCity].indexOf(finalNeigh) === -1) {
+          ISRAEL_CITIES[finalCity].push(finalNeigh);
+          ISRAEL_CITIES[finalCity].sort(function(a,b){return a.localeCompare(b,'he');});
+        }
       }
       ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new","o-fruit-new"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
+      // עדכן דרופדאונים עם הנתונים החדשים
+      populateOwnerCityDropdown();
       document.getElementById("o-city").value = "";
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
@@ -1251,14 +1259,15 @@
       const savedFruit = currentUser && currentUser.notify_fruits && currentUser.notify_fruits[0] ? currentUser.notify_fruits[0] : "";
       const cityEl = document.getElementById("notify-city-select");
       if (cityEl) {
-        const allCities = Object.keys(ISRAEL_CITIES).sort();
+        const allCities = Object.keys(ISRAEL_CITIES).sort(function(a,b){return a.localeCompare(b,'he');});
         const savedCitiesArr = currentUser ? (currentUser.notify_cities || []) : [];
         cityEl.innerHTML = allCities.map(function(c){return '<option value="'+c+'"'+(savedCitiesArr.indexOf(c)>-1?' selected':'')+'>'+c+'</option>';}).join("");
       }
       const fruitEl = document.getElementById("notify-fruit-select");
       if (fruitEl) {
         const savedFruitsArr = currentUser ? (currentUser.notify_fruits || []) : [];
-        fruitEl.innerHTML = ALL_PRODUCE.map(function(f){return '<option value="'+f+'"'+(savedFruitsArr.indexOf(f)>-1?' selected':'')+'>'+f+'</option>';}).join("");
+        const sortedFruits = [...ALL_PRODUCE].sort(function(a,b){return a.localeCompare(b,'he');});
+        fruitEl.innerHTML = sortedFruits.map(function(f){return '<option value="'+f+'"'+(savedFruitsArr.indexOf(f)>-1?' selected':'')+'>'+f+'</option>';}).join("");
       }
       updateNotifyNeighborhoodsDropdown();
     }
