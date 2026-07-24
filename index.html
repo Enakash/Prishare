@@ -329,7 +329,7 @@
           <select class="form-select" id="o-fruit" onchange="updatePriceHint()">
             <option value="">בחר פרי/ירק...</option>
           </select>
-          <input class="form-input" id="o-fruit-new" placeholder="פרי/ירק חדש — יתווסף לרשימה" style="margin-top:6px;font-size:13px" />
+          <input class="form-input" id="o-fruit-new" placeholder="פרי/ירק חדש — יתווסף לרשימה" style="margin-top:6px;font-size:13px" oninput="updatePriceHint()" />
         </div>
         <div class="form-row">
           <label class="form-label">מחיר לק"ג (₪)</label>
@@ -337,15 +337,9 @@
           <div class="price-hint" id="price-hint"></div>
         </div>
       </div>
-      <div class="form-grid">
-        <div class="form-row">
-          <label class="form-label">כמות משוערת</label>
-          <input class="form-input" id="o-quantity" placeholder="~20 לימונים" />
-        </div>
-        <div class="form-row">
-          <label class="form-label">מספר עצים</label>
-          <input class="form-input" id="o-tree-count" type="number" min="1" max="10" value="1" placeholder="1" />
-        </div>
+      <div class="form-row">
+        <label class="form-label">כמות משוערת</label>
+        <input class="form-input" id="o-quantity" placeholder="~20 לימונים" />
       </div>
       <div class="form-row">
         <label class="form-label">תיאור</label>
@@ -508,7 +502,16 @@
   const FUNCTION_URL = SUPABASE_URL + "/functions/v1/notify-owner";
   const SUBSCRIBERS_URL = SUPABASE_URL + "/functions/v1/notify-subscribers";
 
-  const STORE_PRICES = { "תפוח":9,"תפוז":7,"לימון":12,"אגס":11,"ענב":18,"תאנה":25,"שזיף":16,"אבוקדו":20,"זית":14,"אחר":10 };
+  const STORE_PRICES = {
+    "תפוח":9,"תפוז":8,"לימון":14,"אגס":12,"ענב":22,"תאנה":28,"שזיף":18,"אבוקדו":24,"זית":16,
+    "אגוז":45,"אגס":12,"אננס":15,"אפרסמון":16,"אפרסק":18,"אשכולית":7,
+    "בננה":8,"גויאבה":22,"גפן/ענב":22,"דובדבן":35,"דלעת":6,
+    "חבוש":14,"חציל":9,"טנג'רין":9,"כרוב":5,"לימון מאייר":18,
+    "מנגו":20,"מלון":8,"נקטרינה":18,"עגבניה שרי":15,"פסיפלורה":30,
+    "פפאיה":18,"פלפל":12,"קישוא":8,"קלמנטינה":9,"רימון":18,
+    "שזיף":18,"שסק":20,"תאנה":28,"תותים":28,"תמר":35,"תפוח":9,"תפוז":8,
+    "בטטה":7,"גזר":5,"בצל":4,"שום":18,"ברוקולי":9,"כרובית":8,"תרד":10,"חסה":6
+  };
   const FRUIT_EMOJIS = { "תפוח":"🍎","תפוז":"🍊","לימון":"🍋","אגס":"🍐","ענב":"🍇","תאנה":"🫐","שזיף":"🍑","אבוקדו":"🥑","זית":"🫒","אחר":"🌿" };
 
   let trees = [];
@@ -888,11 +891,18 @@
   }
 
   function getFruitName(fruit) {
-    if (!fruit) return "אחר";
+    if (!fruit) return "";
+    // בדוק אם הפרי ברשימת הידועים
     for (const key of Object.keys(FRUIT_EMOJIS)) { if (fruit.includes(key)) return key; }
-    return "אחר";
+    // פרי מותאם אישית — החזר אותו כמו שהוא
+    return fruit;
   }
-  function getFruitEmoji(fruit) { return FRUIT_EMOJIS[getFruitName(fruit)] || "🌿"; }
+  function getFruitEmoji(fruit) {
+    if (!fruit) return "🌿";
+    for (const key of Object.keys(FRUIT_EMOJIS)) { if (fruit.includes(key)) return FRUIT_EMOJIS[key]; }
+    return "🌿";
+  }
+
 
   // ===== FILTERS =====
   function buildFilters() {
@@ -1062,6 +1072,7 @@
     const fruitSelect = document.getElementById("o-fruit").value.trim();
     const fruitNew = document.getElementById("o-fruit-new") ? document.getElementById("o-fruit-new").value.trim() : "";
     const fruit = fruitNew || fruitSelect;
+    if (!fruit) { showToast("נא לבחור סוג פרי/ירק", true); return; }
     const store = STORE_PRICES[fruit] || 10;
     document.getElementById("price-hint").innerHTML = 'מחיר ממוצע בחנויות: <span>₪' + store + '/ק"ג</span> — הזן 0 לחינם';
   }
@@ -1149,21 +1160,18 @@
     const fruitSelect = document.getElementById("o-fruit").value.trim();
     const fruitNew = document.getElementById("o-fruit-new") ? document.getElementById("o-fruit-new").value.trim() : "";
     const fruit = fruitNew || fruitSelect;
+    if (!fruit) { showToast("נא לבחור סוג פרי/ירק", true); return; }
     const price = document.getElementById("o-price").value;
     const quantity = document.getElementById("o-quantity").value.trim();
     const description = document.getElementById("o-desc").value.trim();
-    const treeCount = parseInt(document.getElementById("o-tree-count") ? document.getElementById("o-tree-count").value : "1") || 1;
     if (!name || !phone || !city || !address) { showToast("נא למלא שם, טלפון, עיר וכתובת", true); return; }
     try {
-      // הוסף מספר עצים
-      for (var ti = 0; ti < treeCount; ti++) {
       await sbFetch("trees", { method: "POST", body: JSON.stringify({
         owner_name: name, owner_phone: phone, owner_email: currentUser?.email,
         city, neighborhood, address, fruit, quantity, description,
         price_per_kg: price !== "" ? parseFloat(price) : null,
         user_id: currentUser?.id
       })});
-      } // end loop
       // הוסף פרי/ירק חדש לרשימה אם הוזן
       if (fruitNew && ALL_PRODUCE.indexOf(fruitNew) === -1) {
         ALL_PRODUCE.push(fruitNew);
@@ -1183,7 +1191,7 @@
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
       await loadTrees();
-      showToast("🌳 " + (treeCount > 1 ? treeCount + " עצים פורסמו בהצלחה!" : "העץ שלך פורסם בהצלחה!"));
+      showToast("🌳 העץ שלך פורסם בהצלחה!");
       // שלח עדכון למנויים
       fetch(SUBSCRIBERS_URL, {
         method: "POST",
