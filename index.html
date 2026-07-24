@@ -906,43 +906,44 @@
 
   // ===== FILTERS =====
   function buildFilters() {
-    // בנה רשימות לפי כל העצים הזמינים ללא משתמש נוכחי
-    const available = trees.filter(function(t){ return t.available && (!currentUser || !isGuest || t.user_id !== currentUser.id); });
-    const city = document.getElementById("filter-city").value;
-    const neigh = document.getElementById("filter-neighborhood").value;
-    const fruit = document.getElementById("filter-fruit").value;
-
-    // ערים: אם נבחר פרי — רק ערים בהן הפרי קיים
-    var cityPool = fruit
-      ? available.filter(function(t){ return getFruitName(t.fruit) === fruit; })
-      : available;
-    var cities = [...new Set(cityPool.map(function(t){return t.city;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
+    if (!trees || trees.length === 0) return;
     var cityEl = document.getElementById("filter-city");
-    cityEl.innerHTML = '<option value="">🏙️ כל הערים</option>' + cities.map(function(c){return '<option'+(c===city?' selected':'')+'>'+c+'</option>';}).join("");
-
-    // שכונות: לפי עיר ופרי נבחרים
-    var neighPool = available;
-    if (city) neighPool = neighPool.filter(function(t){return t.city === city;});
-    if (fruit) neighPool = neighPool.filter(function(t){return getFruitName(t.fruit) === fruit;});
-    var neighborhoods = [...new Set(neighPool.map(function(t){return t.neighborhood;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
     var neighEl = document.getElementById("filter-neighborhood");
-    neighEl.innerHTML = '<option value="">🏘️ כל השכונות</option>' + neighborhoods.map(function(n){return '<option'+(n===neigh?' selected':'')+'>'+n+'</option>';}).join("");
-
-    // פירות: אם נבחרה עיר/שכונה — רק פירות קיימים שם
-    var fruitPool = available;
-    if (city) fruitPool = fruitPool.filter(function(t){return t.city === city;});
-    if (neigh) fruitPool = fruitPool.filter(function(t){return t.neighborhood === neigh;});
-    var fruits = [...new Set(fruitPool.map(function(t){return getFruitName(t.fruit);}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
     var fruitEl = document.getElementById("filter-fruit");
-    fruitEl.innerHTML = '<option value="">🌿 כל הפירות</option>' + fruits.map(function(f){return '<option'+(f===fruit?' selected':'')+'>'+getFruitEmoji(f)+' '+f+'</option>';}).join("");
+    if (!cityEl || !neighEl || !fruitEl) return;
+
+    var selCity = cityEl.value;
+    var selNeigh = neighEl.value;
+    var selFruit = fruitEl.value;
+
+    var available = trees.filter(function(t){ return t.available; });
+    if (currentUser && !isGuest) available = available.filter(function(t){ return t.user_id !== currentUser.id; });
+
+    // ערים — מסונן לפי פרי נבחר
+    var citySource = selFruit ? available.filter(function(t){ return getFruitName(t.fruit) === selFruit; }) : available;
+    var cities = [...new Set(citySource.map(function(t){return t.city;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
+    cityEl.innerHTML = '<option value="">🏙️ כל הערים</option>' + cities.map(function(c){return '<option value="'+c+'"'+(c===selCity?' selected':'')+'>'+c+'</option>';}).join("");
+
+    // שכונות — מסונן לפי עיר ופרי
+    var neighSource = available;
+    if (selCity) neighSource = neighSource.filter(function(t){return t.city===selCity;});
+    if (selFruit) neighSource = neighSource.filter(function(t){return getFruitName(t.fruit)===selFruit;});
+    var neighborhoods = [...new Set(neighSource.map(function(t){return t.neighborhood;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
+    neighEl.innerHTML = '<option value="">🏘️ כל השכונות</option>' + neighborhoods.map(function(n){return '<option value="'+n+'"'+(n===selNeigh?' selected':'')+'>'+n+'</option>';}).join("");
+
+    // פירות — מסונן לפי עיר ושכונה
+    var fruitSource = available;
+    if (selCity) fruitSource = fruitSource.filter(function(t){return t.city===selCity;});
+    if (selNeigh) fruitSource = fruitSource.filter(function(t){return t.neighborhood===selNeigh;});
+    var fruits = [...new Set(fruitSource.map(function(t){return getFruitName(t.fruit);}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
+    fruitEl.innerHTML = '<option value="">🌿 כל הפירות</option>' + fruits.map(function(f){return '<option value="'+f+'"'+(f===selFruit?' selected':'')+'>'+ getFruitEmoji(f)+' '+f+'</option>';}).join("");
   }
 
   function applyFilters() {
-    buildFilters(); // מעדכן את הדרופדאונים בהתאם לבחירה
-    const city = document.getElementById("filter-city").value;
-    const neigh = document.getElementById("filter-neighborhood").value;
-    const fruitRaw = document.getElementById("filter-fruit").value;
-    const fruit = fruitRaw ? fruitRaw.replace(/^.+\s/, "").trim() : "";
+    buildFilters();
+    var city = document.getElementById("filter-city").value;
+    var neigh = document.getElementById("filter-neighborhood").value;
+    var fruit = document.getElementById("filter-fruit").value;
     var filtered = trees.filter(function(t){ return t.available; });
     if (currentUser && !isGuest) filtered = filtered.filter(function(t){ return t.user_id !== currentUser.id; });
     if (city) filtered = filtered.filter(function(t){ return t.city === city; });
