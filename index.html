@@ -80,6 +80,7 @@
     .filter-select:focus { outline: none; border-color: #2C6E35; }
     .section-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
     .tree-card { background: #fff; border-radius: 14px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; }
+    .tree-card-image { width: 100%; height: 170px; object-fit: cover; border-radius: 10px; margin-bottom: 12px; display: block; }
     .tree-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .fruit-badge { background: #EEF7EE; color: #2C6E35; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 20px; border: 1px solid #C8E0C8; }
     .price-badge { background: #FFF8E1; color: #E65100; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 20px; border: 1px solid #FFE082; }
@@ -120,6 +121,7 @@
     .toast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2C6E35; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 300; white-space: nowrap; }
     .toast.error { background: #C0392B; }
     .my-tree-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid #EDE6D8; }
+    .my-tree-image { width: 100%; height: 150px; object-fit: cover; display: block; }
     .my-tree-header { background: linear-gradient(135deg, #2C6E35, #4A9B56); padding: 14px 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .my-tree-title { font-size: 15px; font-weight: 700; }
     .my-tree-body { padding: 14px 18px; }
@@ -157,6 +159,9 @@
     .delete-confirm-modal p { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.6; }
     .login-prompt a { color: #2C6E35; font-weight: 700; cursor: pointer; text-decoration: underline; }
     .profile-card { background: #EEF7EE; border: 1.5px solid #C8E0C8; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #2C6E35; display: flex; align-items: center; gap: 8px; }
+    .avatar-wrap { text-align: center; margin-bottom: 16px; }
+    .avatar-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #EDE6D8; display: none; }
+    .avatar-placeholder { width: 80px; height: 80px; border-radius: 50%; background: #EEF7EE; color: #2C6E35; font-size: 32px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .filter-bar { flex-direction: column; } }
   </style>
 </head>
@@ -345,6 +350,10 @@
         <label class="form-label">תיאור</label>
         <textarea class="form-textarea" id="o-desc" placeholder="ספר על הפירות — מתי הם בשלים, שעות נוחות..."></textarea>
       </div>
+      <div class="form-row">
+        <label class="form-label">תמונה (אופציונלי)</label>
+        <input class="form-input" type="file" id="o-image" accept="image/*" />
+      </div>
       <button class="btn btn-primary btn-full" onclick="addTree()">🌳 פרסם את העץ שלך</button>
     </div>
   </div>
@@ -367,6 +376,12 @@
     <div id="dashboard-list"><div class="loading">⏳ טוען...</div></div>
 
     <div class="account-section" id="account-section" style="display:none">
+      <div class="avatar-wrap">
+        <img id="avatar-preview" class="avatar-img" src="" />
+        <div id="avatar-placeholder" class="avatar-placeholder">👤</div>
+        <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="handleAvatarUpload(this.files[0])" />
+        <button class="edit-filters-btn" style="margin-top:8px" onclick="document.getElementById('avatar-upload').click()">📷 החלף תמונת פרופיל</button>
+      </div>
       <h3>⚙️ ניהול חשבון</h3>
       <div style="font-size:13px;color:#666;margin-bottom:14px">
         מחובר כ: <strong id="account-email"></strong>
@@ -390,7 +405,6 @@
           </label>
         </div>
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid #F0EBE0">
-          <!-- תצוגת בחירות נוכחיות -->
           <div style="margin-bottom:10px">
             <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:4px">🏙️ ערים נבחרות:</div>
             <div class="tags-row" id="selected-cities-tags"><span class="tag-empty">לא נבחרו ערים — לא יתקבלו עדכונים</span></div>
@@ -404,7 +418,6 @@
             <div class="tags-row" id="selected-fruits-tags"><span class="tag-empty">כל הפירות</span></div>
           </div>
           <button class="edit-filters-btn" onclick="toggleFiltersEditor()">✏️ ערוך הגדרות</button>
-          <!-- עורך הגדרות -->
           <div class="filters-editor" id="filters-editor">
             <div class="form-row" style="margin-bottom:10px">
               <label class="form-label">🏙️ עיר (חובה)</label>
@@ -603,14 +616,12 @@
     try {
       var customCities = JSON.parse(localStorage.getItem("prishare_custom_cities") || "{}");
       var customFruits = JSON.parse(localStorage.getItem("prishare_custom_fruits") || "[]");
-      // הוסף ערים מותאמות ל-ISRAEL_CITIES
       Object.keys(customCities).forEach(function(city) {
         if (!ISRAEL_CITIES[city]) ISRAEL_CITIES[city] = [];
         customCities[city].forEach(function(n) {
           if (ISRAEL_CITIES[city].indexOf(n) === -1) ISRAEL_CITIES[city].push(n);
         });
       });
-      // הוסף פירות מותאמים ל-ALL_PRODUCE
       customFruits.forEach(function(f) {
         if (ALL_PRODUCE.indexOf(f) === -1) ALL_PRODUCE.push(f);
       });
@@ -639,49 +650,96 @@
     } catch(e) {}
   }
 
+  // ===== IMAGE UPLOAD (Supabase Storage) =====
+  function resizeImage(file, maxDim) {
+    return new Promise(function(resolve, reject) {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        img.onload = function() {
+          let w = img.width, h = img.height;
+          if (w > h && w > maxDim) { h = h * (maxDim / w); w = maxDim; }
+          else if (h > maxDim) { w = w * (maxDim / h); h = maxDim; }
+          const canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          canvas.toBlob(function(blob) { resolve(blob); }, "image/jpeg", 0.82);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadImage(file, bucket, folder) {
+    if (!file) return null;
+    const resized = await resizeImage(file, bucket === "avatars" ? 500 : 1200);
+    const filename = folder + "/" + Date.now() + "_" + Math.random().toString(36).slice(2) + ".jpg";
+    const res = await fetch(SUPABASE_URL + "/storage/v1/object/" + bucket + "/" + filename, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + (currentUser && currentUser.token ? currentUser.token : SUPABASE_KEY),
+        "Content-Type": "image/jpeg"
+      },
+      body: resized
+    });
+    if (!res.ok) { throw new Error("שגיאה בהעלאת התמונה"); }
+    return SUPABASE_URL + "/storage/v1/object/public/" + bucket + "/" + filename;
+  }
+
+  async function handleAvatarUpload(file) {
+    if (!file || !currentUser) return;
+    try {
+      showToast("⏳ מעלה תמונה...");
+      const url = await uploadImage(file, "avatars", currentUser.id);
+      await fetch(SUPABASE_URL + "/auth/v1/user", {
+        method: "PUT",
+        headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + currentUser.token, "Content-Type": "application/json" },
+        body: JSON.stringify({ data: {
+          name: currentUser.name, phone: currentUser.phone,
+          notify_new_trees: currentUser.notify_new_trees,
+          notify_cities: currentUser.notify_cities || [],
+          notify_neighborhoods: currentUser.notify_neighborhoods || [],
+          notify_fruits: currentUser.notify_fruits || [],
+          avatar_url: url
+        }})
+      });
+      currentUser.avatar_url = url;
+      saveSession(currentUser);
+      renderAvatar();
+      showToast("✅ תמונת הפרופיל עודכנה");
+    } catch(e) { showToast("שגיאה בהעלאת התמונה", true); }
+  }
+
+  function renderAvatar() {
+    const img = document.getElementById("avatar-preview");
+    const placeholder = document.getElementById("avatar-placeholder");
+    if (!img) return;
+    if (currentUser && currentUser.avatar_url) {
+      img.src = currentUser.avatar_url;
+      img.style.display = "block";
+      if (placeholder) placeholder.style.display = "none";
+    } else {
+      img.style.display = "none";
+      if (placeholder) placeholder.style.display = "flex";
+    }
+  }
+
   // ===== GOOGLE AUTH =====
   async function doGoogleLogin() {
     try {
       const res = await fetch(SUPABASE_URL + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(window.location.href), {
         headers: { "apikey": SUPABASE_KEY }
       });
-      // redirect to Google
+      const { url } = await res.json();
+      if (url) window.location.href = url;
+      else window.location.href = SUPABASE_URL + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(window.location.href);
+    } catch(e) {
       window.location.href = SUPABASE_URL + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(window.location.href);
-    } catch(e) { showToast("שגיאה בהתחברות עם Google", true); }
-  }
-
-  // Handle OAuth redirect
-  async function handleOAuthRedirect() {
-    const hash = window.location.hash;
-    if (!hash.includes("access_token")) return;
-    const params = new URLSearchParams(hash.replace("#", ""));
-    const access_token = params.get("access_token");
-    const refresh_token = params.get("refresh_token");
-    if (!access_token) return;
-    try {
-      const res = await fetch(SUPABASE_URL + "/auth/v1/user", {
-        headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + access_token }
-      });
-      const user = await res.json();
-      currentUser = {
-        id: user.id,
-        email: user.email,
-        name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split("@")[0],
-        phone: user.user_metadata?.phone || "",
-        provider: "google",
-        notify_new_trees: user.user_metadata?.notify_new_trees || false,
-        notify_cities: user.user_metadata?.notify_cities || [],
-        notify_neighborhoods: user.user_metadata?.notify_neighborhoods || [],
-        notify_fruits: user.user_metadata?.notify_fruits || [],
-        token: access_token,
-        refresh_token: refresh_token
-      };
-      isGuest = false;
-      saveSession(currentUser);
-      // נקה את ה־hash מה־URL
-      history.replaceState(null, "", window.location.pathname);
-      enterApp();
-    } catch(e) { showToast("שגיאה בהתחברות", true); }
+    }
   }
 
   // ===== AUTH =====
@@ -716,6 +774,7 @@
         name: data.user.user_metadata?.name || email.split("@")[0],
         phone: data.user.user_metadata?.phone || "",
         provider: "email",
+        avatar_url: data.user.user_metadata?.avatar_url || "",
         notify_new_trees: data.user.user_metadata?.notify_new_trees || false,
         notify_cities: (data.user.user_metadata && data.user.user_metadata.notify_cities) ? data.user.user_metadata.notify_cities : [],
         notify_neighborhoods: (data.user.user_metadata && data.user.user_metadata.notify_neighborhoods) ? data.user.user_metadata.notify_neighborhoods : [],
@@ -740,37 +799,20 @@
     try {
       const notify = document.getElementById("signup-notify").checked;
       const data = await sbAuth("signup", { email, password: pass, data: { name, phone, notify_new_trees: notify } });
-      // אחרי רישום — כנס אוטומטית אם יש token
       if (data.access_token) {
-        currentUser = { id: data.user.id, email, name, phone, token: data.access_token, refresh_token: data.refresh_token };
+        currentUser = { id: data.user.id, email, name, phone, provider: "email", avatar_url: "", token: data.access_token, refresh_token: data.refresh_token };
         isGuest = false;
         saveSession(currentUser);
         enterApp();
         showToast("✅ נרשמת בהצלחה! ברוך הבא");
       } else {
         showToast("✅ נרשמת! אמת את האימייל שלך ואז התחבר");
-        // מלא אוטומטי בטופס התחברות
         document.getElementById("login-email").value = email;
         switchAuthTab("login");
         document.querySelectorAll(".auth-tab")[0].classList.add("active");
         document.querySelectorAll(".auth-tab")[1].classList.remove("active");
       }
     } catch(e) { showToast(e.message, true); }
-  }
-
-  async function doGoogleLogin() {
-    try {
-      const res = await fetch(SUPABASE_URL + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(window.location.href), {
-        headers: { "apikey": SUPABASE_KEY }
-      });
-      // redirect to Google OAuth
-      const { url } = await res.json();
-      if (url) window.location.href = url;
-      else window.location.href = SUPABASE_URL + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(window.location.href);
-    } catch(e) {
-      // fallback direct redirect
-      window.location.href = SUPABASE_URL + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(window.location.href);
-    }
   }
 
   // Handle Google OAuth callback
@@ -791,10 +833,12 @@
         email: user.email,
         name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split("@")[0],
         phone: user.user_metadata?.phone || "",
+        avatar_url: user.user_metadata?.avatar_url || "",
         notify_new_trees: user.user_metadata?.notify_new_trees || false,
         notify_cities: (user.user_metadata && user.user_metadata.notify_cities) ? user.user_metadata.notify_cities : [],
         notify_neighborhoods: (user.user_metadata && user.user_metadata.notify_neighborhoods) ? user.user_metadata.notify_neighborhoods : [],
         notify_fruits: (user.user_metadata && user.user_metadata.notify_fruits) ? user.user_metadata.notify_fruits : [],
+        provider: (user.app_metadata && user.app_metadata.provider) ? user.app_metadata.provider : "google",
         token: accessToken,
         refresh_token: refreshToken
       };
@@ -820,6 +864,7 @@
     refreshUserMeta();
     loadTrees();
     updateOwnerForm();
+    renderAvatar();
   }
 
   function refreshUserMeta() {
@@ -832,11 +877,13 @@
         currentUser.notify_cities = (user.user_metadata && user.user_metadata.notify_cities) || [];
         currentUser.notify_neighborhoods = (user.user_metadata && user.user_metadata.notify_neighborhoods) || [];
         currentUser.notify_fruits = (user.user_metadata && user.user_metadata.notify_fruits) || [];
+        currentUser.avatar_url = (user.user_metadata && user.user_metadata.avatar_url) || "";
         if (user.app_metadata && user.app_metadata.provider) {
           currentUser.provider = user.app_metadata.provider;
         }
         saveSession(currentUser);
         populateNotifyCityDropdown();
+        renderAvatar();
         var notifyToggle = document.getElementById("notify-toggle");
         if (notifyToggle) notifyToggle.checked = currentUser.notify_new_trees;
       }
@@ -904,7 +951,6 @@
       return await fetch(SUPABASE_URL + "/rest/v1/" + path, { ...options, headers });
     };
     let res = await makeRequest();
-    // אם פג תוקף ה־token — נחדש אוטומטית ונשלח שוב
     if (res.status === 401 && currentUser?.refresh_token) {
       const refreshed = await refreshToken();
       if (refreshed) res = await makeRequest();
@@ -933,9 +979,7 @@
 
   function getFruitName(fruit) {
     if (!fruit) return "";
-    // בדוק אם הפרי ברשימת הידועים
     for (const key of Object.keys(FRUIT_EMOJIS)) { if (fruit.includes(key)) return key; }
-    // פרי מותאם אישית — החזר אותו כמו שהוא
     return fruit;
   }
   function getFruitEmoji(fruit) {
@@ -960,19 +1004,16 @@
     var available = trees.filter(function(t){ return t.available; });
     if (currentUser && !isGuest) available = available.filter(function(t){ return t.user_id !== currentUser.id; });
 
-    // ערים — מסונן לפי פרי נבחר
     var citySource = selFruit ? available.filter(function(t){ return getFruitName(t.fruit) === selFruit; }) : available;
     var cities = [...new Set(citySource.map(function(t){return t.city;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
     cityEl.innerHTML = '<option value="">🏙️ כל הערים</option>' + cities.map(function(c){return '<option value="'+c+'"'+(c===selCity?' selected':'')+'>'+c+'</option>';}).join("");
 
-    // שכונות — מסונן לפי עיר ופרי
     var neighSource = available;
     if (selCity) neighSource = neighSource.filter(function(t){return t.city===selCity;});
     if (selFruit) neighSource = neighSource.filter(function(t){return getFruitName(t.fruit)===selFruit;});
     var neighborhoods = [...new Set(neighSource.map(function(t){return t.neighborhood;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'he');});
     neighEl.innerHTML = '<option value="">🏘️ כל השכונות</option>' + neighborhoods.map(function(n){return '<option value="'+n+'"'+(n===selNeigh?' selected':'')+'>'+n+'</option>';}).join("");
 
-    // פירות — מסונן לפי עיר ושכונה
     var fruitSource = available;
     if (selCity) fruitSource = fruitSource.filter(function(t){return t.city===selCity;});
     if (selNeigh) fruitSource = fruitSource.filter(function(t){return t.neighborhood===selNeigh;});
@@ -997,7 +1038,6 @@
   function renderBrowse(list) {
     const el = document.getElementById("trees-list");
     if (!list) list = trees.filter(t => t.available);
-    // הסר עצים של המשתמש המחובר
     if (currentUser && !isGuest) { list = list.filter(t => t.user_id !== currentUser.id); }
     if (list.length === 0) {
       el.innerHTML = '<div class="empty"><div class="empty-icon">🌾</div><div class="empty-text">אין עצים זמינים</div><div class="empty-sub">נסה לשנות את הסינון</div></div>';
@@ -1010,6 +1050,7 @@
       const isFree = !treePrice || treePrice == 0;
       const saving = isFree ? storePrice : (storePrice - treePrice > 0 ? storePrice - treePrice : 0);
       return '<div class="tree-card">' +
+        (tree.image_url ? '<img class="tree-card-image" src="' + tree.image_url + '" alt="' + fruitName + '" />' : '') +
         '<div class="tree-card-header">' +
           '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
             '<span style="font-size:28px">' + getFruitEmoji(tree.fruit) + '</span>' +
@@ -1047,6 +1088,7 @@
       document.getElementById("account-email").textContent = currentUser.email;
       const notifyToggle = document.getElementById("notify-toggle");
       if (notifyToggle) notifyToggle.checked = currentUser.notify_new_trees || false;
+      renderAvatar();
     } else {
       accSection.style.display = "none";
     }
@@ -1061,6 +1103,7 @@
     }
     el.innerHTML = myTrees.map(tree =>
       '<div class="my-tree-card">' +
+        (tree.image_url ? '<img class="my-tree-image" src="' + tree.image_url + '" alt="" />' : '') +
         '<div class="my-tree-header">' +
           '<div class="my-tree-title">' + getFruitEmoji(tree.fruit) + ' ' + getFruitName(tree.fruit) + ' — ' + tree.address + '</div>' +
           '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
@@ -1071,7 +1114,7 @@
             '<button onclick="deleteTree(\'' + tree.id + '\')" style="background:rgba(220,50,50,0.25);color:white;border:1px solid rgba(255,150,150,0.4);font-size:12px;padding:4px 10px;border-radius:8px;cursor:pointer;font-family:Heebo,sans-serif;font-weight:700">🗑️ הסר</button>' +
           '</div>' +
         '</div>' +
-'<div class="my-tree-body">' +
+        '<div class="my-tree-body">' +
           '<div style="font-size:13px;color:#666;margin-bottom:6px">👤 ' + tree.owner_name + (tree.quantity ? " · " + tree.quantity : "") + (tree.price_per_kg ? ' · ₪' + tree.price_per_kg + '/ק"ג' : " · חינם") + '</div>' +
           ((tree.city || tree.neighborhood) ? '<div style="font-size:13px;color:#888;margin-bottom:6px">🏘️ ' + [tree.neighborhood, tree.city].filter(Boolean).join(", ") + '</div>' : '') +
           (tree.description ? '<div style="font-size:13px;color:#555;margin-bottom:10px;line-height:1.5">' + tree.description + '</div>' : '') +
@@ -1100,7 +1143,7 @@
     document.getElementById("page-" + name).classList.add("active");
     el.classList.add("active");
     if (name === "owner") { autofillOwnerForm(); populateOwnerCityDropdown(); }
-    if (name === "dashboard") { populateNotifyCityDropdown(); }
+    if (name === "dashboard") { populateNotifyCityDropdown(); renderAvatar(); }
     if (name === "favorites") { renderFavorites(); }
     if (name === "history") { renderHistory(); }
   }
@@ -1123,7 +1166,6 @@
     const current = cityEl.value;
     const allCities = Object.keys(ISRAEL_CITIES).sort(function(a,b){return a.localeCompare(b,'he');});
     cityEl.innerHTML = '<option value="">בחר עיר/ישוב...</option>' + allCities.map(function(c){return '<option value="'+c+'"'+(c===current?' selected':'')+'>'+c+'</option>';}).join("");
-    // populate fruit/veggie dropdown
     const fruitEl = document.getElementById("o-fruit");
     if (fruitEl) {
       const currentFruit = fruitEl.value;
@@ -1161,10 +1203,9 @@
       document.getElementById("modal-saving").textContent = saving > 0 ? "חיסכון ₪" + saving + "!" : "";
       priceInfo.style.display = "block";
     } else { priceInfo.style.display = "none"; }
-    // מלא אוטומטי פרטי המשתמש אם מחובר
     if (currentUser && !isGuest) {
       document.getElementById("r-name").value = currentUser.name || "";
-      document.getElementById("r-phone").value = currentUser.phone || "";  // טלפון מהרשמה בלבד
+      document.getElementById("r-phone").value = currentUser.phone || "";
     } else {
       document.getElementById("r-name").value = "";
       document.getElementById("r-phone").value = "";
@@ -1185,7 +1226,6 @@
     if (!name || !phone) { showToast("נא למלא שם וטלפון", true); return; }
     try {
       await sbFetch("requests", { method: "POST", body: JSON.stringify({ tree_id: currentTreeId, requester_name: name, phone, message: msg }) });
-      // שלח אימייל לבעל העץ
       const tree = trees.find(t => t.id === currentTreeId);
       const ownerEmail = tree && (tree.owner_email || tree.owner_email_fallback);
       if (tree && ownerEmail) {
@@ -1205,7 +1245,6 @@
           });
         } catch(emailErr) { console.log("email error:", emailErr); }
       }
-      // שמור בהיסטוריה
       const reqTree = trees.find(function(t){return t.id === currentTreeId;});
       if (reqTree) addToHistory(reqTree, name, phone, msg);
       closeModal();
@@ -1231,29 +1270,33 @@
     const price = document.getElementById("o-price").value;
     const quantity = document.getElementById("o-quantity").value.trim();
     const description = document.getElementById("o-desc").value.trim();
+    const imageFile = document.getElementById("o-image") ? document.getElementById("o-image").files[0] : null;
     if (!name || !phone || !city || !address) { showToast("נא למלא שם, טלפון, עיר וכתובת", true); return; }
     if (!fruit) { showToast("נא לבחור או להזין סוג פרי/ירק", true); return; }
     try {
+      let imageUrl = null;
+      if (imageFile) {
+        showToast("⏳ מעלה תמונה...");
+        imageUrl = await uploadImage(imageFile, "tree-images", currentUser.id);
+      }
       await sbFetch("trees", { method: "POST", body: JSON.stringify({
         owner_name: name, owner_phone: phone, owner_email: currentUser?.email,
         city, neighborhood, address, fruit, quantity, description,
         price_per_kg: price !== "" ? parseFloat(price) : null,
-        user_id: currentUser?.id
+        user_id: currentUser?.id,
+        image_url: imageUrl
       })});
-      // הוסף פרי/ירק חדש לרשימה
       if (fruitNew && ALL_PRODUCE.indexOf(fruitNew) === -1) {
         ALL_PRODUCE.push(fruitNew);
         ALL_PRODUCE.sort(function(a,b){return a.localeCompare(b,'he');});
         saveCustomFruit(fruitNew);
       }
-      // הוסף עיר חדשה לרשימה
       var finalCity = cityNew || citySelect;
       var finalNeigh = neighNew || neighSelect;
       if (cityNew && !ISRAEL_CITIES[cityNew]) {
         ISRAEL_CITIES[cityNew] = [];
         saveCustomCity(cityNew, finalNeigh);
       }
-      // הוסף שכונה חדשה לעיר
       if (finalCity && finalNeigh) {
         if (!ISRAEL_CITIES[finalCity]) ISRAEL_CITIES[finalCity] = [];
         if (ISRAEL_CITIES[finalCity].indexOf(finalNeigh) === -1) {
@@ -1262,15 +1305,12 @@
           saveCustomCity(finalCity, finalNeigh);
         }
       }
-      ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new","o-fruit-new"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
-      // עדכן דרופדאונים עם הנתונים החדשים
+      ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new","o-fruit-new","o-image"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
       populateOwnerCityDropdown();
       document.getElementById("o-city").value = "";
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
-      document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
       await loadTrees();
       showToast("🌳 העץ שלך פורסם בהצלחה!");
-      // שלח עדכון למנויים
       fetch(SUBSCRIBERS_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
@@ -1283,7 +1323,6 @@
     try {
       await sbFetch("trees?id=eq." + id, { method: "PATCH", body: JSON.stringify({ available: !current }) });
       await loadTrees();
-      // שלח התראה למנויים כשעץ חוזר לזמינות
       if (current === false) {
         const tree = trees.find(t => t.id === id);
         if (tree) {
@@ -1315,8 +1354,6 @@
     } catch(e) { showToast("שגיאה", true); }
   }
 
-
-
   function toggleFiltersEditor() {
     const editor = document.getElementById("filters-editor");
     if (!editor) return;
@@ -1324,9 +1361,6 @@
     const btn = document.querySelector(".edit-filters-btn");
     if (btn) btn.textContent = editor.classList.contains("open") ? "✖ סגור עורך" : "✏️ ערוך הגדרות";
     if (editor.classList.contains("open")) {
-      // מלא את הדרופדאונים כשנפתח
-      const savedCity = currentUser && currentUser.notify_cities && currentUser.notify_cities[0] ? currentUser.notify_cities[0] : "";
-      const savedFruit = currentUser && currentUser.notify_fruits && currentUser.notify_fruits[0] ? currentUser.notify_fruits[0] : "";
       const cityEl = document.getElementById("notify-city-select");
       if (cityEl) {
         const allCities = Object.keys(ISRAEL_CITIES).sort(function(a,b){return a.localeCompare(b,'he');});
@@ -1373,7 +1407,7 @@
     if (!currentUser) return;
     currentUser['notify_'+field] = (currentUser['notify_'+field]||[]).filter(function(v){return v!==val;});
     try {
-      await fetch(SUPABASE_URL+"/auth/v1/user",{method:"PUT",headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+currentUser.token,"Content-Type":"application/json"},body:JSON.stringify({data:{name:currentUser.name,phone:currentUser.phone,notify_new_trees:currentUser.notify_new_trees,notify_cities:currentUser.notify_cities||[],notify_neighborhoods:currentUser.notify_neighborhoods||[],notify_fruits:currentUser.notify_fruits||[]}})});
+      await fetch(SUPABASE_URL+"/auth/v1/user",{method:"PUT",headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+currentUser.token,"Content-Type":"application/json"},body:JSON.stringify({data:{name:currentUser.name,phone:currentUser.phone,notify_new_trees:currentUser.notify_new_trees,notify_cities:currentUser.notify_cities||[],notify_neighborhoods:currentUser.notify_neighborhoods||[],notify_fruits:currentUser.notify_fruits||[],avatar_url:currentUser.avatar_url||""}})});
       saveSession(currentUser);
       populateNotifyCityDropdown();
       showToast("✅ עודכן");
@@ -1389,7 +1423,7 @@
       await fetch(SUPABASE_URL + "/auth/v1/user", {
         method: "PUT",
         headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + currentUser.token, "Content-Type": "application/json" },
-        body: JSON.stringify({ data: { name: currentUser.name, phone: currentUser.phone, notify_new_trees: currentUser.notify_new_trees, notify_cities: currentUser.notify_cities, notify_neighborhoods: currentUser.notify_neighborhoods, notify_fruits: currentUser.notify_fruits }})
+        body: JSON.stringify({ data: { name: currentUser.name, phone: currentUser.phone, notify_new_trees: currentUser.notify_new_trees, notify_cities: currentUser.notify_cities, notify_neighborhoods: currentUser.notify_neighborhoods, notify_fruits: currentUser.notify_fruits, avatar_url: currentUser.avatar_url || "" }})
       });
       saveSession(currentUser);
       populateNotifyCityDropdown();
@@ -1406,7 +1440,7 @@
       await fetch(SUPABASE_URL + "/auth/v1/user", {
         method: "PUT",
         headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + currentUser.token, "Content-Type": "application/json" },
-        body: JSON.stringify({ data: { name: currentUser.name, phone: currentUser.phone, notify_new_trees: currentUser.notify_new_trees, notify_cities: currentUser.notify_cities, notify_neighborhoods: currentUser.notify_neighborhoods, notify_fruits: currentUser.notify_fruits }})
+        body: JSON.stringify({ data: { name: currentUser.name, phone: currentUser.phone, notify_new_trees: currentUser.notify_new_trees, notify_cities: currentUser.notify_cities, notify_neighborhoods: currentUser.notify_neighborhoods, notify_fruits: currentUser.notify_fruits, avatar_url: currentUser.avatar_url || "" }})
       });
       saveSession(currentUser);
       updateSelectedTags();
@@ -1506,7 +1540,8 @@
           notify_new_trees: currentUser.notify_new_trees,
           notify_cities: cities,
           notify_neighborhoods: neighborhoods,
-          notify_fruits: fruits
+          notify_fruits: fruits,
+          avatar_url: currentUser.avatar_url || ""
         }})
       });
       if (res.ok) {
@@ -1531,7 +1566,7 @@
           "Authorization": "Bearer " + currentUser.token,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ data: { name: currentUser.name, phone: currentUser.phone, notify_new_trees: val } })
+        body: JSON.stringify({ data: { name: currentUser.name, phone: currentUser.phone, notify_new_trees: val, notify_cities: currentUser.notify_cities || [], notify_neighborhoods: currentUser.notify_neighborhoods || [], notify_fruits: currentUser.notify_fruits || [], avatar_url: currentUser.avatar_url || "" } })
       });
       if (res.ok) {
         currentUser.notify_new_trees = val;
@@ -1548,7 +1583,6 @@
     const passRow = document.getElementById("delete-pass-row");
     const googleNote = document.getElementById("delete-google-note");
     document.getElementById("delete-modal").classList.add("open");
-    // תמיד שאל את Supabase לדעת בדיוק מה ה-provider
     if (currentUser && currentUser.token) {
       fetch(SUPABASE_URL + "/auth/v1/user", {
         headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + currentUser.token }
@@ -1560,27 +1594,24 @@
         if (passRow) passRow.style.display = isG ? "none" : "block";
         if (googleNote) googleNote.style.display = isG ? "block" : "none";
       }).catch(function(){
-        // fallback — הצג סיסמה
         if (passRow) passRow.style.display = "block";
         if (googleNote) googleNote.style.display = "none";
       });
     }
   }
 
-async function doDeleteAccount() {
+  async function doDeleteAccount() {
     const pass = document.getElementById("delete-pass").value;
     const confirmed = document.getElementById("delete-confirm-check").checked;
     const isGoogleUser = currentUser && currentUser.provider === "google";
     if (!isGoogleUser && !pass) { showToast("נא להזין סיסמה", true); return; }
     if (!confirmed) { showToast("יש לסמן את תיבת האישור", true); return; }
     try {
-      // מחק את כל עצי המשתמש ובקשותיהם
       const myTrees = trees.filter(t => t.user_id === currentUser.id);
       for (const tree of myTrees) {
         await sbFetch("requests?tree_id=eq." + tree.id, { method: "DELETE", prefer: "return=minimal" });
         await sbFetch("trees?id=eq." + tree.id, { method: "DELETE", prefer: "return=minimal" });
       }
-      // מחק את המשתמש מ־Supabase Auth
       const res = await fetch(SUPABASE_URL + "/auth/v1/user", {
         method: "DELETE",
         headers: {
@@ -1590,7 +1621,6 @@ async function doDeleteAccount() {
         }
       });
       if (!res.ok) {
-        // אם מחיקה ישירה לא נתמכת — התנתק לפחות
         showToast("החשבון נמחק. אנא צור קשר לאישור סופי.", false);
       } else {
         showToast("✅ החשבון נמחק בהצלחה");
@@ -1637,6 +1667,7 @@ async function doDeleteAccount() {
       var isFree = !tree.price_per_kg || tree.price_per_kg == 0;
       return '<div class="fav-card">' +
         '<button class="fav-remove" onclick="toggleFavorite(&quot;' + tree.id + '&quot;)">✕</button>' +
+        (tree.image_url ? '<img src="' + tree.image_url + '" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:10px" />' : '') +
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
           '<span style="font-size:24px">' + getFruitEmoji(tree.fruit) + '</span>' +
           '<div><div style="font-weight:700;font-size:15px">' + fruitName + '</div>' +
@@ -1676,7 +1707,6 @@ async function doDeleteAccount() {
       date: new Date().toLocaleDateString("he-IL"),
       status: "pending"
     });
-    // שמור רק 50 אחרונות
     if (history.length > 50) history = history.slice(0, 50);
     localStorage.setItem("prishare_history", JSON.stringify(history));
   }
@@ -1726,8 +1756,6 @@ async function doDeleteAccount() {
   handleOAuthCallback().then(handled => {
     if (handled) return;
 
-  // helper to refresh metadata
-  // ===== AUTO LOGIN =====
   const saved = loadSession();
   if (saved && saved.token) {
     currentUser = saved;
@@ -1736,7 +1764,6 @@ async function doDeleteAccount() {
     document.getElementById("main-app").style.display = "block";
     document.getElementById("header-username").textContent = currentUser.name;
     autofillOwnerForm();
-    // הצג קופסת חשבון מיד
     const accSection = document.getElementById("account-section");
     if (accSection) {
       accSection.style.display = "block";
@@ -1746,11 +1773,11 @@ async function doDeleteAccount() {
     }
     loadTrees();
     updateOwnerForm();
+    renderAvatar();
   }
 
-  }); // end handleOAuthCallback
+  });
 
-  handleOAuthRedirect();
   loadCustomItems();
   updatePriceHint();
 </script>
