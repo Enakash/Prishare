@@ -1062,7 +1062,10 @@
         '</div>' +
         ((tree.city || tree.neighborhood) ? '<div class="tree-meta">🏘️ ' + [tree.neighborhood, tree.city].filter(Boolean).join(", ") + '</div>' : '') +
         '<div class="tree-meta">📍 ' + tree.address + '</div>' +
-        '<div class="tree-meta">👤 ' + tree.owner_name + '</div>' +
+        '<div class="tree-meta" style="display:flex;align-items:center;gap:6px">' +
+          (tree.owner_avatar_url ? '<img src="' + tree.owner_avatar_url + '" style="width:20px;height:20px;border-radius:50%;object-fit:cover" />' : '👤') +
+          ' ' + tree.owner_name +
+        '</div>' +
         (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap">📞 ' + tree.owner_phone +
           ' <a href="tel:' + tree.owner_phone + '" style="background:#2C6E35;color:white;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">📲 התקשר</a>' +
           ' <a href="https://wa.me/972' + tree.owner_phone.replace(/^0/, "").replace(/-/g, "") + '?text=' + encodeURIComponent('שלום, ראיתי את העץ שלך באפליקציית פירות השכונה ואשמח לתאם קטיף 🌿') + '" target="_blank" style="background:#25D366;color:white;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
@@ -1281,6 +1284,7 @@
       }
       await sbFetch("trees", { method: "POST", body: JSON.stringify({
         owner_name: name, owner_phone: phone, owner_email: currentUser?.email,
+        owner_avatar_url: currentUser?.avatar_url || null,
         city, neighborhood, address, fruit, quantity, description,
         price_per_kg: price !== "" ? parseFloat(price) : null,
         user_id: currentUser?.id,
