@@ -3,17 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>פירות השכונה</title>
+  <title>פירות השכונה - Pro</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2C6E35" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Heebo', sans-serif; direction: rtl; background: #F7F3EC; color: #2C2416; }
-    .header { background: #2C6E35; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .header { background: #2C6E35; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 70px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
     .header-logo { display: flex; align-items: center; gap: 10px; }
-    .header-title { color: #fff; font-size: 20px; font-weight: 800; }
-    .header-subtitle { color: rgba(255,255,255,0.7); font-size: 12px; }
-    .header-user { display: flex; align-items: center; gap: 10px; }
-    .header-user-name { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600; }
+    .header-title { color: #fff; font-size: 20px; font-weight: 800; line-height: 1.2; }
+    .header-subtitle { color: rgba(255,255,255,0.7); font-size: 12px; line-height: 1.3; }
+    .header-user { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .header-user-name { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; display: inline-block; vertical-align: middle; }
     .btn-logout { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Heebo', sans-serif; }
     .nav { background: #fff; border-bottom: 2px solid #E8E0D0; display: flex; }
     .nav-tab { flex: 1; padding: 14px 8px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 600; color: #888; border: none; background: transparent; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: 'Heebo', sans-serif; }
@@ -36,6 +40,8 @@
     .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #EDE6D8; }
     .remember-row { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px; font-size: 13px; color: #666; }
     .btn-google { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 16px; border: 1.5px solid #DDD8CC; border-radius: 10px; background: #fff; font-size: 14px; font-weight: 700; font-family: "Heebo", sans-serif; color: #2C2416; cursor: pointer; transition: all 0.18s; margin-bottom: 4px; }
+    .btn-apple { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 16px; border: 1.5px solid #000; border-radius: 10px; background: #000; font-size: 14px; font-weight: 700; font-family: "Heebo", sans-serif; color: #fff; cursor: pointer; transition: all 0.18s; margin-bottom: 14px; }
+    .btn-apple:hover { background: #1a1a1a; }
     .btn-google:hover { background: #F7F3EC; border-color: #C8D8C0; }
     .auth-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: #bbb; font-size: 13px; }
     .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: #EDE6D8; }
@@ -183,6 +189,10 @@
           <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           התחבר עם Google
         </button>
+        <button class="btn btn-apple" onclick="doAppleLogin()">
+          <svg width="18" height="18" viewBox="0 0 384 512" fill="#fff"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141 4 184.8 4 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+          התחבר עם Apple
+        </button>
         <div class="divider">או</div>
         <div class="form-row">
           <label class="form-label">אימייל</label>
@@ -205,6 +215,10 @@
         <button class="btn btn-google" onclick="doGoogleLogin()">
           <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           הירשם עם Google
+        </button>
+        <button class="btn btn-apple" onclick="doAppleLogin()">
+          <svg width="18" height="18" viewBox="0 0 384 512" fill="#fff"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141 4 184.8 4 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+          הירשם עם Apple
         </button>
         <div class="divider">או</div>
         <div class="form-row">
@@ -248,7 +262,7 @@
   <div class="header-logo">
     <span style="font-size:26px">🌳</span>
     <div>
-      <div class="header-title">פירות השכונה</div>
+      <div class="header-title">פירות השכונה <span id="tier-badge" style="font-size:11px;font-weight:800;letter-spacing:0.5px;padding:3px 9px;border-radius:8px;vertical-align:middle;box-shadow:0 1px 3px rgba(0,0,0,0.25);color:#fff"></span></div>
       <div class="header-subtitle">שיתוף פירות בין שכנים</div>
     </div>
   </div>
@@ -297,6 +311,7 @@
       <div class="profile-card" id="profile-autofill" style="display:none">
         ✅ הפרטים שלך מולאו אוטומטית — תוכל לערוך אם צריך
       </div>
+      <div id="tier-limit-banner" style="display:none;background:#FFF8E1;border:1.5px solid #FFE082;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#795548;text-align:center"></div>
       <div class="form-title">🌳 פרטי העץ</div>
       <div class="form-grid">
         <div class="form-row">
@@ -354,7 +369,11 @@
         <label class="form-label">תמונה (אופציונלי)</label>
         <input class="form-input" type="file" id="o-image" accept="image/*" />
       </div>
-      <button class="btn btn-primary btn-full" onclick="addTree()">🌳 פרסם את העץ שלך</button>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin:4px 0 16px;font-size:13px;color:#555;line-height:1.6;background:#FFF8E1;border:1.5px solid #FFE082;border-radius:10px;padding:12px 14px">
+        <input type="checkbox" id="o-pesticide-confirm" style="margin-top:3px;accent-color:#2C6E35;width:16px;height:16px;flex-shrink:0" />
+        <label for="o-pesticide-confirm">🌿 אני מצהיר/ה ומתחייב/ת כי אם העץ טופל בחומרי הדברה (ריסוס) ו/או בדשן, הטיפול בוצע בהתאם לתקן הישראלי ולדרישות הדין החל בישראל, לרבות ימי ההמתנה הנדרשים בין ריסוס לקטיף — כמפורט ב<a href="terms.html" target="_blank" style="color:#2C6E35;font-weight:700;text-decoration:underline">תנאי השימוש</a>.</label>
+      </div>
+      <button class="btn btn-primary btn-full" id="publish-tree-btn" onclick="addTree()">🌳 פרסם את העץ שלך</button>
     </div>
   </div>
 
@@ -514,6 +533,13 @@
   const SUPABASE_KEY = "sb_publishable_UxLyGsF4PlFOIF3OXJgbSg_hh5MA_oM";
   const FUNCTION_URL = SUPABASE_URL + "/functions/v1/notify-owner";
   const SUBSCRIBERS_URL = SUPABASE_URL + "/functions/v1/notify-subscribers";
+
+  // ===== APP TIER CONFIG (שונה בין הגרסאות שמועלות לחנות) =====
+  const APP_TIER = "pro"; // "home" | "pro" | "biz"
+  const TIER_LIMITS = { home: 1, pro: 3, biz: 20 };
+  const TIER_LABELS = { home: "Home", pro: "Pro", biz: "Business" };
+  const TIER_COLORS = { home: "#2C6E35", pro: "#1E6E96", biz: "#B4820A" };
+  const TREE_LIMIT = TIER_LIMITS[APP_TIER];
 
   const STORE_PRICES = {
     "תפוח":9,"תפוז":8,"לימון":14,"אגס":12,"ענב":22,"תאנה":28,"שזיף":18,"אבוקדו":24,"זית":16,
@@ -742,6 +768,20 @@
     }
   }
 
+  // ===== APPLE AUTH =====
+  async function doAppleLogin() {
+    try {
+      const res = await fetch(SUPABASE_URL + "/auth/v1/authorize?provider=apple&redirect_to=" + encodeURIComponent(window.location.href), {
+        headers: { "apikey": SUPABASE_KEY }
+      });
+      const { url } = await res.json();
+      if (url) window.location.href = url;
+      else window.location.href = SUPABASE_URL + "/auth/v1/authorize?provider=apple&redirect_to=" + encodeURIComponent(window.location.href);
+    } catch(e) {
+      window.location.href = SUPABASE_URL + "/auth/v1/authorize?provider=apple&redirect_to=" + encodeURIComponent(window.location.href);
+    }
+  }
+
   // ===== AUTH =====
   async function sbAuth(path, body) {
     const res = await fetch(SUPABASE_URL + "/auth/v1/" + path, {
@@ -838,7 +878,7 @@
         notify_cities: (user.user_metadata && user.user_metadata.notify_cities) ? user.user_metadata.notify_cities : [],
         notify_neighborhoods: (user.user_metadata && user.user_metadata.notify_neighborhoods) ? user.user_metadata.notify_neighborhoods : [],
         notify_fruits: (user.user_metadata && user.user_metadata.notify_fruits) ? user.user_metadata.notify_fruits : [],
-        provider: (user.app_metadata && user.app_metadata.provider) ? user.app_metadata.provider : "google",
+        provider: (user.app_metadata && user.app_metadata.provider) ? user.app_metadata.provider : "oauth",
         token: accessToken,
         refresh_token: refreshToken
       };
@@ -908,6 +948,28 @@
     const form = document.getElementById("owner-form");
     if (isGuest) { prompt.style.display = "block"; form.style.display = "none"; }
     else { prompt.style.display = "none"; form.style.display = "block"; }
+    updateTierLimitBanner();
+  }
+
+  function updateTierLimitBanner() {
+    const banner = document.getElementById("tier-limit-banner");
+    const btn = document.getElementById("publish-tree-btn");
+    if (!banner || !btn || isGuest || !currentUser) return;
+    const myTreeCount = trees.filter(function(t){ return t.user_id === currentUser.id; }).length;
+    const limit = TREE_LIMIT;
+    if (myTreeCount >= limit) {
+      banner.style.display = "block";
+      banner.innerHTML = "⚠️ הגעת למגבלת <strong>" + limit + " עצים</strong> במסלול <strong>" + TIER_LABELS[APP_TIER] + "</strong>. שדרג מסלול כדי לפרסם עוד עצים.";
+      btn.disabled = true;
+      btn.style.opacity = "0.5";
+      btn.style.cursor = "not-allowed";
+    } else {
+      banner.style.display = "block";
+      banner.innerHTML = "🌳 פרסמת " + myTreeCount + " מתוך " + limit + " עצים המותרים במסלול " + TIER_LABELS[APP_TIER] + ".";
+      btn.disabled = false;
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
+    }
   }
 
   // ===== AUTOFILL =====
@@ -968,6 +1030,7 @@
       renderDashboard();
       updateStats();
       populateOwnerCityDropdown();
+      updateTierLimitBanner();
     } catch(e) { showToast("שגיאה בטעינת הנתונים", true); }
   }
 
@@ -1145,7 +1208,7 @@
     document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
     document.getElementById("page-" + name).classList.add("active");
     el.classList.add("active");
-    if (name === "owner") { autofillOwnerForm(); populateOwnerCityDropdown(); }
+    if (name === "owner") { autofillOwnerForm(); populateOwnerCityDropdown(); updateTierLimitBanner(); }
     if (name === "dashboard") { populateNotifyCityDropdown(); renderAvatar(); }
     if (name === "favorites") { renderFavorites(); }
     if (name === "history") { renderHistory(); }
@@ -1276,6 +1339,16 @@
     const imageFile = document.getElementById("o-image") ? document.getElementById("o-image").files[0] : null;
     if (!name || !phone || !city || !address) { showToast("נא למלא שם, טלפון, עיר וכתובת", true); return; }
     if (!fruit) { showToast("נא לבחור או להזין סוג פרי/ירק", true); return; }
+    const pesticideConfirm = document.getElementById("o-pesticide-confirm");
+    if (!pesticideConfirm || !pesticideConfirm.checked) {
+      showToast("יש לאשר את ההצהרה בנוגע לריסוס ודישון לפי התקן הישראלי", true);
+      return;
+    }
+    const myTreeCount = currentUser ? trees.filter(function(t){ return t.user_id === currentUser.id; }).length : 0;
+    if (myTreeCount >= TREE_LIMIT) {
+      showToast("הגעת למגבלת " + TREE_LIMIT + " עצים במסלול " + TIER_LABELS[APP_TIER] + " — שדרג מסלול כדי לפרסם עוד", true);
+      return;
+    }
     try {
       let imageUrl = null;
       if (imageFile) {
@@ -1310,6 +1383,7 @@
         }
       }
       ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new","o-fruit-new","o-image"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
+      if (pesticideConfirm) pesticideConfirm.checked = false;
       populateOwnerCityDropdown();
       document.getElementById("o-city").value = "";
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
@@ -1594,7 +1668,7 @@
         const prov = (u.app_metadata && u.app_metadata.provider) || "email";
         currentUser.provider = prov;
         saveSession(currentUser);
-        const isG = prov === "google";
+        const isG = prov === "google" || prov === "apple";
         if (passRow) passRow.style.display = isG ? "none" : "block";
         if (googleNote) googleNote.style.display = isG ? "block" : "none";
       }).catch(function(){
@@ -1607,7 +1681,7 @@
   async function doDeleteAccount() {
     const pass = document.getElementById("delete-pass").value;
     const confirmed = document.getElementById("delete-confirm-check").checked;
-    const isGoogleUser = currentUser && currentUser.provider === "google";
+    const isGoogleUser = currentUser && (currentUser.provider === "google" || currentUser.provider === "apple");
     if (!isGoogleUser && !pass) { showToast("נא להזין סיסמה", true); return; }
     if (!confirmed) { showToast("יש לסמן את תיבת האישור", true); return; }
     try {
@@ -1784,6 +1858,11 @@
 
   loadCustomItems();
   updatePriceHint();
+  var tierBadgeEl = document.getElementById("tier-badge");
+  if (tierBadgeEl) {
+    tierBadgeEl.textContent = TIER_LABELS[APP_TIER];
+    tierBadgeEl.style.background = TIER_COLORS[APP_TIER];
+  }
 </script>
 </body>
 </html>
