@@ -1,0 +1,40 @@
+{
+  "name": "פירות השכונה - Business",
+  "short_name": "פירות השכונה Biz",
+  "id": "/Prishare/biz/",
+  "start_url": "/Prishare/biz/",
+  "scope": "/Prishare/biz/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F3EC",
+  "theme_color": "#2C6E35",
+  "lang": "he",
+  "dir": "rtl",
+  "description": "שיתוף פירות בין שכנים - מסלול Business: פרסום עד 20 עצים",
+  "icons": [
+    {
+      "src": "/Prishare/biz/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Prishare/biz/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Prishare/biz/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/Prishare/biz/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
