@@ -12,10 +12,10 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Heebo', sans-serif; direction: rtl; background: #F7F3EC; color: #2C2416; }
-    .header { background: #2C6E35; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; min-height: 64px; flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .header { background: #2C6E35; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 70px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
     .header-logo { display: flex; align-items: center; gap: 10px; }
-    .header-title { color: #fff; font-size: 20px; font-weight: 800; }
-    .header-subtitle { color: rgba(255,255,255,0.7); font-size: 12px; }
+    .header-title { color: #fff; font-size: 20px; font-weight: 800; line-height: 1.2; }
+    .header-subtitle { color: rgba(255,255,255,0.7); font-size: 12px; line-height: 1.3; }
     .header-user { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .header-user-name { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; display: inline-block; vertical-align: middle; }
     .btn-logout { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Heebo', sans-serif; }
@@ -262,7 +262,7 @@
   <div class="header-logo">
     <span style="font-size:26px">🌳</span>
     <div>
-      <div class="header-title">פירות השכונה <span id="tier-badge" style="font-size:10px;font-weight:700;background:rgba(255,255,255,0.25);padding:2px 7px;border-radius:8px;vertical-align:middle"></span></div>
+      <div class="header-title">פירות השכונה <span id="tier-badge" style="font-size:11px;font-weight:800;letter-spacing:0.5px;padding:3px 9px;border-radius:8px;vertical-align:middle;box-shadow:0 1px 3px rgba(0,0,0,0.25);color:#fff"></span></div>
       <div class="header-subtitle">שיתוף פירות בין שכנים</div>
     </div>
   </div>
@@ -538,6 +538,7 @@
   const APP_TIER = "pro"; // "home" | "pro" | "biz"
   const TIER_LIMITS = { home: 1, pro: 3, biz: 20 };
   const TIER_LABELS = { home: "Home", pro: "Pro", biz: "Business" };
+  const TIER_COLORS = { home: "#2C6E35", pro: "#1E6E96", biz: "#B4820A" };
   const TREE_LIMIT = TIER_LIMITS[APP_TIER];
 
   const STORE_PRICES = {
@@ -1858,7 +1859,10 @@
   loadCustomItems();
   updatePriceHint();
   var tierBadgeEl = document.getElementById("tier-badge");
-  if (tierBadgeEl) tierBadgeEl.textContent = TIER_LABELS[APP_TIER];
+  if (tierBadgeEl) {
+    tierBadgeEl.textContent = TIER_LABELS[APP_TIER];
+    tierBadgeEl.style.background = TIER_COLORS[APP_TIER];
+  }
 </script>
 </body>
 </html>
