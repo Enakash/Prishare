@@ -1,0 +1,40 @@
+{
+  "name": "פירות השכונה - Home",
+  "short_name": "פירות השכונה",
+  "id": "/Prishare/home/",
+  "start_url": "/Prishare/home/",
+  "scope": "/Prishare/home/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F3EC",
+  "theme_color": "#2C6E35",
+  "lang": "he",
+  "dir": "rtl",
+  "description": "שיתוף פירות בין שכנים - מסלול Home: פרסום עד עץ אחד",
+  "icons": [
+    {
+      "src": "/Prishare/home/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Prishare/home/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Prishare/home/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/Prishare/home/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
