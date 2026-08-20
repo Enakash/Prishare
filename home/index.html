@@ -535,10 +535,10 @@
   const SUBSCRIBERS_URL = SUPABASE_URL + "/functions/v1/notify-subscribers";
 
   // ===== APP TIER CONFIG (שונה בין הגרסאות שמועלות לחנות) =====
-  const APP_TIER = "home"; // "home" | "pro" | "biz"
-  const TIER_LIMITS = { home: 1, pro: 3, biz: 20 };
-  const TIER_LABELS = { home: "Home", pro: "Pro", biz: "Business" };
-  const TIER_COLORS = { home: "#2C6E35", pro: "#1E6E96", biz: "#B4820A" };
+  const APP_TIER = "home"; // "home" | "biz"
+  const TIER_LIMITS = { home: 3, biz: 20 };
+  const TIER_LABELS = { home: "Home", biz: "Business" };
+  const TIER_COLORS = { home: "#2C6E35", biz: "#B4820A" };
   const TREE_LIMIT = TIER_LIMITS[APP_TIER];
 
   const STORE_PRICES = {
