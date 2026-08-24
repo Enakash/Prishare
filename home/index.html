@@ -365,6 +365,18 @@
         <label class="form-label">תיאור</label>
         <textarea class="form-textarea" id="o-desc" placeholder="ספר על הפירות — מתי הם בשלים, שעות נוחות..."></textarea>
       </div>
+      <div class="form-row" style="background:#F7F3EC;border:1.5px solid #EDE6D8;border-radius:10px;padding:12px 14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#2C2416">📞 הצג את מספר הטלפון שלי לכל הגולשים</div>
+            <div style="font-size:12px;color:#999;margin-top:2px">אם כבוי, קוטפים יפנו אליך רק דרך בקשת קטיף במייל, ותוכל לבחור בעצמך אם לשתף טלפון לכל בקשה בנפרד</div>
+          </div>
+          <label class="toggle" style="flex-shrink:0">
+            <input type="checkbox" id="o-phone-visible" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
       <div class="form-row">
         <label class="form-label">תמונה (אופציונלי)</label>
         <input class="form-input" type="file" id="o-image" accept="image/*" />
@@ -516,6 +528,11 @@
       <input class="form-input" id="r-phone" placeholder="050-0000000" />
     </div>
     <div class="form-row">
+      <label class="form-label">אימייל *</label>
+      <input class="form-input" id="r-email" type="email" placeholder="your@email.com" />
+      <div style="font-size:11px;color:#aaa;margin-top:3px">בעל/ת העץ עשויים לבחור לתאם דרך מייל בלבד</div>
+    </div>
+    <div class="form-row">
       <label class="form-label">הערה (אופציונלי)</label>
       <textarea class="form-textarea" id="r-msg" rows="2" placeholder="זמין בסופי שבוע..."></textarea>
     </div>
@@ -533,6 +550,7 @@
   const SUPABASE_KEY = "sb_publishable_UxLyGsF4PlFOIF3OXJgbSg_hh5MA_oM";
   const FUNCTION_URL = SUPABASE_URL + "/functions/v1/notify-owner";
   const SUBSCRIBERS_URL = SUPABASE_URL + "/functions/v1/notify-subscribers";
+  const REQUESTER_URL = SUPABASE_URL + "/functions/v1/notify-requester";
 
   // ===== APP TIER CONFIG (שונה בין הגרסאות שמועלות לחנות) =====
   const APP_TIER = "home"; // "home" | "biz"
@@ -1129,10 +1147,10 @@
           (tree.owner_avatar_url ? '<img src="' + tree.owner_avatar_url + '" style="width:20px;height:20px;border-radius:50%;object-fit:cover" />' : '👤') +
           ' ' + tree.owner_name +
         '</div>' +
-        (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap">📞 ' + tree.owner_phone +
+        (tree.owner_phone && tree.phone_visible !== false ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap">📞 ' + tree.owner_phone +
           ' <a href="tel:' + tree.owner_phone + '" style="background:#2C6E35;color:white;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">📲 התקשר</a>' +
           ' <a href="https://wa.me/972' + tree.owner_phone.replace(/^0/, "").replace(/-/g, "") + '?text=' + encodeURIComponent('שלום, ראיתי את העץ שלך באפליקציית פירות השכונה ואשמח לתאם קטיף 🌿') + '" target="_blank" style="background:#25D366;color:white;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
-        '</div>' : '') +
+        '</div>' : (tree.phone_visible === false ? '<div class="tree-meta" style="color:#888;font-style:italic">✉️ בעל/ת העץ מעדיפים תיאום דרך בקשת קטיף במייל</div>' : '')) +
         (tree.description ? '<div class="tree-desc">' + tree.description + '</div>' : '') +
         '<div class="tree-footer">' +
           '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
@@ -1186,16 +1204,32 @@
           (tree.description ? '<div style="font-size:13px;color:#555;margin-bottom:10px;line-height:1.5">' + tree.description + '</div>' : '') +
           (!(tree.requests && tree.requests.length)
             ? '<div style="font-size:13px;color:#bbb;padding:8px 0">עדיין אין בקשות קטיף</div>'
-            : tree.requests.map(req =>
-                '<div class="request-item">' +
-                  '<div>' +
-                    '<div class="request-name">🌿 ' + req.requester_name + '</div>' +
-                    (req.message ? '<div class="request-msg">"' + req.message + '"</div>' : '') +
-                    '<div class="request-phone">📞 ' + req.phone + '</div>' +
+            : tree.requests.map(req => {
+                const status = req.status || "pending";
+                const statusLabels = {
+                  pending: "",
+                  rejected: '<span style="background:#FFF0F0;color:#C0392B;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">❌ נדחתה</span>',
+                  approved_no_share: '<span style="background:#FFF8E1;color:#E65100;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">✅ אושרה — תיאום במייל</span>',
+                  approved_shared: '<span style="background:#E8F5E9;color:#2E7D32;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">✅ אושרה — טלפון שותף</span>'
+                };
+                return '<div class="request-item" style="align-items:flex-start;flex-direction:column">' +
+                  '<div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;gap:8px">' +
+                    '<div>' +
+                      '<div class="request-name">🌿 ' + req.requester_name + '</div>' +
+                      (req.message ? '<div class="request-msg">"' + req.message + '"</div>' : '') +
+                      '<div class="request-phone">📞 ' + req.phone + (req.requester_email ? ' · ✉️ ' + req.requester_email : '') + '</div>' +
+                    '</div>' +
+                    (statusLabels[status] || '') +
                   '</div>' +
-                  '<button class="btn btn-danger btn-sm" onclick="deleteRequest(\'' + req.id + '\')">סגור</button>' +
-                '</div>'
-              ).join("")
+                  (status === "pending" ?
+                    '<div style="display:flex;gap:6px;margin-top:10px;width:100%">' +
+                      '<button class="btn btn-danger btn-sm" style="flex:1;justify-content:center" onclick="rejectRequest(\'' + req.id + '\',\'' + tree.id + '\')">❌ דחה</button>' +
+                      '<button class="btn btn-sm" style="flex:1;justify-content:center;background:#FFF8E1;color:#E65100;border:1px solid #FFE082" onclick="approveRequestNoShare(\'' + req.id + '\',\'' + tree.id + '\')">✉️ אשר במייל</button>' +
+                      '<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="approveRequestShare(\'' + req.id + '\',\'' + tree.id + '\')">📞 אשר ושתף</button>' +
+                    '</div>'
+                  : '') +
+                '</div>';
+              }).join("")
           ) +
         '</div>' +
       '</div>'
@@ -1272,9 +1306,11 @@
     if (currentUser && !isGuest) {
       document.getElementById("r-name").value = currentUser.name || "";
       document.getElementById("r-phone").value = currentUser.phone || "";
+      document.getElementById("r-email").value = currentUser.email || "";
     } else {
       document.getElementById("r-name").value = "";
       document.getElementById("r-phone").value = "";
+      document.getElementById("r-email").value = "";
     }
     document.getElementById("r-msg").value = "";
     document.getElementById("modal").classList.add("open");
@@ -1288,10 +1324,11 @@
   async function submitRequest() {
     const name = document.getElementById("r-name").value.trim();
     const phone = document.getElementById("r-phone").value.trim();
+    const email = document.getElementById("r-email").value.trim();
     const msg = document.getElementById("r-msg").value.trim();
-    if (!name || !phone) { showToast("נא למלא שם וטלפון", true); return; }
+    if (!name || !phone || !email) { showToast("נא למלא שם, טלפון ואימייל", true); return; }
     try {
-      await sbFetch("requests", { method: "POST", body: JSON.stringify({ tree_id: currentTreeId, requester_name: name, phone, message: msg }) });
+      await sbFetch("requests", { method: "POST", body: JSON.stringify({ tree_id: currentTreeId, requester_name: name, phone, requester_email: email, message: msg, status: "pending" }) });
       const tree = trees.find(t => t.id === currentTreeId);
       const ownerEmail = tree && (tree.owner_email || tree.owner_email_fallback);
       if (tree && ownerEmail) {
@@ -1337,6 +1374,7 @@
     const quantity = document.getElementById("o-quantity").value.trim();
     const description = document.getElementById("o-desc").value.trim();
     const imageFile = document.getElementById("o-image") ? document.getElementById("o-image").files[0] : null;
+    const phoneVisible = document.getElementById("o-phone-visible") ? document.getElementById("o-phone-visible").checked : true;
     if (!name || !phone || !city || !address) { showToast("נא למלא שם, טלפון, עיר וכתובת", true); return; }
     if (!fruit) { showToast("נא לבחור או להזין סוג פרי/ירק", true); return; }
     const pesticideConfirm = document.getElementById("o-pesticide-confirm");
@@ -1358,6 +1396,7 @@
       await sbFetch("trees", { method: "POST", body: JSON.stringify({
         owner_name: name, owner_phone: phone, owner_email: currentUser?.email,
         owner_avatar_url: currentUser?.avatar_url || null,
+        phone_visible: phoneVisible,
         city, neighborhood, address, fruit, quantity, description,
         price_per_kg: price !== "" ? parseFloat(price) : null,
         user_id: currentUser?.id,
@@ -1384,6 +1423,8 @@
       }
       ["o-address","o-quantity","o-desc","o-price","o-neighborhood-new","o-city-new","o-fruit-new","o-image"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
       if (pesticideConfirm) pesticideConfirm.checked = false;
+      const phoneVisibleToggle = document.getElementById("o-phone-visible");
+      if (phoneVisibleToggle) phoneVisibleToggle.checked = true;
       populateOwnerCityDropdown();
       document.getElementById("o-city").value = "";
       document.getElementById("o-neighborhood").innerHTML = '<option value="">בחר שכונה...</option>';
@@ -1430,6 +1471,43 @@
       await loadTrees();
       showToast("✅ הבקשה הוסרה");
     } catch(e) { showToast("שגיאה", true); }
+  }
+
+  async function handleRequestDecision(requestId, treeId, status, toastMsg) {
+    try {
+      const tree = trees.find(function(t){ return t.id === treeId; });
+      const req = tree && tree.requests ? tree.requests.find(function(r){ return r.id === requestId; }) : null;
+      await sbFetch("requests?id=eq." + requestId, { method: "PATCH", body: JSON.stringify({ status: status }) });
+      if (tree && req && req.requester_email) {
+        fetch(REQUESTER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
+          body: JSON.stringify({
+            requester_email: req.requester_email,
+            requester_name: req.requester_name,
+            owner_name: tree.owner_name,
+            owner_phone: status === "approved_shared" ? tree.owner_phone : "",
+            fruit: getFruitName(tree.fruit),
+            address: tree.address,
+            decision: status
+          })
+        }).catch(function(e){ console.log("notify-requester error:", e); });
+      }
+      await loadTrees();
+      showToast(toastMsg);
+    } catch(e) { showToast("שגיאה בעדכון הבקשה", true); }
+  }
+
+  function rejectRequest(requestId, treeId) {
+    handleRequestDecision(requestId, treeId, "rejected", "הבקשה נדחתה, המבקש קיבל עדכון במייל");
+  }
+
+  function approveRequestNoShare(requestId, treeId) {
+    handleRequestDecision(requestId, treeId, "approved_no_share", "✅ אושר — המבקש יודע שתתאמו במייל");
+  }
+
+  function approveRequestShare(requestId, treeId) {
+    handleRequestDecision(requestId, treeId, "approved_shared", "✅ אושר — הטלפון נשלח למבקש במייל");
   }
 
   function toggleFiltersEditor() {
@@ -1754,9 +1832,9 @@
         '</div>' +
         (tree.city || tree.neighborhood ? '<div class="tree-meta">🏘️ ' + [tree.neighborhood,tree.city].filter(Boolean).join(", ") + '</div>' : '') +
         '<div class="tree-meta">📍 ' + tree.address + '</div>' +
-        (tree.owner_phone ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ' + tree.owner_phone + '</div>' : '') +
+        (tree.owner_phone && tree.phone_visible !== false ? '<div class="tree-meta" style="color:#2C6E35;font-weight:600">📞 ' + tree.owner_phone + '</div>' : '') +
         '<div style="display:flex;gap:8px;margin-top:10px">' +
-          (tree.owner_phone ? '<a href="tel:' + tree.owner_phone + '" class="btn btn-secondary btn-sm">📲 התקשר</a>' : '') +
+          (tree.owner_phone && tree.phone_visible !== false ? '<a href="tel:' + tree.owner_phone + '" class="btn btn-secondary btn-sm">📲 התקשר</a>' : '') +
           '<button class="btn btn-primary btn-sm" onclick="openModal(&quot;' + tree.id + '&quot;)">🌿 בקש לקטוף</button>' +
         '</div>' +
       '</div>';
