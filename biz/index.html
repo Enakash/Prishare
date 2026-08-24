@@ -22,6 +22,8 @@
     .nav { background: #fff; border-bottom: 2px solid #E8E0D0; display: flex; }
     .nav-tab { flex: 1; padding: 14px 8px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 600; color: #888; border: none; background: transparent; border-bottom: 3px solid transparent; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-family: 'Heebo', sans-serif; }
     .nav-tab.active { color: #2C6E35; border-bottom-color: #2C6E35; background: #F7FBF7; }
+    .nav-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 4px; margin-right: 4px; background: #E74C3C; color: #fff; font-size: 10px; font-weight: 800; border-radius: 10px; vertical-align: middle; line-height: 1; }
+    .nav-badge.hidden { display: none; }
     .main { max-width: 680px; margin: 0 auto; padding: 24px 16px; }
     .page { display: none; }
     .page.active { display: block; }
@@ -156,6 +158,8 @@
     .history-status { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
     .status-pending { background: #FFF8E1; color: #E65100; }
     .status-closed { background: #F5F5F5; color: #999; }
+    .status-rejected { background: #FFF0F0; color: #C0392B; }
+    .status-approved { background: #E8F5E9; color: #2E7D32; }
     .fav-card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1.5px solid #EDE6D8; box-shadow: 0 2px 6px rgba(0,0,0,0.05); position: relative; }
     .fav-remove { position: absolute; top: 12px; left: 12px; background: none; border: none; cursor: pointer; font-size: 18px; color: #ccc; }
     .fav-remove:hover { color: #C0392B; }
@@ -275,9 +279,9 @@
 <nav class="nav">
   <button class="nav-tab active" onclick="showTab('browse', this)">🔍 עצים</button>
   <button class="nav-tab" onclick="showTab('favorites', this)">⭐ מועדפים</button>
-  <button class="nav-tab" onclick="showTab('history', this)">📜 היסטוריה</button>
+  <button class="nav-tab" onclick="showTab('history', this)">📬 הודעות<span id="messages-badge" class="nav-badge hidden">0</span></button>
   <button class="nav-tab" onclick="showTab('owner', this)">🌱 הוסף עץ</button>
-  <button class="nav-tab" onclick="showTab('dashboard', this)">📋 ניהול</button>
+  <button class="nav-tab" onclick="showTab('dashboard', this)">📋 ניהול<span id="dashboard-badge" class="nav-badge hidden">0</span></button>
 </nav>
 
 <main class="main">
@@ -923,6 +927,7 @@
     loadTrees();
     updateOwnerForm();
     renderAvatar();
+    startPeriodicSync();
   }
 
   function refreshUserMeta() {
@@ -952,6 +957,7 @@
     clearSession();
     currentUser = null;
     isGuest = false;
+    stopPeriodicSync();
     document.getElementById("main-app").style.display = "none";
     document.getElementById("auth-page").style.display = "block";
   }
@@ -1049,6 +1055,11 @@
       updateStats();
       populateOwnerCityDropdown();
       updateTierLimitBanner();
+      syncMessagesStatuses();
+      updateDashboardBadge();
+      // אם ההודעות/הניהול פתוחים כרגע — רענן את התוכן בלי לאבד את מיקום הגלילה
+      const historyPage = document.getElementById("page-history");
+      if (historyPage && historyPage.classList.contains("active")) renderHistory();
     } catch(e) { showToast("שגיאה בטעינת הנתונים", true); }
   }
 
@@ -1243,9 +1254,9 @@
     document.getElementById("page-" + name).classList.add("active");
     el.classList.add("active");
     if (name === "owner") { autofillOwnerForm(); populateOwnerCityDropdown(); updateTierLimitBanner(); }
-    if (name === "dashboard") { populateNotifyCityDropdown(); renderAvatar(); }
+    if (name === "dashboard") { populateNotifyCityDropdown(); renderAvatar(); markDashboardAsSeen(); }
     if (name === "favorites") { renderFavorites(); }
-    if (name === "history") { renderHistory(); }
+    if (name === "history") { renderHistory(); markMessagesAsRead(); }
   }
 
   function updateOwnerNeighborhoods() {
@@ -1328,7 +1339,8 @@
     const msg = document.getElementById("r-msg").value.trim();
     if (!name || !phone || !email) { showToast("נא למלא שם, טלפון ואימייל", true); return; }
     try {
-      await sbFetch("requests", { method: "POST", body: JSON.stringify({ tree_id: currentTreeId, requester_name: name, phone, requester_email: email, message: msg, status: "pending" }) });
+      const created = await sbFetch("requests", { method: "POST", body: JSON.stringify({ tree_id: currentTreeId, requester_name: name, phone, requester_email: email, message: msg, status: "pending" }) });
+      const newRequestId = (created && created[0] && created[0].id) ? created[0].id : null;
       const tree = trees.find(t => t.id === currentTreeId);
       const ownerEmail = tree && (tree.owner_email || tree.owner_email_fallback);
       if (tree && ownerEmail) {
@@ -1343,13 +1355,14 @@
               address: tree.address,
               requester_name: name,
               requester_phone: phone,
+              requester_email: email,
               message: msg
             })
           });
         } catch(emailErr) { console.log("email error:", emailErr); }
       }
       const reqTree = trees.find(function(t){return t.id === currentTreeId;});
-      if (reqTree) addToHistory(reqTree, name, phone, msg);
+      if (reqTree) addToHistory(reqTree, name, phone, msg, newRequestId);
       closeModal();
       await loadTrees();
       renderHistory();
@@ -1649,7 +1662,7 @@
     const btn = document.querySelector(".edit-filters-btn");
     const hasCities = currentUser && currentUser.notify_cities && currentUser.notify_cities.length > 0;
     if (editor) {
-      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ סגור עורך"; }
+      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ בחר תמונה"; }
       else { editor.classList.remove("open"); if (btn) btn.textContent = "✏️ ערוך הגדרות"; }
     }
     const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
@@ -1854,14 +1867,25 @@
     }).join("");
   }
 
-  // ===== HISTORY =====
+  // ===== MESSAGES (was HISTORY) =====
+  const MSG_STATUS_LABELS = {
+    pending: { text: "ממתין לתשובה", cls: "status-pending" },
+    rejected: { text: "נדחתה", cls: "status-rejected" },
+    approved_no_share: { text: "אושרה — ממתין לתיאום במייל", cls: "status-approved" },
+    approved_shared: { text: "אושרה — פרטי קשר שותפו", cls: "status-approved" }
+  };
+
   function getHistory() {
     try { return JSON.parse(localStorage.getItem("prishare_history") || "[]"); } catch(e) { return []; }
   }
-  function addToHistory(tree, reqName, reqPhone, reqMsg) {
+  function saveHistory(history) {
+    localStorage.setItem("prishare_history", JSON.stringify(history));
+  }
+  function addToHistory(tree, reqName, reqPhone, reqMsg, requestId) {
     var history = getHistory();
     history.unshift({
       id: Date.now(),
+      requestId: requestId || null,
       treeId: tree.id,
       fruit: getFruitName(tree.fruit),
       fruitEmoji: getFruitEmoji(tree.fruit),
@@ -1874,29 +1898,69 @@
       requesterPhone: reqPhone,
       message: reqMsg,
       date: new Date().toLocaleDateString("he-IL"),
-      status: "pending"
+      status: "pending",
+      unread: false
     });
     if (history.length > 50) history = history.slice(0, 50);
-    localStorage.setItem("prishare_history", JSON.stringify(history));
+    saveHistory(history);
   }
+
+  // משווה את הסטטוס השמור מקומית מול הסטטוס האמיתי מה-DB (מגיע כבר בתוך trees[].requests)
+  // אם השתנה — מסמן כ"לא נקרא" ומעדכן.
+  function syncMessagesStatuses() {
+    var history = getHistory();
+    if (!history.length) return;
+    var changed = false;
+    history.forEach(function(item) {
+      if (!item.requestId) return;
+      var tree = trees.find(function(t){ return t.id === item.treeId; });
+      var req = tree && tree.requests ? tree.requests.find(function(r){ return r.id === item.requestId; }) : null;
+      if (req && req.status && req.status !== item.status) {
+        item.status = req.status;
+        item.unread = true;
+        changed = true;
+      }
+    });
+    if (changed) saveHistory(history);
+    updateMessagesBadge();
+  }
+
+  function updateMessagesBadge() {
+    var history = getHistory();
+    var unreadCount = history.filter(function(h){ return h.unread; }).length;
+    var badge = document.getElementById("messages-badge");
+    if (!badge) return;
+    if (unreadCount > 0) { badge.textContent = unreadCount > 9 ? "9+" : unreadCount; badge.classList.remove("hidden"); }
+    else { badge.classList.add("hidden"); }
+  }
+
+  function markMessagesAsRead() {
+    var history = getHistory();
+    var changed = false;
+    history.forEach(function(h){ if (h.unread) { h.unread = false; changed = true; } });
+    if (changed) saveHistory(history);
+    updateMessagesBadge();
+  }
+
   function renderHistory() {
     var el = document.getElementById("history-list");
     if (!el) return;
     var history = getHistory();
     if (history.length === 0) {
-      el.innerHTML = '<div class="empty"><div class="empty-icon">📜</div><div class="empty-text">אין היסטוריית הזמנות</div><div class="empty-sub">בקשות קטיף שתשלח יופיעו כאן</div></div>';
+      el.innerHTML = '<div class="empty"><div class="empty-icon">📬</div><div class="empty-text">אין הודעות</div><div class="empty-sub">בקשות קטיף שתשלח יופיעו כאן, כולל עדכוני סטטוס</div></div>';
       return;
     }
     el.innerHTML = history.map(function(item) {
-      return '<div class="history-item">' +
+      var statusInfo = MSG_STATUS_LABELS[item.status] || MSG_STATUS_LABELS.pending;
+      return '<div class="history-item" style="' + (item.unread ? 'border-color:#2C6E35;box-shadow:0 0 0 2px rgba(44,110,53,0.12)' : '') + '">' +
         '<div class="history-item-header">' +
-          '<div class="history-fruit">' + item.fruitEmoji + ' ' + item.fruit + '</div>' +
+          '<div class="history-fruit">' + item.fruitEmoji + ' ' + item.fruit + (item.unread ? ' <span style="width:8px;height:8px;background:#E74C3C;border-radius:50%;display:inline-block"></span>' : '') + '</div>' +
           '<div style="display:flex;align-items:center;gap:8px">' +
-            '<span class="history-status ' + (item.status==="pending"?"status-pending":"status-closed") + '">' + (item.status==="pending"?"ממתין":"נסגר") + '</span>' +
+            '<span class="history-status ' + statusInfo.cls + '">' + statusInfo.text + '</span>' +
             '<span class="history-date">' + item.date + '</span>' +
           '</div>' +
         '</div>' +
-        '<div style="font-size:13px;color:#555;margin-bottom:4px">👤 ' + item.ownerName + (item.ownerPhone ? ' · 📞 <a href="tel:'+item.ownerPhone+'" style="color:#2C6E35">'+item.ownerPhone+'</a>' : '') + '</div>' +
+        '<div style="font-size:13px;color:#555;margin-bottom:4px">👤 ' + item.ownerName + ((item.status === "approved_shared" && item.ownerPhone) ? ' · 📞 <a href="tel:'+item.ownerPhone+'" style="color:#2C6E35">'+item.ownerPhone+'</a>' : '') + '</div>' +
         '<div style="font-size:13px;color:#888">📍 ' + [item.neighborhood,item.city,item.address].filter(Boolean).join(", ") + '</div>' +
         (item.message ? '<div style="font-size:12px;color:#aaa;margin-top:4px">הערה: ' + item.message + '</div>' : '') +
         '<button class="btn btn-danger btn-sm" style="margin-top:10px" onclick="removeHistory(' + item.id + ')">הסר</button>' +
@@ -1905,8 +1969,54 @@
   }
   function removeHistory(id) {
     var history = getHistory().filter(function(h){ return h.id !== id; });
-    localStorage.setItem("prishare_history", JSON.stringify(history));
+    saveHistory(history);
     renderHistory();
+    updateMessagesBadge();
+  }
+
+  // ===== DASHBOARD (owner) NEW-ACTIVITY BADGE =====
+  function getSeenRequestIds() {
+    try { return JSON.parse(localStorage.getItem("prishare_seen_requests") || "[]"); } catch(e) { return []; }
+  }
+  function updateDashboardBadge() {
+    var badge = document.getElementById("dashboard-badge");
+    if (!badge || !currentUser) return;
+    var seen = getSeenRequestIds();
+    var myTrees = trees.filter(function(t){ return t.user_id === currentUser.id; });
+    var unseenCount = 0;
+    myTrees.forEach(function(t) {
+      (t.requests || []).forEach(function(r) {
+        if (seen.indexOf(r.id) === -1) unseenCount++;
+      });
+    });
+    if (unseenCount > 0) { badge.textContent = unseenCount > 9 ? "9+" : unseenCount; badge.classList.remove("hidden"); }
+    else { badge.classList.add("hidden"); }
+  }
+  function markDashboardAsSeen() {
+    if (!currentUser) return;
+    var myTrees = trees.filter(function(t){ return t.user_id === currentUser.id; });
+    var seen = getSeenRequestIds();
+    myTrees.forEach(function(t) {
+      (t.requests || []).forEach(function(r) {
+        if (seen.indexOf(r.id) === -1) seen.push(r.id);
+      });
+    });
+    localStorage.setItem("prishare_seen_requests", JSON.stringify(seen));
+    updateDashboardBadge();
+  }
+
+  // ===== PERIODIC SYNC =====
+  let syncIntervalId = null;
+  function startPeriodicSync() {
+    if (syncIntervalId) clearInterval(syncIntervalId);
+    syncIntervalId = setInterval(function() {
+      if (currentUser && !isGuest && document.getElementById("main-app").style.display !== "none") {
+        loadTrees();
+      }
+    }, 45000); // כל 45 שניות
+  }
+  function stopPeriodicSync() {
+    if (syncIntervalId) { clearInterval(syncIntervalId); syncIntervalId = null; }
   }
 
   function showToast(msg, isError = false) {
@@ -1943,6 +2053,7 @@
     loadTrees();
     updateOwnerForm();
     renderAvatar();
+    startPeriodicSync();
   }
 
   });
