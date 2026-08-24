@@ -1649,7 +1649,7 @@
     const btn = document.querySelector(".edit-filters-btn");
     const hasCities = currentUser && currentUser.notify_cities && currentUser.notify_cities.length > 0;
     if (editor) {
-      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ סגור עורך"; }
+      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ בחר תמונה"; }
       else { editor.classList.remove("open"); if (btn) btn.textContent = "✏️ ערוך הגדרות"; }
     }
     const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
