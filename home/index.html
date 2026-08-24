@@ -1478,23 +1478,36 @@
       const tree = trees.find(function(t){ return t.id === treeId; });
       const req = tree && tree.requests ? tree.requests.find(function(r){ return r.id === requestId; }) : null;
       await sbFetch("requests?id=eq." + requestId, { method: "PATCH", body: JSON.stringify({ status: status }) });
+      let emailSent = true;
       if (tree && req && req.requester_email) {
-        fetch(REQUESTER_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
-          body: JSON.stringify({
-            requester_email: req.requester_email,
-            requester_name: req.requester_name,
-            owner_name: tree.owner_name,
-            owner_phone: status === "approved_shared" ? tree.owner_phone : "",
-            fruit: getFruitName(tree.fruit),
-            address: tree.address,
-            decision: status
-          })
-        }).catch(function(e){ console.log("notify-requester error:", e); });
+        try {
+          const emailRes = await fetch(REQUESTER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SUPABASE_KEY, "apikey": SUPABASE_KEY },
+            body: JSON.stringify({
+              requester_email: req.requester_email,
+              requester_name: req.requester_name,
+              owner_name: tree.owner_name,
+              owner_phone: status === "approved_shared" ? tree.owner_phone : "",
+              fruit: getFruitName(tree.fruit),
+              address: tree.address,
+              decision: status
+            })
+          });
+          if (!emailRes.ok) {
+            const errText = await emailRes.text();
+            console.error("notify-requester failed:", emailRes.status, errText);
+            emailSent = false;
+          }
+        } catch(emailErr) {
+          console.error("notify-requester network error:", emailErr);
+          emailSent = false;
+        }
+      } else {
+        emailSent = false;
       }
       await loadTrees();
-      showToast(toastMsg);
+      showToast(emailSent ? toastMsg : (toastMsg + " (⚠️ שליחת המייל נכשלה, בדוק בהמשך)"), !emailSent);
     } catch(e) { showToast("שגיאה בעדכון הבקשה", true); }
   }
 
