@@ -1215,18 +1215,27 @@
           (tree.description ? '<div style="font-size:13px;color:#555;margin-bottom:10px;line-height:1.5">' + tree.description + '</div>' : '') +
           (!(tree.requests && tree.requests.length)
             ? '<div style="font-size:13px;color:#bbb;padding:8px 0">עדיין אין בקשות קטיף</div>'
-            : tree.requests.map(req => {
+            : (function() {
+                const seenIds = getSeenRequestIds();
+                const sortedRequests = tree.requests.slice().sort(function(a, b) {
+                  const aNew = seenIds.indexOf(a.id) === -1;
+                  const bNew = seenIds.indexOf(b.id) === -1;
+                  if (aNew !== bNew) return aNew ? -1 : 1; // חדשות קודם
+                  return new Date(b.created_at || 0) - new Date(a.created_at || 0); // ואז מהחדש לישן
+                });
+                return sortedRequests.map(req => {
                 const status = req.status || "pending";
+                const isNew = seenIds.indexOf(req.id) === -1;
                 const statusLabels = {
                   pending: "",
                   rejected: '<span style="background:#FFF0F0;color:#C0392B;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">❌ נדחתה</span>',
                   approved_no_share: '<span style="background:#FFF8E1;color:#E65100;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">✅ אושרה — תיאום במייל</span>',
                   approved_shared: '<span style="background:#E8F5E9;color:#2E7D32;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">✅ אושרה — טלפון שותף</span>'
                 };
-                return '<div class="request-item" style="align-items:flex-start;flex-direction:column">' +
+                return '<div class="request-item" style="align-items:flex-start;flex-direction:column;' + (isNew ? 'border-color:#2C6E35;box-shadow:0 0 0 2px rgba(44,110,53,0.12)' : '') + '">' +
                   '<div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;gap:8px">' +
                     '<div>' +
-                      '<div class="request-name">🌿 ' + req.requester_name + '</div>' +
+                      '<div class="request-name">🌿 ' + req.requester_name + (isNew ? ' <span style="width:7px;height:7px;background:#E74C3C;border-radius:50%;display:inline-block"></span>' : '') + '</div>' +
                       (req.message ? '<div class="request-msg">"' + req.message + '"</div>' : '') +
                       '<div class="request-phone">📞 ' + req.phone + (req.requester_email ? ' · ✉️ ' + req.requester_email : '') + '</div>' +
                     '</div>' +
@@ -1238,9 +1247,10 @@
                       '<button class="btn btn-sm" style="flex:1;justify-content:center;background:#FFF8E1;color:#E65100;border:1px solid #FFE082" onclick="approveRequestNoShare(\'' + req.id + '\',\'' + tree.id + '\')">✉️ אשר במייל</button>' +
                       '<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="approveRequestShare(\'' + req.id + '\',\'' + tree.id + '\')">📞 אשר ושתף</button>' +
                     '</div>'
-                  : '') +
+                  : '<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="deleteRequest(\'' + req.id + '\')">🗑️ הסר מהרשימה</button>') +
                 '</div>';
-              }).join("")
+                }).join("");
+              })()
           ) +
         '</div>' +
       '</div>'
@@ -1662,7 +1672,7 @@
     const btn = document.querySelector(".edit-filters-btn");
     const hasCities = currentUser && currentUser.notify_cities && currentUser.notify_cities.length > 0;
     if (editor) {
-      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ בחר תמןנה"; }
+      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ סגור עורך"; }
       else { editor.classList.remove("open"); if (btn) btn.textContent = "✏️ ערוך הגדרות"; }
     }
     const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
@@ -1945,7 +1955,10 @@
   function renderHistory() {
     var el = document.getElementById("history-list");
     if (!el) return;
-    var history = getHistory();
+    var history = getHistory().slice().sort(function(a, b) {
+      if (!!a.unread !== !!b.unread) return a.unread ? -1 : 1; // לא-נקראות קודם
+      return 0; // שומר על סדר היצירה הקיים (חדש לישן, כי הרשומות נוספות עם unshift)
+    });
     if (history.length === 0) {
       el.innerHTML = '<div class="empty"><div class="empty-icon">📬</div><div class="empty-text">אין הודעות</div><div class="empty-sub">בקשות קטיף שתשלח יופיעו כאן, כולל עדכוני סטטוס</div></div>';
       return;
