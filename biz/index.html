@@ -1675,7 +1675,7 @@
     const btn = document.querySelector(".edit-filters-btn");
     const hasCities = currentUser && currentUser.notify_cities && currentUser.notify_cities.length > 0;
     if (editor) {
-      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ סגור עורך"; }
+      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ החלפת תמונה"; }
       else { editor.classList.remove("open"); if (btn) btn.textContent = "✏️ ערוך הגדרות"; }
     }
     const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
@@ -2040,12 +2040,17 @@
 
   // נקרא מתוך MainActivity.kt ברגע שיש FCM token זמין (עשוי לקרות לפני שהמשתמש מחובר)
   window.onNativePushToken = function(token) {
+    console.log("onNativePushToken called! token length:", token ? token.length : 0);
     pendingPushToken = token;
     registerPushTokenIfPossible();
   };
 
   async function registerPushTokenIfPossible() {
-    if (!pendingPushToken || !currentUser || isGuest || !currentUser.token) return;
+    console.log("registerPushTokenIfPossible: pendingPushToken=" + (pendingPushToken ? "yes" : "no") + " currentUser=" + (currentUser ? "yes" : "no") + " isGuest=" + isGuest);
+    if (!pendingPushToken || !currentUser || isGuest || !currentUser.token) {
+      console.log("registerPushTokenIfPossible: skipped, conditions not met");
+      return;
+    }
     try {
       const res = await fetch(SUPABASE_URL + "/rest/v1/push_tokens?on_conflict=token", {
         method: "POST",
