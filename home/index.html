@@ -550,6 +550,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  console.log("PRISHARE_DEBUG_CANARY_V2_LOADED " + new Date().toISOString());
   const SUPABASE_URL = "https://obrmyjygitkbaipqdcqb.supabase.co";
   const SUPABASE_KEY = "sb_publishable_UxLyGsF4PlFOIF3OXJgbSg_hh5MA_oM";
   const FUNCTION_URL = SUPABASE_URL + "/functions/v1/notify-owner";
@@ -1675,7 +1676,7 @@
     const btn = document.querySelector(".edit-filters-btn");
     const hasCities = currentUser && currentUser.notify_cities && currentUser.notify_cities.length > 0;
     if (editor) {
-      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ החלפת תמונה"; }
+      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ סגור עורך"; }
       else { editor.classList.remove("open"); if (btn) btn.textContent = "✏️ ערוך הגדרות"; }
     }
     const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
