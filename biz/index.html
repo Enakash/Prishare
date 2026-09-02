@@ -174,6 +174,11 @@
     .avatar-placeholder { width: 80px; height: 80px; border-radius: 50%; background: #EEF7EE; color: #2C6E35; font-size: 32px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .filter-bar { flex-direction: column; } }
   </style>
+  <meta name="appleid-signin-client-id" content="store.prishare.home.web" />
+  <meta name="appleid-signin-scope" content="name email" />
+  <meta name="appleid-signin-redirect-uri" content="https://enakash.github.io/Prishare/biz/" />
+  <meta name="appleid-signin-state" content="prishare" />
+  <meta name="appleid-signin-use-popup" content="true" />
 </head>
 <body>
 
@@ -184,6 +189,9 @@
       <div class="auth-logo"><span>🌳</span></div>
       <div class="auth-title">פירות השכונה</div>
       <div class="auth-sub">שיתוף פירות בין שכנים</div>
+      <div style="display:flex;justify-content:center;margin-bottom:14px">
+        <div id="appleid-signin" data-color="black" data-border="false" data-type="continue" data-width="280" data-height="40" data-border-radius="10"></div>
+      </div>
       <div class="auth-tabs">
         <button class="auth-tab active" onclick="switchAuthTab('login')">התחברות</button>
         <button class="auth-tab" onclick="switchAuthTab('signup')">הרשמה</button>
@@ -192,10 +200,6 @@
         <button class="btn btn-google" onclick="doGoogleLogin()">
           <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           התחבר עם Google
-        </button>
-        <button class="btn btn-apple" onclick="doAppleLogin()">
-          <svg width="18" height="18" viewBox="0 0 384 512" fill="#fff"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141 4 184.8 4 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
-          התחבר עם Apple
         </button>
         <div class="divider">או</div>
         <div class="form-row">
@@ -219,10 +223,6 @@
         <button class="btn btn-google" onclick="doGoogleLogin()">
           <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           הירשם עם Google
-        </button>
-        <button class="btn btn-apple" onclick="doAppleLogin()">
-          <svg width="18" height="18" viewBox="0 0 384 512" fill="#fff"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141 4 184.8 4 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
-          הירשם עם Apple
         </button>
         <div class="divider">או</div>
         <div class="form-row">
@@ -550,6 +550,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  console.log("PRISHARE_DEBUG_CANARY_V2_LOADED " + new Date().toISOString());
   const SUPABASE_URL = "https://obrmyjygitkbaipqdcqb.supabase.co";
   const SUPABASE_KEY = "sb_publishable_UxLyGsF4PlFOIF3OXJgbSg_hh5MA_oM";
   const FUNCTION_URL = SUPABASE_URL + "/functions/v1/notify-owner";
@@ -790,19 +791,51 @@
     }
   }
 
-  // ===== APPLE AUTH =====
-  async function doAppleLogin() {
+  // ===== APPLE AUTH (Sign in with Apple JS - official rendered button) =====
+  async function handleAppleIdToken(idToken, fullName) {
     try {
-      const res = await fetch(SUPABASE_URL + "/auth/v1/authorize?provider=apple&redirect_to=" + encodeURIComponent(window.location.href), {
-        headers: { "apikey": SUPABASE_KEY }
+      const res = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=id_token", {
+        method: "POST",
+        headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "apple", id_token: idToken })
       });
-      const { url } = await res.json();
-      if (url) window.location.href = url;
-      else window.location.href = SUPABASE_URL + "/auth/v1/authorize?provider=apple&redirect_to=" + encodeURIComponent(window.location.href);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error_description || data.msg || "שגיאה בהתחברות עם Apple");
+      currentUser = {
+        id: data.user.id,
+        email: data.user.email,
+        name: fullName || data.user.user_metadata?.full_name || data.user.user_metadata?.name || (data.user.email ? data.user.email.split("@")[0] : "משתמש Apple"),
+        phone: data.user.user_metadata?.phone || "",
+        avatar_url: data.user.user_metadata?.avatar_url || "",
+        provider: "apple",
+        notify_new_trees: data.user.user_metadata?.notify_new_trees || false,
+        notify_cities: data.user.user_metadata?.notify_cities || [],
+        notify_neighborhoods: data.user.user_metadata?.notify_neighborhoods || [],
+        notify_fruits: data.user.user_metadata?.notify_fruits || [],
+        token: data.access_token,
+        refresh_token: data.refresh_token
+      };
+      isGuest = false;
+      saveSession(currentUser);
+      enterApp();
     } catch(e) {
-      window.location.href = SUPABASE_URL + "/auth/v1/authorize?provider=apple&redirect_to=" + encodeURIComponent(window.location.href);
+      showToast(e.message || "שגיאה בהתחברות עם Apple", true);
     }
   }
+
+  document.addEventListener("AppleIDSignInOnSuccess", function(event) {
+    const authData = event.detail && event.detail.authorization;
+    const idToken = authData && authData.id_token;
+    const fullNameObj = event.detail && event.detail.user && event.detail.user.name;
+    const fullName = fullNameObj ? [fullNameObj.firstName, fullNameObj.lastName].filter(Boolean).join(" ") : null;
+    if (idToken) handleAppleIdToken(idToken, fullName);
+    else showToast("שגיאה בהתחברות עם Apple", true);
+  });
+
+  document.addEventListener("AppleIDSignInOnFailure", function(event) {
+    console.error("Apple sign in failed:", event.detail);
+    // המשתמש ביטל את ההתחברות - לא מציגים שגיאה מפריעה
+  });
 
   // ===== AUTH =====
   async function sbAuth(path, body) {
@@ -1675,7 +1708,7 @@
     const btn = document.querySelector(".edit-filters-btn");
     const hasCities = currentUser && currentUser.notify_cities && currentUser.notify_cities.length > 0;
     if (editor) {
-      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ החלפת תמונה"; }
+      if (!hasCities) { editor.classList.add("open"); if (btn) btn.textContent = "✖ סגור עורך"; }
       else { editor.classList.remove("open"); if (btn) btn.textContent = "✏️ ערוך הגדרות"; }
     }
     const savedCities = currentUser ? (currentUser.notify_cities || []) : [];
@@ -2125,5 +2158,6 @@
     tierBadgeEl.style.background = TIER_COLORS[APP_TIER];
   }
 </script>
+<script async defer src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
 </body>
 </html>
