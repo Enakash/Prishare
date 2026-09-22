@@ -1080,9 +1080,24 @@
     return text ? JSON.parse(text) : null;
   }
 
+  var ownerBlocklistMap = {}; // requester_email -> 'blocked' | 'muted', עבור המשתמש המחובר בתור בעל עץ
+
+  async function loadOwnerBlocklist() {
+    if (!currentUser || isGuest || !currentUser.token) { ownerBlocklistMap = {}; return; }
+    try {
+      const rows = await fetch(SUPABASE_URL + "/rest/v1/owner_blocklist?owner_user_id=eq." + currentUser.id + "&select=requester_email,action", {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + currentUser.token }
+      }).then(r => r.ok ? r.json() : []);
+      const map = {};
+      (rows || []).forEach(function(row) { map[row.requester_email] = row.action; });
+      ownerBlocklistMap = map;
+    } catch(e) { console.error("loadOwnerBlocklist error:", e); }
+  }
+
   async function loadTrees() {
     try {
       trees = await sbFetch("trees?select=*,requests(*)&order=created_at.desc") || [];
+      await loadOwnerBlocklist();
       buildFilters();
       applyFilters();
       renderDashboard();
@@ -1266,10 +1281,16 @@
                   approved_no_share: '<span style="background:#FFF8E1;color:#E65100;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">✅ אושרה — תיאום במייל</span>',
                   approved_shared: '<span style="background:#E8F5E9;color:#2E7D32;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">✅ אושרה — טלפון שותף</span>'
                 };
+                const blockStatus = req.requester_email ? ownerBlocklistMap[req.requester_email] : null;
+                const blockBadge = blockStatus === "blocked"
+                  ? '<span style="background:#4A1515;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-inline-start:6px">🚫 חסום</span>'
+                  : (blockStatus === "muted"
+                    ? '<span style="background:#555;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-inline-start:6px">🔇 מושתק</span>'
+                    : '');
                 return '<div class="request-item" style="align-items:flex-start;flex-direction:column;' + (isNew ? 'border-color:#2C6E35;box-shadow:0 0 0 2px rgba(44,110,53,0.12)' : '') + '">' +
                   '<div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;gap:8px">' +
                     '<div>' +
-                      '<div class="request-name">🌿 ' + req.requester_name + (isNew ? ' <span style="width:7px;height:7px;background:#E74C3C;border-radius:50%;display:inline-block"></span>' : '') + '</div>' +
+                      '<div class="request-name">🌿 ' + req.requester_name + (isNew ? ' <span style="width:7px;height:7px;background:#E74C3C;border-radius:50%;display:inline-block"></span>' : '') + blockBadge + '</div>' +
                       (req.message ? '<div class="request-msg">"' + req.message + '"</div>' : '') +
                       '<div class="request-phone">📞 ' + req.phone + (req.requester_email ? ' · ✉️ ' + req.requester_email : '') + '</div>' +
                     '</div>' +
@@ -1284,8 +1305,12 @@
                   : '<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="deleteRequest(\'' + req.id + '\')">🗑️ הסר מהרשימה</button>') +
                   (req.requester_email ?
                     '<div style="display:flex;gap:6px;margin-top:6px;width:100%">' +
-                      '<button class="btn btn-sm" style="flex:1;justify-content:center;background:#F5F5F5;color:#666;border:1px solid #ddd;font-size:11px" onclick="muteRequester(\'' + tree.user_id + '\',\'' + req.requester_email + '\')">🔇 השתק שולח זה</button>' +
-                      '<button class="btn btn-sm" style="flex:1;justify-content:center;background:#FFF0F0;color:#C0392B;border:1px solid #FFCDD2;font-size:11px" onclick="blockRequester(\'' + tree.user_id + '\',\'' + req.requester_email + '\')">🚫 חסום שולח זה</button>' +
+                      (blockStatus === "muted"
+                        ? '<button class="btn btn-sm" style="flex:1;justify-content:center;background:#E8F5E9;color:#2E7D32;border:1px solid #C8E0C8;font-size:11px" onclick="unsetRequesterStatus(\'' + tree.user_id + '\',\'' + req.requester_email + '\')">✅ בטל השתקה</button>'
+                        : '<button class="btn btn-sm" style="flex:1;justify-content:center;background:#F5F5F5;color:#666;border:1px solid #ddd;font-size:11px" onclick="muteRequester(\'' + tree.user_id + '\',\'' + req.requester_email + '\')">🔇 השתק שולח זה</button>') +
+                      (blockStatus === "blocked"
+                        ? '<button class="btn btn-sm" style="flex:1;justify-content:center;background:#E8F5E9;color:#2E7D32;border:1px solid #C8E0C8;font-size:11px" onclick="unsetRequesterStatus(\'' + tree.user_id + '\',\'' + req.requester_email + '\')">✅ בטל חסימה</button>'
+                        : '<button class="btn btn-sm" style="flex:1;justify-content:center;background:#FFF0F0;color:#C0392B;border:1px solid #FFCDD2;font-size:11px" onclick="blockRequester(\'' + tree.user_id + '\',\'' + req.requester_email + '\')">🚫 חסום שולח זה</button>') +
                     '</div>'
                   : '') +
                 '</div>';
@@ -1468,7 +1493,31 @@
         showToast("שגיאה בעדכון", true);
         return;
       }
+      ownerBlocklistMap[requesterEmail] = action;
+      renderDashboard();
       showToast(action === "blocked" ? "✅ המבקש נחסם" : "✅ המבקש הושתק");
+    } catch(e) {
+      showToast("שגיאה בעדכון", true);
+    }
+  }
+
+  async function unsetRequesterStatus(ownerUserId, requesterEmail) {
+    try {
+      const res = await fetch(SUPABASE_URL + "/rest/v1/owner_blocklist?owner_user_id=eq." + ownerUserId + "&requester_email=eq." + encodeURIComponent(requesterEmail), {
+        method: "DELETE",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + currentUser.token,
+          "Prefer": "return=minimal"
+        }
+      });
+      if (!res.ok) {
+        showToast("שגיאה בעדכון", true);
+        return;
+      }
+      delete ownerBlocklistMap[requesterEmail];
+      renderDashboard();
+      showToast("✅ ההגבלה בוטלה");
     } catch(e) {
       showToast("שגיאה בעדכון", true);
     }
