@@ -2096,8 +2096,7 @@
         body: JSON.stringify({
           user_id: currentUser.id,
           token: pendingPushToken,
-          platform: "android",
-          updated_at: new Date().toISOString()
+          platform: "android"
         })
       });
       if (!res.ok) {
